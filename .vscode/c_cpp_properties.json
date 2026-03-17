@@ -1,0 +1,41 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/src",
+                "${workspaceFolder}/src/core",
+                "${workspaceFolder}/src/core/crypto",
+                "${workspaceFolder}/src/database",
+                "${workspaceFolder}/src/gui",
+                "/usr/local/include/wx-3.2",
+                "/usr/local/lib/wx/include/gtk3-unicode-static-3.2",
+                "/usr/include/gtest", // ← Добавлено
+                "/usr/include/gtest/internal", // ← Добавлено
+                "/usr/src/googletest/googletest/include" // ← Добавлено (на всякий случай)
+            ],
+            "defines": [
+                "_FILE_OFFSET_BITS=64",
+                "__WXGTK__"
+            ],
+            "compilerPath": "/usr/bin/g++",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-x64",
+            "compilerArgs": [
+                "-pthread"
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/src",
+                    "/usr/local/include/wx-3.2",
+                    "/usr/local/lib/wx/include/gtk3-unicode-static-3.2",
+                    "/usr/include/gtest", // ← Добавлено
+                    "/usr/src/googletest/googletest/include" // ← Добавлено
+                ],
+                "limitSymbolsToIncludedHeaders": false
+            }
+        }
+    ],
+    "version": 4
+}
