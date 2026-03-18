@@ -232,12 +232,21 @@ void Database::runMigrations(int current_version)
 
   char *errMsg = nullptr;
 
-  // Миграция с 1 на 2 (для будущих спринтов)
-  if (current_version < 2 && CURRENT_VERSION >= 2)
+  // Миграция с 1 на 2
+  if (current_version < 2)
   {
-    /*
-        STUB
-    */
+    int rc =
+        sqlite3_exec(conn, MIGRATE_TO_V2.c_str(), nullptr, nullptr, &errMsg);
+
+    if (rc != SQLITE_OK)
+    {
+      std::cerr << "Migration failed: " << errMsg << std::endl;
+      sqlite3_free(errMsg);
+    }
+    else
+    {
+      std::cout << "Migration completed successfully" << std::endl;
+    }
   }
 
   releaseConnection(conn);
