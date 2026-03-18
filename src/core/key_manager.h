@@ -1,48 +1,128 @@
 #ifndef KEY_MANAGER_H
 #define KEY_MANAGER_H
 
+#include <chrono>
+#include <cstddef>
 #include <cstdint>
-#include <string>
+#include <mutex>
+#include <optional>
+#include <thread>
 #include <vector>
 
-namespace Crypto
-{
 class KeyManager
 {
-  std::vector<uint8_t> current_key;
+private:
+  std::unique_ptr<uint8_t[]> key;
+  size_t key_size;
+  std::chrono::steady_clock::time_point last_activity;
+  bool is_unlocked;
+  bool is_active;
+  std::mutex mutex;
+
+  void zero_memory()
+  {
+    volatile uint8_t *data = key.get();
+    for (size_t i = 0; i < key_size; i++)
+    {
+      data[i] = 0;
+    }
+    key.reset();
+    key_size = 0;
+  }
 
 public:
-  // заглушка для derive_key
-  std::vector<uint8_t> derive_key(const std::string &password,
-                                  const std::vector<uint8_t> &salt)
+  struct KeyData
   {
+    uint8_t *data;
+    size_t size;
+  };
 
-    // Просто копируем пароль в вектор байт
-    std::vector<uint8_t> key(password.begin(), password.end());
+  KeyManager() : is_unlocked(false), is_active(true) {}
 
-    // Добиваем до 32 байт нулями (для имитации 256-битного ключа)
-    key.resize(32, 0);
+  // Сохранить ключ
+  void store_key(std::vector<uint8_t> &source)
+  {
+    std::lock_guard<std::mutex> lock(mutex);
 
-    return key;
+    zero_memory(); // очищаем старый ключ
+
+    // Забираем память у вектора
+    key_size = source.size();
+    key = std::make_unique<uint8_t[]>(key_size);
+    std::copy(source.begin(), source.end(), key.get());
+
+    // Зануляем источник
+    volatile uint8_t *src_data = source.data();
+    for (size_t i = 0; i < source.size(); i++)
+    {
+      src_data[i] = 0;
+    }
+    source.clear();
+
+    last_activity = std::chrono::steady_clock::now();
+    is_unlocked = true;
   }
 
-  // заглушка для store_key
-  bool store_key(const std::vector<uint8_t> &key,
-                 const std::string &identifier = "default")
+  // Получить ключ (если доступен)
+  void get_key(KeyData &d)
   {
-
-    // Просто сохраняем в памяти
-    current_key = key;
-
-    return true; // Всегда успешно
+    std::lock_guard<std::mutex> lock(mutex);
+    d.data = key.get();
+    d.size = key_size;
   }
 
-  // Пзаглушка для load_key
-  std::vector<uint8_t> load_key(const std::string &identifier = "default")
+  void zero_keyData(KeyData &d)
   {
-    return current_key; // Возвращаем последний сохраненный ключ
+    volatile uint8_t *data = d.data;
+    for (size_t i = 0; i < d.size; i++)
+    {
+      data[i] = 0;
+    }
+    d.size = 0;
   }
+
+  // Обновить активность
+  void update_activity()
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    last_activity = std::chrono::steady_clock::now();
+
+    auto now = std::chrono::steady_clock::now();
+    auto elapsed =
+        std::chrono::duration_cast<std::chrono::hours>(now - last_activity)
+            .count();
+
+    if (elapsed >= 1)
+    { // 1 час бездействия
+      zero_memory();
+    }
+  }
+
+  // Приложение свернулось/потеряло фокус
+  void on_app_inactive()
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    is_active = false;
+    zero_memory();
+    is_unlocked = false;
+  }
+
+  // Приложение активно
+  void on_app_active()
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    is_active = true;
+  }
+
+  // Выход из системы
+  void logout()
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    zero_memory();
+    is_unlocked = false;
+  }
+
+  ~KeyManager() { logout(); }
 };
-} // namespace Crypto
 
 #endif
