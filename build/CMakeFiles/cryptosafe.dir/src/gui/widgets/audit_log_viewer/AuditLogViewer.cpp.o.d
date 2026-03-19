@@ -3,7 +3,7 @@ CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o:
  /usr/include/stdc-predef.h \
  /home/master666/development/cryptosafe_password_manager/src/gui/widgets/audit_log_viewer/AuditLogViewer.h \
  /home/master666/development/cryptosafe_password_manager/src/../src/database/DB_helper/db_helper.h \
- /home/master666/development/cryptosafe_password_manager/src/../src/database/DBSchema.h \
+ /home/master666/development/cryptosafe_password_manager/src/../src/database/DB_helper/../DBSchema.h \
  /usr/include/c++/13/string /usr/include/c++/13/bits/requires_hosted.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \

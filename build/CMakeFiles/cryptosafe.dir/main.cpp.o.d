@@ -294,18 +294,121 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: \
  /usr/include/nlohmann/detail/macro_unscope.hpp \
  /usr/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
  /home/master666/development/cryptosafe_password_manager/src/database/DB_helper/db_helper.h \
- /home/master666/development/cryptosafe_password_manager/src/../src/database/DBSchema.h \
+ /home/master666/development/cryptosafe_password_manager/src/database/DB_helper/../DBSchema.h \
  /usr/include/c++/13/mutex /usr/include/c++/13/bits/std_mutex.h \
  /usr/include/c++/13/bits/unique_lock.h /usr/include/sqlite3.h \
  /home/master666/development/cryptosafe_password_manager/src/gui/MainWindow.h \
  /home/master666/development/cryptosafe_password_manager/src/../src/core/config_handler.h \
+ /home/master666/development/cryptosafe_password_manager/src/../src/core/events.h \
+ /usr/include/c++/13/chrono /usr/include/c++/13/thread \
+ /usr/include/c++/13/bits/std_thread.h \
+ /usr/include/c++/13/bits/this_thread_sleep.h \
+ /home/master666/development/cryptosafe_password_manager/src/../src/core/key_manager.h \
+ /usr/include/c++/13/optional \
  /home/master666/development/cryptosafe_password_manager/src/../src/database/DB_helper/db_helper.h \
- /home/master666/development/cryptosafe_password_manager/src/../src/gui/widgets/audit_log_viewer/AuditLogViewer.h \
- /usr/local/include/wx-3.2/wx/dialog.h \
- /usr/local/include/wx-3.2/wx/toplevel.h \
- /usr/local/include/wx-3.2/wx/nonownedwnd.h \
- /usr/local/include/wx-3.2/wx/window.h \
- /usr/local/include/wx-3.2/wx/event.h /usr/local/include/wx-3.2/wx/defs.h \
+ /home/master666/development/cryptosafe_password_manager/src/../src/gui/dialogs/login_dialog/LoginDialog.h \
+ /home/master666/development/cryptosafe_password_manager/src/core/../core/config_handler.h \
+ /home/master666/development/cryptosafe_password_manager/src/core/../core/crypto/authentication.h \
+ /usr/include/argon2.h /usr/lib/gcc/x86_64-linux-gnu/13/include/limits.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h \
+ /usr/include/limits.h /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/local_lim.h \
+ /usr/include/linux/limits.h \
+ /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/uio_lim.h /usr/include/sodium.h \
+ /usr/include/sodium/version.h /usr/include/sodium/export.h \
+ /usr/include/sodium/core.h /usr/include/sodium/crypto_aead_aes256gcm.h \
+ /usr/include/sodium/crypto_aead_chacha20poly1305.h \
+ /usr/include/sodium/crypto_aead_xchacha20poly1305.h \
+ /usr/include/sodium/crypto_auth.h \
+ /usr/include/sodium/crypto_auth_hmacsha512256.h \
+ /usr/include/sodium/crypto_auth_hmacsha512.h \
+ /usr/include/sodium/crypto_hash_sha512.h /usr/include/c++/13/stdlib.h \
+ /usr/include/sodium/crypto_auth_hmacsha256.h \
+ /usr/include/sodium/crypto_hash_sha256.h \
+ /usr/include/sodium/crypto_auth_hmacsha512.h \
+ /usr/include/sodium/crypto_auth_hmacsha512256.h \
+ /usr/include/sodium/crypto_box.h \
+ /usr/include/sodium/crypto_box_curve25519xsalsa20poly1305.h \
+ /usr/include/sodium/crypto_stream_xsalsa20.h \
+ /usr/include/sodium/crypto_box_curve25519xsalsa20poly1305.h \
+ /usr/include/sodium/crypto_core_hsalsa20.h \
+ /usr/include/sodium/crypto_core_hchacha20.h \
+ /usr/include/sodium/crypto_core_salsa20.h \
+ /usr/include/sodium/crypto_core_salsa2012.h \
+ /usr/include/sodium/crypto_core_salsa208.h \
+ /usr/include/sodium/crypto_generichash.h \
+ /usr/include/sodium/crypto_generichash_blake2b.h \
+ /usr/include/sodium/crypto_generichash_blake2b.h \
+ /usr/include/sodium/crypto_hash.h \
+ /usr/include/sodium/crypto_hash_sha256.h \
+ /usr/include/sodium/crypto_hash_sha512.h \
+ /usr/include/sodium/crypto_kdf.h \
+ /usr/include/sodium/crypto_kdf_blake2b.h \
+ /usr/include/sodium/crypto_kdf_blake2b.h /usr/include/sodium/crypto_kx.h \
+ /usr/include/sodium/crypto_onetimeauth.h \
+ /usr/include/sodium/crypto_onetimeauth_poly1305.h \
+ /usr/include/sodium/crypto_onetimeauth_poly1305.h \
+ /usr/include/sodium/crypto_pwhash.h \
+ /usr/include/sodium/crypto_pwhash_argon2i.h \
+ /usr/include/sodium/crypto_pwhash_argon2id.h \
+ /usr/include/sodium/crypto_pwhash_argon2i.h \
+ /usr/include/sodium/crypto_scalarmult.h \
+ /usr/include/sodium/crypto_scalarmult_curve25519.h \
+ /usr/include/sodium/crypto_scalarmult_curve25519.h \
+ /usr/include/sodium/crypto_secretbox.h \
+ /usr/include/sodium/crypto_secretbox_xsalsa20poly1305.h \
+ /usr/include/sodium/crypto_secretbox_xsalsa20poly1305.h \
+ /usr/include/sodium/crypto_secretstream_xchacha20poly1305.h \
+ /usr/include/sodium/crypto_aead_xchacha20poly1305.h \
+ /usr/include/sodium/crypto_stream_chacha20.h \
+ /usr/include/sodium/crypto_shorthash.h \
+ /usr/include/sodium/crypto_shorthash_siphash24.h \
+ /usr/include/sodium/crypto_shorthash_siphash24.h \
+ /usr/include/sodium/crypto_sign.h \
+ /usr/include/sodium/crypto_sign_ed25519.h \
+ /usr/include/sodium/crypto_sign_ed25519.h \
+ /usr/include/sodium/crypto_stream.h \
+ /usr/include/sodium/crypto_stream_chacha20.h \
+ /usr/include/sodium/crypto_stream_salsa20.h \
+ /usr/include/sodium/crypto_stream_xsalsa20.h \
+ /usr/include/sodium/crypto_verify_16.h \
+ /usr/include/sodium/crypto_verify_32.h \
+ /usr/include/sodium/crypto_verify_64.h /usr/include/sodium/randombytes.h \
+ /usr/include/sodium/randombytes_internal_random.h \
+ /usr/include/sodium/randombytes.h \
+ /usr/include/sodium/randombytes_sysrandom.h \
+ /usr/include/sodium/runtime.h /usr/include/sodium/utils.h \
+ /usr/include/sodium/crypto_box_curve25519xchacha20poly1305.h \
+ /usr/include/sodium/crypto_stream_xchacha20.h \
+ /usr/include/sodium/crypto_core_ed25519.h \
+ /usr/include/sodium/crypto_core_ristretto255.h \
+ /usr/include/sodium/crypto_scalarmult_ed25519.h \
+ /usr/include/sodium/crypto_scalarmult_ristretto255.h \
+ /usr/include/sodium/crypto_secretbox_xchacha20poly1305.h \
+ /usr/include/sodium/crypto_pwhash_scryptsalsa208sha256.h \
+ /usr/include/sodium/crypto_stream_salsa2012.h \
+ /usr/include/sodium/crypto_stream_salsa208.h \
+ /usr/include/sodium/crypto_stream_xchacha20.h /usr/include/zxcvbn.h \
+ /home/master666/development/cryptosafe_password_manager/src/core/../core/crypto/key_derivation.h \
+ /usr/include/openssl/evp.h /usr/include/openssl/macros.h \
+ /usr/include/x86_64-linux-gnu/openssl/opensslconf.h \
+ /usr/include/x86_64-linux-gnu/openssl/configuration.h \
+ /usr/include/openssl/opensslv.h /usr/include/openssl/types.h \
+ /usr/include/openssl/e_os2.h /usr/include/openssl/safestack.h \
+ /usr/include/openssl/stack.h /usr/include/openssl/core.h \
+ /usr/include/openssl/core_dispatch.h /usr/include/openssl/symhacks.h \
+ /usr/include/openssl/bio.h /usr/include/openssl/crypto.h \
+ /usr/include/openssl/cryptoerr.h /usr/include/openssl/cryptoerr_legacy.h \
+ /usr/include/openssl/bioerr.h /usr/include/openssl/evperr.h \
+ /usr/include/openssl/params.h /usr/include/openssl/bn.h \
+ /usr/include/openssl/bnerr.h /usr/include/openssl/objects.h \
+ /usr/include/openssl/obj_mac.h /usr/include/openssl/asn1.h \
+ /usr/include/openssl/asn1err.h /usr/include/openssl/objectserr.h \
+ /home/master666/development/cryptosafe_password_manager/src/core/../core/events.h \
+ /home/master666/development/cryptosafe_password_manager/src/core/../core/key_manager.h \
+ /usr/local/include/wx-3.2/wx/timer.h /usr/local/include/wx-3.2/wx/defs.h \
  /usr/local/include/wx-3.2/wx/platform.h \
  /usr/local/include/wx-3.2/wx/compiler.h \
  /usr/local/lib/wx/include/gtk3-unicode-static-3.2/wx/setup.h \
@@ -317,19 +420,11 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: \
  /usr/local/include/wx-3.2/wx/dlimpexp.h \
  /usr/local/include/wx-3.2/wx/types.h \
  /usr/local/include/wx-3.2/wx/debug.h \
- /usr/lib/gcc/x86_64-linux-gnu/13/include/limits.h \
- /usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h \
- /usr/include/limits.h /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
- /usr/include/x86_64-linux-gnu/bits/local_lim.h \
- /usr/include/linux/limits.h \
- /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
- /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
- /usr/include/x86_64-linux-gnu/bits/uio_lim.h \
  /usr/local/include/wx-3.2/wx/chartype.h \
  /usr/local/include/wx-3.2/wx/features.h \
  /usr/local/include/wx-3.2/wx/object.h \
  /usr/local/include/wx-3.2/wx/memory.h \
- /usr/local/include/wx-3.2/wx/string.h /usr/include/c++/13/stdlib.h \
+ /usr/local/include/wx-3.2/wx/string.h \
  /usr/local/include/wx-3.2/wx/wxcrtbase.h \
  /usr/local/include/wx-3.2/wx/strvararg.h \
  /usr/local/include/wx-3.2/wx/strconv.h \
@@ -344,6 +439,8 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: \
  /usr/local/include/wx-3.2/wx/msgout.h /usr/local/include/wx-3.2/wx/xti.h \
  /usr/local/include/wx-3.2/wx/rtti.h /usr/local/include/wx-3.2/wx/flags.h \
  /usr/local/include/wx-3.2/wx/xti2.h \
+ /usr/local/include/wx-3.2/wx/longlong.h \
+ /usr/local/include/wx-3.2/wx/event.h \
  /usr/local/include/wx-3.2/wx/clntdata.h \
  /usr/local/include/wx-3.2/wx/hashmap.h \
  /usr/local/include/wx-3.2/wx/wxcrt.h /usr/local/include/wx-3.2/wx/math.h \
@@ -393,7 +490,6 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: \
  /usr/local/include/wx-3.2/wx/meta/implicitconversion.h \
  /usr/local/include/wx-3.2/wx/mousestate.h \
  /usr/local/include/wx-3.2/wx/kbdstate.h \
- /usr/local/include/wx-3.2/wx/longlong.h \
  /usr/local/include/wx-3.2/wx/platinfo.h \
  /usr/local/include/wx-3.2/wx/thread.h \
  /usr/local/include/wx-3.2/wx/tracker.h \
@@ -404,74 +500,15 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: \
  /usr/local/include/wx-3.2/wx/variant.h \
  /usr/local/include/wx-3.2/wx/meta/convertible.h \
  /usr/local/include/wx-3.2/wx/meta/removeref.h \
- /usr/local/include/wx-3.2/wx/font.h \
- /usr/local/include/wx-3.2/wx/gtk/font.h \
- /usr/local/include/wx-3.2/wx/colour.h \
- /usr/local/include/wx-3.2/wx/gtk/colour.h \
- /usr/local/include/wx-3.2/wx/region.h \
- /usr/local/include/wx-3.2/wx/gtk/region.h \
- /usr/local/include/wx-3.2/wx/intl.h \
+ /usr/local/include/wx-3.2/wx/stopwatch.h \
+ /usr/local/include/wx-3.2/wx/time.h /usr/local/include/wx-3.2/wx/wx.h \
+ /usr/local/include/wx-3.2/wx/hash.h /usr/local/include/wx-3.2/wx/intl.h \
  /usr/local/include/wx-3.2/wx/localedefs.h \
  /usr/local/include/wx-3.2/wx/translation.h \
  /usr/local/include/wx-3.2/wx/language.h \
  /usr/local/include/wx-3.2/wx/scopedptr.h \
  /usr/local/include/wx-3.2/wx/checkeddelete.h \
- /usr/local/include/wx-3.2/wx/validate.h \
- /usr/local/include/wx-3.2/wx/windowid.h \
- /usr/local/include/wx-3.2/wx/palette.h \
- /usr/local/include/wx-3.2/wx/generic/paletteg.h \
- /usr/local/include/wx-3.2/wx/accel.h \
- /usr/local/include/wx-3.2/wx/gtk/accel.h \
- /usr/local/include/wx-3.2/wx/generic/accel.h \
- /usr/local/include/wx-3.2/wx/gtk/window.h \
- /usr/local/include/wx-3.2/wx/gtk/nonownedwnd.h \
- /usr/local/include/wx-3.2/wx/iconbndl.h \
- /usr/local/include/wx-3.2/wx/icon.h \
- /usr/local/include/wx-3.2/wx/iconloc.h \
- /usr/local/include/wx-3.2/wx/generic/icon.h \
- /usr/local/include/wx-3.2/wx/bitmap.h \
- /usr/local/include/wx-3.2/wx/image.h \
- /usr/local/include/wx-3.2/wx/stream.h \
- /usr/local/include/wx-3.2/wx/imagbmp.h \
- /usr/local/include/wx-3.2/wx/imagpng.h \
- /usr/local/include/wx-3.2/wx/imaggif.h \
- /usr/local/include/wx-3.2/wx/imagpcx.h \
- /usr/local/include/wx-3.2/wx/imagjpeg.h \
- /usr/local/include/wx-3.2/wx/imagtga.h \
- /usr/local/include/wx-3.2/wx/imagtiff.h \
- /usr/local/include/wx-3.2/wx/imagpnm.h \
- /usr/local/include/wx-3.2/wx/imagxpm.h \
- /usr/local/include/wx-3.2/wx/imagiff.h \
- /usr/local/include/wx-3.2/wx/gtk/bitmap.h \
- /usr/local/include/wx-3.2/wx/weakref.h \
- /usr/local/include/wx-3.2/wx/meta/int2type.h \
- /usr/local/include/wx-3.2/wx/gtk/toplevel.h \
- /usr/local/include/wx-3.2/wx/containr.h \
- /usr/local/include/wx-3.2/wx/sharedptr.h \
- /usr/local/include/wx-3.2/wx/atomic.h \
- /usr/local/include/wx-3.2/wx/gtk/dialog.h \
- /usr/local/include/wx-3.2/wx/listctrl.h \
- /usr/local/include/wx-3.2/wx/listbase.h \
- /usr/local/include/wx-3.2/wx/control.h \
- /usr/local/include/wx-3.2/wx/gtk/control.h \
- /usr/local/include/wx-3.2/wx/itemattr.h \
- /usr/local/include/wx-3.2/wx/systhemectrl.h \
- /usr/local/include/wx-3.2/wx/withimages.h \
- /usr/local/include/wx-3.2/wx/bmpbndl.h \
- /usr/local/include/wx-3.2/wx/imaglist.h \
- /usr/local/include/wx-3.2/wx/generic/imaglist.h \
- /usr/local/include/wx-3.2/wx/generic/listctrl.h \
- /usr/local/include/wx-3.2/wx/scrolwin.h \
- /usr/local/include/wx-3.2/wx/panel.h \
- /usr/local/include/wx-3.2/wx/generic/panelg.h \
- /usr/local/include/wx-3.2/wx/gtk/scrolwin.h \
- /usr/local/include/wx-3.2/wx/textctrl.h \
- /usr/local/include/wx-3.2/wx/textentry.h \
- /usr/local/include/wx-3.2/wx/gtk/textentry.h \
- /usr/local/include/wx-3.2/wx/ioswrap.h \
- /usr/local/include/wx-3.2/wx/gtk/textctrl.h \
- /usr/local/include/wx-3.2/wx/wx.h /usr/local/include/wx-3.2/wx/hash.h \
- /usr/local/include/wx-3.2/wx/log.h /usr/local/include/wx-3.2/wx/time.h \
+ /usr/local/include/wx-3.2/wx/log.h \
  /usr/local/include/wx-3.2/wx/generic/logg.h \
  /usr/local/include/wx-3.2/wx/app.h \
  /usr/local/include/wx-3.2/wx/eventfilter.h \
@@ -501,18 +538,61 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/sigthread.h \
  /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
  /usr/local/include/wx-3.2/wx/gtk/app.h \
- /usr/local/include/wx-3.2/wx/stopwatch.h \
- /usr/local/include/wx-3.2/wx/timer.h \
+ /usr/local/include/wx-3.2/wx/stream.h \
  /usr/local/include/wx-3.2/wx/module.h \
  /usr/local/include/wx-3.2/wx/wxcrtvararg.h \
+ /usr/local/include/wx-3.2/wx/window.h \
+ /usr/local/include/wx-3.2/wx/font.h \
+ /usr/local/include/wx-3.2/wx/gtk/font.h \
+ /usr/local/include/wx-3.2/wx/colour.h \
+ /usr/local/include/wx-3.2/wx/gtk/colour.h \
+ /usr/local/include/wx-3.2/wx/region.h \
+ /usr/local/include/wx-3.2/wx/gtk/region.h \
+ /usr/local/include/wx-3.2/wx/validate.h \
+ /usr/local/include/wx-3.2/wx/windowid.h \
+ /usr/local/include/wx-3.2/wx/palette.h \
+ /usr/local/include/wx-3.2/wx/generic/paletteg.h \
+ /usr/local/include/wx-3.2/wx/accel.h \
+ /usr/local/include/wx-3.2/wx/gtk/accel.h \
+ /usr/local/include/wx-3.2/wx/generic/accel.h \
+ /usr/local/include/wx-3.2/wx/gtk/window.h \
+ /usr/local/include/wx-3.2/wx/containr.h \
+ /usr/local/include/wx-3.2/wx/panel.h \
+ /usr/local/include/wx-3.2/wx/generic/panelg.h \
+ /usr/local/include/wx-3.2/wx/bitmap.h \
+ /usr/local/include/wx-3.2/wx/image.h \
+ /usr/local/include/wx-3.2/wx/imagbmp.h \
+ /usr/local/include/wx-3.2/wx/imagpng.h \
+ /usr/local/include/wx-3.2/wx/imaggif.h \
+ /usr/local/include/wx-3.2/wx/imagpcx.h \
+ /usr/local/include/wx-3.2/wx/imagjpeg.h \
+ /usr/local/include/wx-3.2/wx/imagtga.h \
+ /usr/local/include/wx-3.2/wx/imagtiff.h \
+ /usr/local/include/wx-3.2/wx/imagpnm.h \
+ /usr/local/include/wx-3.2/wx/imagxpm.h \
+ /usr/local/include/wx-3.2/wx/imagiff.h \
+ /usr/local/include/wx-3.2/wx/gtk/bitmap.h \
+ /usr/local/include/wx-3.2/wx/toplevel.h \
+ /usr/local/include/wx-3.2/wx/nonownedwnd.h \
+ /usr/local/include/wx-3.2/wx/gtk/nonownedwnd.h \
+ /usr/local/include/wx-3.2/wx/iconbndl.h \
+ /usr/local/include/wx-3.2/wx/icon.h \
+ /usr/local/include/wx-3.2/wx/iconloc.h \
+ /usr/local/include/wx-3.2/wx/generic/icon.h \
+ /usr/local/include/wx-3.2/wx/weakref.h \
+ /usr/local/include/wx-3.2/wx/meta/int2type.h \
+ /usr/local/include/wx-3.2/wx/gtk/toplevel.h \
  /usr/local/include/wx-3.2/wx/frame.h \
  /usr/local/include/wx-3.2/wx/statusbr.h \
+ /usr/local/include/wx-3.2/wx/control.h \
+ /usr/local/include/wx-3.2/wx/gtk/control.h \
  /usr/local/include/wx-3.2/wx/generic/statusbr.h \
  /usr/local/include/wx-3.2/wx/pen.h \
  /usr/local/include/wx-3.2/wx/peninfobase.h \
  /usr/local/include/wx-3.2/wx/gtk/pen.h \
  /usr/local/include/wx-3.2/wx/gtk/frame.h \
- /usr/local/include/wx-3.2/wx/dc.h /usr/local/include/wx-3.2/wx/brush.h \
+ /usr/local/include/wx-3.2/wx/bmpbndl.h /usr/local/include/wx-3.2/wx/dc.h \
+ /usr/local/include/wx-3.2/wx/brush.h \
  /usr/local/include/wx-3.2/wx/gtk/brush.h \
  /usr/local/include/wx-3.2/wx/affinematrix2d.h \
  /usr/local/include/wx-3.2/wx/affinematrix2dbase.h \
@@ -529,6 +609,10 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: \
  /usr/local/include/wx-3.2/wx/gtk/menuitem.h \
  /usr/local/include/wx-3.2/wx/menu.h \
  /usr/local/include/wx-3.2/wx/gtk/menu.h \
+ /usr/local/include/wx-3.2/wx/dialog.h \
+ /usr/local/include/wx-3.2/wx/sharedptr.h \
+ /usr/local/include/wx-3.2/wx/atomic.h \
+ /usr/local/include/wx-3.2/wx/gtk/dialog.h \
  /usr/local/include/wx-3.2/wx/settings.h \
  /usr/local/include/wx-3.2/wx/msgdlg.h \
  /usr/local/include/wx-3.2/wx/stockitem.h \
@@ -561,10 +645,17 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: \
  /usr/local/include/wx-3.2/wx/gtk/radiobox.h \
  /usr/local/include/wx-3.2/wx/radiobut.h \
  /usr/local/include/wx-3.2/wx/gtk/radiobut.h \
+ /usr/local/include/wx-3.2/wx/textctrl.h \
+ /usr/local/include/wx-3.2/wx/textentry.h \
+ /usr/local/include/wx-3.2/wx/gtk/textentry.h \
+ /usr/local/include/wx-3.2/wx/ioswrap.h \
+ /usr/local/include/wx-3.2/wx/gtk/textctrl.h \
  /usr/local/include/wx-3.2/wx/slider.h \
  /usr/local/include/wx-3.2/wx/gtk/slider.h \
  /usr/local/include/wx-3.2/wx/gauge.h \
  /usr/local/include/wx-3.2/wx/gtk/gauge.h \
+ /usr/local/include/wx-3.2/wx/scrolwin.h \
+ /usr/local/include/wx-3.2/wx/gtk/scrolwin.h \
  /usr/local/include/wx-3.2/wx/dirdlg.h \
  /usr/local/include/wx-3.2/wx/gtk/dirdlg.h \
  /usr/local/include/wx-3.2/wx/toolbar.h \
@@ -585,4 +676,12 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: \
  /usr/local/include/wx-3.2/wx/filectrl.h \
  /usr/local/include/wx-3.2/wx/mdi.h \
  /usr/local/include/wx-3.2/wx/gtk/mdi.h \
- /home/master666/development/cryptosafe_password_manager/src/../src/gui/widgets/secure_table/SecureTable.h
+ /home/master666/development/cryptosafe_password_manager/src/../src/gui/widgets/secure_table/SecureTable.h \
+ /usr/local/include/wx-3.2/wx/listctrl.h \
+ /usr/local/include/wx-3.2/wx/listbase.h \
+ /usr/local/include/wx-3.2/wx/itemattr.h \
+ /usr/local/include/wx-3.2/wx/systhemectrl.h \
+ /usr/local/include/wx-3.2/wx/withimages.h \
+ /usr/local/include/wx-3.2/wx/imaglist.h \
+ /usr/local/include/wx-3.2/wx/generic/imaglist.h \
+ /usr/local/include/wx-3.2/wx/generic/listctrl.h

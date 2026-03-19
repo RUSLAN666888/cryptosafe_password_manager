@@ -476,10 +476,5 @@ CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o: \
  /usr/local/include/wx-3.2/wx/filectrl.h \
  /usr/local/include/wx-3.2/wx/mdi.h \
  /usr/local/include/wx-3.2/wx/gtk/mdi.h \
- /home/master666/development/cryptosafe_password_manager/src/../src/core/memory_zero.h \
- /usr/include/c++/13/cstdint \
- /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h /usr/include/stdint.h \
- /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
- /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
  /usr/local/include/wx-3.2/wx/clipbrd.h \
  /usr/local/include/wx-3.2/wx/gtk/clipbrd.h

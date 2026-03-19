@@ -153,30 +153,6 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/main.cpp.s
 .PHONY : main.cpp.s
 
-src/core/state_manager/state_manager.o: src/core/state_manager/state_manager.cpp.o
-.PHONY : src/core/state_manager/state_manager.o
-
-# target to build an object file
-src/core/state_manager/state_manager.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/state_manager/state_manager.cpp.o
-.PHONY : src/core/state_manager/state_manager.cpp.o
-
-src/core/state_manager/state_manager.i: src/core/state_manager/state_manager.cpp.i
-.PHONY : src/core/state_manager/state_manager.i
-
-# target to preprocess a source file
-src/core/state_manager/state_manager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/state_manager/state_manager.cpp.i
-.PHONY : src/core/state_manager/state_manager.cpp.i
-
-src/core/state_manager/state_manager.s: src/core/state_manager/state_manager.cpp.s
-.PHONY : src/core/state_manager/state_manager.s
-
-# target to generate assembly for a file
-src/core/state_manager/state_manager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/state_manager/state_manager.cpp.s
-.PHONY : src/core/state_manager/state_manager.cpp.s
-
 src/database/DB_helper/db_helper.o: src/database/DB_helper/db_helper.cpp.o
 .PHONY : src/database/DB_helper/db_helper.o
 
@@ -248,6 +224,30 @@ src/gui/dialogs/first_run_wizard/FirstRunWizard.s: src/gui/dialogs/first_run_wiz
 src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.s
 .PHONY : src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.s
+
+src/gui/dialogs/login_dialog/LoginDialog.o: src/gui/dialogs/login_dialog/LoginDialog.cpp.o
+.PHONY : src/gui/dialogs/login_dialog/LoginDialog.o
+
+# target to build an object file
+src/gui/dialogs/login_dialog/LoginDialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.o
+.PHONY : src/gui/dialogs/login_dialog/LoginDialog.cpp.o
+
+src/gui/dialogs/login_dialog/LoginDialog.i: src/gui/dialogs/login_dialog/LoginDialog.cpp.i
+.PHONY : src/gui/dialogs/login_dialog/LoginDialog.i
+
+# target to preprocess a source file
+src/gui/dialogs/login_dialog/LoginDialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.i
+.PHONY : src/gui/dialogs/login_dialog/LoginDialog.cpp.i
+
+src/gui/dialogs/login_dialog/LoginDialog.s: src/gui/dialogs/login_dialog/LoginDialog.cpp.s
+.PHONY : src/gui/dialogs/login_dialog/LoginDialog.s
+
+# target to generate assembly for a file
+src/gui/dialogs/login_dialog/LoginDialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.s
+.PHONY : src/gui/dialogs/login_dialog/LoginDialog.cpp.s
 
 src/gui/dialogs/settings_dialog/SettingsDialog.o: src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o
 .PHONY : src/gui/dialogs/settings_dialog/SettingsDialog.o
@@ -357,9 +357,6 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
-	@echo "... src/core/state_manager/state_manager.o"
-	@echo "... src/core/state_manager/state_manager.i"
-	@echo "... src/core/state_manager/state_manager.s"
 	@echo "... src/database/DB_helper/db_helper.o"
 	@echo "... src/database/DB_helper/db_helper.i"
 	@echo "... src/database/DB_helper/db_helper.s"
@@ -369,6 +366,9 @@ help:
 	@echo "... src/gui/dialogs/first_run_wizard/FirstRunWizard.o"
 	@echo "... src/gui/dialogs/first_run_wizard/FirstRunWizard.i"
 	@echo "... src/gui/dialogs/first_run_wizard/FirstRunWizard.s"
+	@echo "... src/gui/dialogs/login_dialog/LoginDialog.o"
+	@echo "... src/gui/dialogs/login_dialog/LoginDialog.i"
+	@echo "... src/gui/dialogs/login_dialog/LoginDialog.s"
 	@echo "... src/gui/dialogs/settings_dialog/SettingsDialog.o"
 	@echo "... src/gui/dialogs/settings_dialog/SettingsDialog.i"
 	@echo "... src/gui/dialogs/settings_dialog/SettingsDialog.s"

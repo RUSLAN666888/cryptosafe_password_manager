@@ -3,7 +3,7 @@ CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o: \
  /usr/include/stdc-predef.h \
  /home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SecureTable.h \
  /home/master666/development/cryptosafe_password_manager/src/../src/database/DB_helper/db_helper.h \
- /home/master666/development/cryptosafe_password_manager/src/../src/database/DBSchema.h \
+ /home/master666/development/cryptosafe_password_manager/src/../src/database/DB_helper/../DBSchema.h \
  /usr/include/c++/13/string /usr/include/c++/13/bits/requires_hosted.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \
