@@ -2,6 +2,7 @@
 #define FIRST_RUN_WIZARD_H
 
 #include "../src/core/config_handler.h"
+#include "../src/core/crypto/authentication.h"
 #include "../src/gui/widgets/password_entry/PasswordEntry.h"
 #include <wx/spinctrl.h>
 #include <wx/wizard.h>
@@ -12,6 +13,10 @@ class FirstRunWizard : public wxWizard
 private:
   ConfigHander &config;
   wxString temp_password;
+  wxGauge *strengthGauge;
+  wxStaticText *strengthText;
+  wxTimer *strengthTimer;
+  Argon2Data pendingAuthData; // для временного хранения
 
   // Страницы
   wxWizardPageSimple *welcomePage;
@@ -23,7 +28,6 @@ private:
   // Элементы для страницы пароля
   PasswordEntry *passwordCtrl;
   PasswordEntry *confirmCtrl;
-  wxStaticText *strengthText;
 
   // Элементы для страницы базы данных
   wxTextCtrl *dbPathCtrl;
@@ -46,12 +50,14 @@ private:
   void onBrowseDatabase(wxCommandEvent &event);
   void onWizardFinished(wxWizardEvent &event);
   void onPasswordPageChanging(wxWizardEvent &event);
-
+  void onPasswordTextChanged(wxCommandEvent &event);
+  void onStrengthTimer(wxTimerEvent &event);
   bool validatePassword();
 
 public:
   wxWizardPage *GetFirstPage() const { return welcomePage; }
   FirstRunWizard(wxWindow *parent, ConfigHander &cfg);
+  Argon2Data &getAuthData();
 
   wxDECLARE_EVENT_TABLE();
 };

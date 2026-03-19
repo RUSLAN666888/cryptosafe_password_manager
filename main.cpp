@@ -18,6 +18,7 @@ public:
 
     // Создаем базу данных с путем из конфига
     Database db(dbPath);
+    db.initialize();
 
     // Создаем главное окно
     MainWindow *frame = new MainWindow(config, db);

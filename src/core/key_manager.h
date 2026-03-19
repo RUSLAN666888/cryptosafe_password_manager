@@ -1,6 +1,7 @@
 #ifndef KEY_MANAGER_H
 #define KEY_MANAGER_H
 
+#include "../src/core/events.h"
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -30,6 +31,8 @@ private:
     key_size = 0;
   }
 
+  KeyManager() : is_unlocked(false), is_active(true) {}
+
 public:
   struct KeyData
   {
@@ -37,7 +40,14 @@ public:
     size_t size;
   };
 
-  KeyManager() : is_unlocked(false), is_active(true) {}
+  KeyManager(const KeyManager &) = delete;
+  KeyManager &operator=(const KeyManager &) = delete;
+
+  static KeyManager &getInstance()
+  {
+    static KeyManager instance;
+    return instance;
+  }
 
   // Сохранить ключ
   void store_key(std::vector<uint8_t> &source)
@@ -61,6 +71,10 @@ public:
 
     last_activity = std::chrono::steady_clock::now();
     is_unlocked = true;
+
+    EventBus &eb = EventBus::getInstance();
+    // Публикуем событие успешного входа
+    eb.publish(EventType::UserLoggedIn, "KeyManager", "store_key");
   }
 
   // Получить ключ (если доступен)
@@ -95,6 +109,11 @@ public:
     if (elapsed >= 1)
     { // 1 час бездействия
       zero_memory();
+      is_unlocked = false;
+
+      EventBus &eb = EventBus::getInstance();
+
+      eventBus.publish(EventType::UserLoggedOut, "auto_lock", "KeyManager");
     }
   }
 
@@ -105,6 +124,10 @@ public:
     is_active = false;
     zero_memory();
     is_unlocked = false;
+
+    EventBus &eb = EventBus::getInstance();
+
+    eventBus.publish(EventType::UserLoggedOut, "app_minimized", "KeyManager");
   }
 
   // Приложение активно
@@ -120,6 +143,9 @@ public:
     std::lock_guard<std::mutex> lock(mutex);
     zero_memory();
     is_unlocked = false;
+
+    EventBus &eb = EventBus::getInstance();
+    eventBus.publish(EventType::UserLoggedOut, "user_logout", "KeyManager");
   }
 
   ~KeyManager() { logout(); }

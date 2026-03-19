@@ -61,14 +61,13 @@ class Database
 private:
   std::string db_path;
   std::vector<sqlite3 *> connection_pool; // пул соединений
-  std::mutex pool_mutex;                  // мьютекс для доступа к пулу
+  std::recursive_mutex pool_mutex;        // мьютекс для доступа к пулу
   std::mutex db_mutex;                    // мьютекс для операций с БД
   int max_connections;
 
   // Внутренние вспомогательные методы
   sqlite3 *getConnection();
   void releaseConnection(sqlite3 *conn);
-  void closeAllConnections();
   bool executeScript(const std::string &script);
   int getCurrentVersion();
   void setVersion(int version);
@@ -82,7 +81,9 @@ public:
   // Инициализация и миграции
   bool initialize();
   bool createTables();
-  bool checkMigration();
+  void checkMigration();
+
+  void closeAllConnections();
 
   // CRUD операции для записей
   int addEntry(const std::string &title, const std::string &username,
@@ -121,6 +122,23 @@ public:
 
   // Утилиты
   int getVersion() { return getCurrentVersion(); }
+
+  // Сохранить данные аутентификации (Argon2 хеш и соль)
+  bool saveAuthData(const std::vector<uint8_t> &hash,
+                    const std::vector<uint8_t> &salt, uint32_t time_cost,
+                    uint32_t memory_cost, uint32_t parallelism,
+                    uint32_t hash_len);
+
+  // Получить данные аутентификации
+  bool getAuthData(std::vector<uint8_t> &hash, std::vector<uint8_t> &salt,
+                   uint32_t &time_cost, uint32_t &memory_cost,
+                   uint32_t &parallelism, uint32_t &hash_len);
+
+  // Сохранить соль для PBKDF2 (encryption key derivation)
+  bool saveEncSalt(const std::vector<uint8_t> &salt);
+
+  // Получить соль для PBKDF2
+  bool getEncSalt(std::vector<uint8_t> &salt);
 };
 
 #endif

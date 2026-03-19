@@ -96,7 +96,7 @@ const std::string CREATE_TABLES = R"(
 
         )";
 
-const std::string CREATE_TABLES = R"(
+const std::string CREATE_TABLES_V2 = R"(
             -- Версия базы данных
             PRAGMA user_version = 2;
 

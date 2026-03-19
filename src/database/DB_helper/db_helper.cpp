@@ -4,7 +4,11 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <sqlite3.h>
+#include <thread>
+
+using json = nlohmann::json;
 
 // Вспомогательная функция для преобразования SQLite result в string
 std::string getColumnString(sqlite3_stmt *stmt, int col)
@@ -51,37 +55,165 @@ Database::~Database() { closeAllConnections(); }
 // Получить соединение из пула
 sqlite3 *Database::getConnection()
 {
-  std::lock_guard<std::mutex> lock(pool_mutex);
+  std::cout << "2222222 - getConnection started (thread: "
+            << std::this_thread::get_id() << ")" << std::endl;
 
   sqlite3 *conn = nullptr;
 
-  // Если есть свободные соединения в пуле - берем одно
-  if (!connection_pool.empty())
+  // Попытка захвата мьютекса с таймаутом для диагностики
+  const int max_attempts = 3;
+  for (int attempt = 1; attempt <= max_attempts; ++attempt)
   {
-    conn = connection_pool.back();
-    connection_pool.pop_back();
+    try
+    {
+      // Пытаемся захватить мьютекс
+      if (pool_mutex.try_lock())
+      {
+        std::cout << "2222222 - mutex locked on attempt " << attempt
+                  << std::endl;
+
+        // Используем lock_guard для гарантированного освобождения
+        std::lock_guard<std::recursive_mutex> lock(pool_mutex, std::adopt_lock);
+
+        // Если есть свободные соединения в пуле - берем одно
+        if (!connection_pool.empty())
+        {
+          conn = connection_pool.back();
+          connection_pool.pop_back();
+          std::cout << "Taking connection from pool, remaining: "
+                    << connection_pool.size() << std::endl;
+          return conn;
+        }
+
+        // Выходим из блока - мьютекс автоматически освобождается
+        std::cout << "Pool empty, releasing mutex" << std::endl;
+        break; // Выходим из цикла попыток
+      }
+      else
+      {
+        std::cout << "Warning: Mutex is locked by another thread (attempt "
+                  << attempt << "/" << max_attempts << ")" << std::endl;
+
+        if (attempt < max_attempts)
+        {
+          std::this_thread::sleep_for(std::chrono::milliseconds(100 * attempt));
+        }
+        else
+        {
+          std::cerr << "ERROR: Failed to acquire mutex after " << max_attempts
+                    << " attempts" << std::endl;
+          return nullptr;
+        }
+      }
+    }
+    catch (const std::system_error &e)
+    {
+      std::cerr << "CRITICAL: System error in mutex operation: " << e.what()
+                << " (code: " << e.code() << ")" << std::endl;
+
+      // Проверяем специфичные ошибки
+      if (e.code() == std::errc::resource_deadlock_would_occur)
+      {
+        std::cerr << "  -> Deadlock detected!" << std::endl;
+      }
+      else if (e.code() == std::errc::operation_not_permitted)
+      {
+        std::cerr << "  -> Operation not permitted (mutex might be destroyed)"
+                  << std::endl;
+      }
+      else if (e.code() == std::errc::device_or_resource_busy)
+      {
+        std::cerr << "  -> Mutex is busy" << std::endl;
+      }
+
+      return nullptr;
+    }
+    catch (const std::exception &e)
+    {
+      std::cerr << "CRITICAL: Unexpected exception in mutex phase: " << e.what()
+                << std::endl;
+      return nullptr;
+    }
+  }
+
+  // Создаем новое соединение (мьютекс уже освобожден)
+  try
+  {
+    std::cout << "Creating new database connection..." << std::endl;
+
+    // Добавим проверку существования директории перед открытием
+    std::filesystem::path dbPath(db_path);
+    std::filesystem::path dbDir = dbPath.parent_path();
+    if (!dbDir.empty() && !std::filesystem::exists(dbDir))
+    {
+      std::cout << "Creating database directory: " << dbDir << std::endl;
+      std::filesystem::create_directories(dbDir);
+    }
+
+    int rc = sqlite3_open(db_path.c_str(), &conn);
+
+    if (rc != SQLITE_OK)
+    {
+      std::string errorMsg = sqlite3_errmsg(conn);
+      std::cerr << "Cannot open database: " << errorMsg << std::endl;
+      std::cerr << "  Path: " << db_path << std::endl;
+      std::cerr << "  Error code: " << rc << std::endl;
+
+      if (conn)
+      {
+        sqlite3_close(conn);
+        conn = nullptr;
+      }
+      return nullptr;
+    }
+
+    // Проверяем, что соединение действительно работает
+    rc = sqlite3_exec(conn, "SELECT 1;", nullptr, nullptr, nullptr);
+    if (rc != SQLITE_OK)
+    {
+      std::cerr << "Database connection test failed: " << sqlite3_errmsg(conn)
+                << std::endl;
+      sqlite3_close(conn);
+      return nullptr;
+    }
+
+    // Включаем поддержку внешних ключей
+    char *errMsg = nullptr;
+    rc = sqlite3_exec(conn, "PRAGMA foreign_keys = ON;", nullptr, nullptr,
+                      &errMsg);
+    if (rc != SQLITE_OK)
+    {
+      std::cerr << "Failed to enable foreign keys: " << errMsg << std::endl;
+      sqlite3_free(errMsg);
+    }
+
+    // Устанавливаем таймаут для избежания блокировок
+    sqlite3_busy_timeout(conn, 5000); // 5 секунд
+
+    std::cout << "New connection created successfully" << std::endl;
     return conn;
   }
-
-  // Иначе создаем новое соединение
-  int rc = sqlite3_open(db_path.c_str(), &conn);
-  if (rc != SQLITE_OK)
+  catch (const std::filesystem::filesystem_error &e)
   {
-    std::cerr << "Cannot open database: " << sqlite3_errmsg(conn) << std::endl;
+    std::cerr << "Filesystem error while creating database: " << e.what()
+              << std::endl;
+    std::cerr << "  Path1: " << e.path1() << std::endl;
+    if (!e.path2().empty())
+    {
+      std::cerr << "  Path2: " << e.path2() << std::endl;
+    }
     return nullptr;
   }
-
-  // Включаем поддержку внешних ключей
-  char *errMsg = nullptr;
-  rc = sqlite3_exec(conn, "PRAGMA foreign_keys = ON;", nullptr, nullptr,
-                    &errMsg);
-  if (rc != SQLITE_OK)
+  catch (const std::exception &e)
   {
-    std::cerr << "Failed to enable foreign keys: " << errMsg << std::endl;
-    sqlite3_free(errMsg);
+    std::cerr << "CRITICAL: Exception while creating database connection: "
+              << e.what() << std::endl;
+    if (conn)
+    {
+      sqlite3_close(conn);
+    }
+    return nullptr;
   }
-
-  return conn;
 }
 
 // Вернуть соединение в пул
@@ -90,7 +222,7 @@ void Database::releaseConnection(sqlite3 *conn)
   if (!conn)
     return;
 
-  std::lock_guard<std::mutex> lock(pool_mutex);
+  std::lock_guard<std::recursive_mutex> lock(pool_mutex);
 
   // Если пул не переполнен - возвращаем соединение
   if (connection_pool.size() < max_connections)
@@ -107,11 +239,14 @@ void Database::releaseConnection(sqlite3 *conn)
 // Закрыть все соединения
 void Database::closeAllConnections()
 {
-  std::lock_guard<std::mutex> lock(pool_mutex);
-  for (auto conn : connection_pool)
-  {
-    sqlite3_close(conn);
-  }
+  std::cout << "Clearing " << std::endl;
+  std::lock_guard<std::recursive_mutex> lock(pool_mutex);
+
+  std::cout << "Clearing " << connection_pool.size() << " connections from pool"
+            << std::endl;
+
+  // Просто очищаем пул, не закрывая соединения
+  // (они закроются сами при разрушении объектов)
   connection_pool.clear();
 }
 
@@ -186,17 +321,20 @@ void Database::setVersion(int version)
 // Инициализация базы данных
 bool Database::initialize()
 {
-  // Создаем таблицы (если их нет)
-  if (!createTables())
+  std::cout << "INIT" << std::endl;
+
+  // Проверяем, существует ли файл БД
+  bool dbExists = std::filesystem::exists(db_path);
+
+  if (!dbExists)
   {
-    return false;
+    std::cout << "New database, creating tables..." << std::endl;
+    // Новая БД - просто создаем таблицы версии 2
+    return executeScript(CREATE_TABLES_V2);
   }
 
-  // Проверяем миграции (на случай, если БД старая)
-  if (!checkMigration())
-  {
-    return false;
-  }
+  // Существующая БД - проверяем миграции
+  checkMigration();
 
   return true;
 }
@@ -210,7 +348,7 @@ bool Database::createTables()
 }
 
 // Проверка миграций
-bool Database::checkMigration()
+void Database::checkMigration()
 {
   int current_version = getCurrentVersion();
 
@@ -218,8 +356,11 @@ bool Database::checkMigration()
   {
     runMigrations(current_version);
   }
-
-  return true;
+  else
+  {
+    std::cout << "CREATE_TABLES_V2" << std::endl;
+    executeScript(CREATE_TABLES_V2);
+  }
 }
 
 // Выполнение миграций
@@ -713,3 +854,262 @@ bool Database::backup(const std::string &backup_path) { return true; }
 
 // Восстановление базы (заглушка для Sprint 8)
 bool Database::restore(const std::string &backup_path) { return true; }
+
+// Сохранить данные аутентификации (Argon2 хеш и соль)
+bool Database::saveAuthData(const std::vector<uint8_t> &hash,
+                            const std::vector<uint8_t> &salt,
+                            uint32_t time_cost, uint32_t memory_cost,
+                            uint32_t parallelism, uint32_t hash_len)
+{
+  sqlite3 *conn = getConnection();
+  if (!conn)
+    return false;
+
+  sqlite3_stmt *stmt;
+  const char *sql = R"(
+        INSERT INTO key_store (key_type, key_data, version, created_at) 
+        VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+    )";
+
+  int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+  if (rc != SQLITE_OK)
+  {
+    std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+    releaseConnection(conn);
+    return false;
+  }
+
+  bool success = true;
+
+  // Сохраняем хеш
+  sqlite3_bind_text(stmt, 1, "auth_hash", -1, SQLITE_STATIC);
+  sqlite3_bind_blob(stmt, 2, hash.data(), hash.size(), SQLITE_STATIC);
+  sqlite3_bind_int(stmt, 3, 1);
+
+  rc = sqlite3_step(stmt);
+  if (rc != SQLITE_DONE)
+  {
+    std::cerr << "Failed to save auth_hash: " << sqlite3_errmsg(conn)
+              << std::endl;
+    success = false;
+  }
+
+  if (success)
+  {
+    // Сбрасываем statement для нового использования
+    sqlite3_reset(stmt);
+
+    // Сохраняем соль
+    sqlite3_bind_text(stmt, 1, "auth_salt", -1, SQLITE_STATIC);
+    sqlite3_bind_blob(stmt, 2, salt.data(), salt.size(), SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 3, 1);
+
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE)
+    {
+      std::cerr << "Failed to save auth_salt: " << sqlite3_errmsg(conn)
+                << std::endl;
+      success = false;
+    }
+  }
+
+  if (success)
+  {
+    // Сбрасываем statement
+    sqlite3_reset(stmt);
+
+    // Сохраняем параметры как JSON
+    std::string params = "{\"time_cost\":" + std::to_string(time_cost) +
+                         ",\"memory_cost\":" + std::to_string(memory_cost) +
+                         ",\"parallelism\":" + std::to_string(parallelism) +
+                         ",\"hash_len\":" + std::to_string(hash_len) + "}";
+
+    sqlite3_bind_text(stmt, 1, "auth_params", -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, params.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 3, 1);
+
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE)
+    {
+      std::cerr << "Failed to save auth_params: " << sqlite3_errmsg(conn)
+                << std::endl;
+      success = false;
+    }
+  }
+
+  sqlite3_finalize(stmt);
+  releaseConnection(conn);
+
+  return success;
+}
+
+// Получить данные аутентификации
+bool Database::getAuthData(std::vector<uint8_t> &hash,
+                           std::vector<uint8_t> &salt, uint32_t &time_cost,
+                           uint32_t &memory_cost, uint32_t &parallelism,
+                           uint32_t &hash_len)
+{
+
+  std::cout << "11111" << std::endl;
+  sqlite3 *conn = getConnection();
+  std::cout << "11111" << std::endl;
+  if (!conn)
+    return false;
+
+  sqlite3_stmt *stmt;
+  bool success = true;
+
+  // Получаем хеш
+  const char *sql_hash = "SELECT key_data FROM key_store WHERE key_type = "
+                         "'auth_hash' AND version = 1";
+  int rc = sqlite3_prepare_v2(conn, sql_hash, -1, &stmt, nullptr);
+  if (rc == SQLITE_OK && sqlite3_step(stmt) == SQLITE_ROW)
+  {
+    hash = getColumnBlob(stmt, 0);
+  }
+  else
+  {
+    success = false;
+  }
+  sqlite3_finalize(stmt);
+
+  if (!success)
+  {
+    releaseConnection(conn);
+    return false;
+  }
+
+  // Получаем соль
+  const char *sql_salt = "SELECT key_data FROM key_store WHERE key_type = "
+                         "'auth_salt' AND version = 1";
+  rc = sqlite3_prepare_v2(conn, sql_salt, -1, &stmt, nullptr);
+  if (rc == SQLITE_OK && sqlite3_step(stmt) == SQLITE_ROW)
+  {
+    salt = getColumnBlob(stmt, 0);
+  }
+  else
+  {
+    success = false;
+  }
+  sqlite3_finalize(stmt);
+
+  if (!success)
+  {
+    releaseConnection(conn);
+    return false;
+  }
+
+  // Получаем параметры
+  const char *sql_params = "SELECT key_data FROM key_store WHERE key_type = "
+                           "'auth_params' AND version = 1";
+  rc = sqlite3_prepare_v2(conn, sql_params, -1, &stmt, nullptr);
+  if (rc == SQLITE_OK && sqlite3_step(stmt) == SQLITE_ROW)
+  {
+    std::string params_str = getColumnString(stmt, 0);
+
+    try
+    {
+      // Парсим JSON через nlohmann
+      json params = json::parse(params_str);
+
+      // Извлекаем значения с проверкой
+      if (params.contains("time_cost") && params["time_cost"].is_number())
+      {
+        time_cost = params["time_cost"].get<uint32_t>();
+      }
+
+      if (params.contains("memory_cost") && params["memory_cost"].is_number())
+      {
+        memory_cost = params["memory_cost"].get<uint32_t>();
+      }
+
+      if (params.contains("parallelism") && params["parallelism"].is_number())
+      {
+        parallelism = params["parallelism"].get<uint32_t>();
+      }
+
+      if (params.contains("hash_len") && params["hash_len"].is_number())
+      {
+        hash_len = params["hash_len"].get<uint32_t>();
+      }
+    }
+    catch (const json::parse_error &e)
+    {
+      std::cerr << "Failed to parse auth_params JSON: " << e.what()
+                << std::endl;
+    }
+    catch (const json::type_error &e)
+    {
+      std::cerr << "JSON type error: " << e.what() << std::endl;
+    }
+  }
+
+  sqlite3_finalize(stmt);
+  releaseConnection(conn);
+
+  return success;
+}
+
+// Сохранить соль для PBKDF2 (encryption key derivation)
+bool Database::saveEncSalt(const std::vector<uint8_t> &salt)
+{
+  sqlite3 *conn = getConnection();
+  if (!conn)
+    return false;
+
+  sqlite3_stmt *stmt;
+  const char *sql = R"(
+        INSERT INTO key_store (key_type, key_data, version, created_at) 
+        VALUES ('enc_salt', ?, 1, CURRENT_TIMESTAMP)
+    )";
+
+  int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+  if (rc != SQLITE_OK)
+  {
+    std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+    releaseConnection(conn);
+    return false;
+  }
+
+  sqlite3_bind_blob(stmt, 1, salt.data(), salt.size(), SQLITE_STATIC);
+
+  rc = sqlite3_step(stmt);
+  bool success = (rc == SQLITE_DONE);
+
+  sqlite3_finalize(stmt);
+  releaseConnection(conn);
+
+  return success;
+}
+
+// Получить соль для PBKDF2
+bool Database::getEncSalt(std::vector<uint8_t> &salt)
+{
+  sqlite3 *conn = getConnection();
+  if (!conn)
+    return false;
+
+  sqlite3_stmt *stmt;
+  const char *sql = "SELECT key_data FROM key_store WHERE key_type = "
+                    "'enc_salt' AND version = 1";
+
+  int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+  if (rc != SQLITE_OK)
+  {
+    std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+    releaseConnection(conn);
+    return false;
+  }
+
+  bool found = false;
+  if (sqlite3_step(stmt) == SQLITE_ROW)
+  {
+    salt = getColumnBlob(stmt, 0);
+    found = true;
+  }
+
+  sqlite3_finalize(stmt);
+  releaseConnection(conn);
+
+  return found;
+}

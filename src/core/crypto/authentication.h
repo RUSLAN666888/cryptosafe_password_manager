@@ -26,7 +26,7 @@ struct Argon2Data
   }
 };
 
-void hash_password(const std::string &password, Argon2Data &data)
+inline void hash_password(const std::string &password, Argon2Data &data)
 {
   if (sodium_init() < 0)
   {
@@ -56,8 +56,8 @@ void hash_password(const std::string &password, Argon2Data &data)
 }
 
 // Constant-time сравнение двух векторов
-bool constant_time_compare(const std::vector<uint8_t> &a,
-                           const std::vector<uint8_t> &b)
+inline bool constant_time_compare(const std::vector<uint8_t> &a,
+                                  const std::vector<uint8_t> &b)
 {
   if (a.size() != b.size())
   {
@@ -76,7 +76,7 @@ bool constant_time_compare(const std::vector<uint8_t> &a,
 }
 
 // Функция верификации пароля
-bool verify_password(const std::string &password, const Argon2Data &data)
+inline bool verify_password(const std::string &password, const Argon2Data &data)
 {
   // Переводим MiB в KiB
   uint64_t memory_kib = static_cast<uint64_t>(data.memory_cost_mb) * 1024;
@@ -99,10 +99,23 @@ bool verify_password(const std::string &password, const Argon2Data &data)
   return constant_time_compare(computed_hash, data.hash);
 }
 
-int check_password_strength(const std::string &password)
+inline int check_password_strength(const std::string &password)
 {
-  int score = ZxcvbnMatch(password.c_str(), NULL, NULL);
-  return score;
+  ZxcMatch_t *info = NULL;
+  double entropy = ZxcvbnMatch(password.c_str(), NULL, &info);
+
+  if (entropy < 20)
+    return 0;
+  if (entropy < 40)
+    return 1;
+  if (entropy < 60)
+    return 2;
+  if (entropy < 80)
+    return 3;
+  if (entropy >= 80)
+    return 4;
+
+  return 4;
 }
 
 #endif

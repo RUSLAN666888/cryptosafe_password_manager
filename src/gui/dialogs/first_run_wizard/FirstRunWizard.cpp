@@ -1,18 +1,25 @@
 #include "FirstRunWizard.h"
+#include "../src/core/crypto/authentication.h"
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
+#include <wx/stattext.h>
+#include <wx/timer.h>
+#include <zxcvbn.h>
 
 #define ID_BrowseButton 10001
+#define ID_STRENGTH_TIMER 10002
 
-wxBEGIN_EVENT_TABLE(FirstRunWizard, wxWizard)
-    EVT_BUTTON(ID_BrowseButton, FirstRunWizard::onBrowseDatabase)
-        EVT_WIZARD_PAGE_CHANGING(wxID_ANY,
-                                 FirstRunWizard::onPasswordPageChanging)
-            EVT_WIZARD_FINISHED(wxID_ANY, FirstRunWizard::onWizardFinished)
-                wxEND_EVENT_TABLE()
+wxBEGIN_EVENT_TABLE(FirstRunWizard,
+                    wxWizard) EVT_BUTTON(ID_BrowseButton,
+                                         FirstRunWizard::onBrowseDatabase)
+    EVT_WIZARD_PAGE_CHANGING(wxID_ANY, FirstRunWizard::onPasswordPageChanging)
+        EVT_WIZARD_FINISHED(wxID_ANY, FirstRunWizard::onWizardFinished)
+            EVT_TEXT(wxID_ANY, FirstRunWizard::onPasswordTextChanged)
+                EVT_TIMER(ID_STRENGTH_TIMER, FirstRunWizard::onStrengthTimer)
+                    wxEND_EVENT_TABLE()
 
-                    FirstRunWizard::FirstRunWizard(wxWindow *parent,
-                                                   ConfigHander &cfg)
+                        FirstRunWizard::FirstRunWizard(wxWindow *parent,
+                                                       ConfigHander &cfg)
     : wxWizard(parent, wxID_ANY, "CryptoSafe Setup Wizard", wxNullBitmap,
                wxDefaultPosition, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
       config(cfg)
@@ -77,7 +84,7 @@ wxWizardPageSimple *FirstRunWizard::createPasswordPage()
   wxWizardPageSimple *page = new wxWizardPageSimple(this);
   wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
 
-  // Заголовок (прижат к верху)
+  // Заголовок
   wxStaticText *title =
       new wxStaticText(page, wxID_ANY, "Create Master Password");
   wxFont titleFont = title->GetFont();
@@ -86,10 +93,9 @@ wxWizardPageSimple *FirstRunWizard::createPasswordPage()
   title->SetFont(titleFont);
   mainSizer->Add(title, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 20);
 
-  // ПроСТО ПРОБЕЛ, который растянется
   mainSizer->AddStretchSpacer();
 
-  // Панель с полями (будет по центру)
+  // Панель с полями
   wxPanel *panel = new wxPanel(page);
   wxBoxSizer *panelSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -104,6 +110,19 @@ wxWizardPageSimple *FirstRunWizard::createPasswordPage()
 
   panelSizer->Add(passLabel, 0, wxLEFT | wxTOP, 5);
   panelSizer->Add(passwordCtrl, 0, wxLEFT | wxRIGHT | wxEXPAND, 5);
+
+  // Индикатор силы пароля
+  strengthGauge =
+      new wxGauge(panel, wxID_ANY, 4, wxDefaultPosition, wxSize(300, 20));
+  strengthGauge->SetValue(0);
+  panelSizer->Add(strengthGauge, 0, wxLEFT | wxRIGHT | wxTOP, 10);
+
+  // Текст с описанием силы пароля
+  strengthText =
+      new wxStaticText(panel, wxID_ANY, "Enter password to check strength");
+  strengthText->SetForegroundColour(wxColour(100, 100, 100));
+  panelSizer->Add(strengthText, 0, wxLEFT | wxRIGHT | wxBOTTOM, 5);
+
   panelSizer->Add(confirmLabel, 0, wxLEFT | wxTOP, 15);
   panelSizer->Add(confirmCtrl, 0, wxLEFT | wxRIGHT | wxEXPAND, 5);
 
@@ -113,6 +132,10 @@ wxWizardPageSimple *FirstRunWizard::createPasswordPage()
   mainSizer->AddStretchSpacer();
 
   page->SetSizer(mainSizer);
+
+  // Создаем таймер для задержки проверки
+  strengthTimer = new wxTimer(this, ID_STRENGTH_TIMER);
+
   return page;
 }
 
@@ -330,15 +353,95 @@ bool FirstRunWizard::validatePassword()
     return false;
   }
 
-  if (password.length() < 8)
+  if (password.length() < 12)
   {
-    wxMessageBox("Password must be at least 8 characters!", "Error",
+    wxMessageBox("Password must be at least 12 characters!", "Error",
                  wxOK | wxICON_ERROR, this);
+    return false;
+  }
+
+  // Проверка силы пароля через zxcvbn
+  wxScopedCharBuffer pwdBuf = password.ToUTF8();
+  std::string pwdStr(pwdBuf.data(), pwdBuf.length());
+  int score = check_password_strength(pwdStr);
+
+  if (score < 3)
+  {
+    wxMessageBox("Password is not strong enough!\n\n"
+                 "Please choose a stronger password that is not common, "
+                 "doesn't contain dictionary words, and has good entropy.",
+                 "Weak Password", wxOK | wxICON_WARNING, this);
     return false;
   }
 
   temp_password = password;
   return true;
+}
+
+void FirstRunWizard::onStrengthTimer(wxTimerEvent &event)
+{
+  wxString password = passwordCtrl->GetValue();
+
+  if (password.IsEmpty())
+  {
+    strengthGauge->SetValue(0);
+    strengthText->SetLabel("Enter password to check strength");
+    strengthText->SetForegroundColour(wxColour(100, 100, 100));
+    return;
+  }
+
+  // Конвертируем wxString в std::string
+  wxScopedCharBuffer pwdBuf = password.ToUTF8();
+  std::string pwdStr(pwdBuf.data(), pwdBuf.length());
+
+  // Получаем оценку силы пароля (0-4)
+  int score = check_password_strength(pwdStr);
+  std::cout << "====================== " << score << std::endl;
+
+  // Обновляем индикатор
+  strengthGauge->SetValue(score);
+
+  // Обновляем текст и цвет в зависимости от оценки
+  wxColour color;
+  wxString message;
+
+  switch (score)
+  {
+  case 0:
+    color = wxColour(255, 0, 0); // Красный
+    message = "Too weak - easily guessable";
+    break;
+  case 1:
+    color = wxColour(255, 100, 0); // Оранжевый
+    message = "Very weak";
+    break;
+  case 2:
+    color = wxColour(255, 255, 0); // Желтый
+    message = "Weak";
+    break;
+  case 3:
+    color = wxColour(0, 255, 0); // Зеленый
+    message = "Strong";
+    break;
+  case 4:
+    color = wxColour(0, 200, 0); // Темно-зеленый
+    message = "Very strong";
+    break;
+  default:
+    color = wxColour(100, 100, 100); // Серый
+    message = "Unknown";
+  }
+
+  strengthText->SetLabel(message);
+  strengthText->SetForegroundColour(color);
+}
+
+void FirstRunWizard::onPasswordTextChanged(wxCommandEvent &event)
+{
+  // Перезапускаем таймер при каждом изменении текста
+  strengthTimer->Stop();
+  strengthTimer->Start(
+      500, wxTIMER_ONE_SHOT); // Проверка через 500 мс после остановки ввода
 }
 
 void FirstRunWizard::onWizardFinished(wxWizardEvent &event)
@@ -352,9 +455,30 @@ void FirstRunWizard::onWizardFinished(wxWizardEvent &event)
   config.setArgon2Parallelism(parallelSpin->GetValue());  // threads
   config.setArgon2HashLength(hashLengthSpin->GetValue()); // bytes
 
-  // В Sprint 2 здесь будет создание ключа из мастер-пароля
+  // БД еще нет, но мы готовим данные
+  Argon2Data authData(iterationsSpin->GetValue(), memorySpin->GetValue(),
+                      parallelSpin->GetValue(), hashLengthSpin->GetValue());
+
+  // Конвертируем wxString в std::string для хеширования
+  wxScopedCharBuffer pwdBuf = temp_password.ToUTF8();
+  std::string pwdStr(pwdBuf.data(), pwdBuf.length());
+
+  // Хешируем пароль
+  hash_password(pwdStr, authData);
+
+  // Сохраняем данные аутентификации во временные поля мастера
+  // (БД будет создана после закрытия мастера)
+  pendingAuthData = std::move(authData);
+
+  // Зануляем пароль в памяти
+  volatile char *p = const_cast<char *>(pwdStr.data());
+  for (size_t i = 0; i < pwdStr.size(); ++i)
+    p[i] = 0;
+
   wxMessageBox("Setup completed successfully!", "CryptoSafe",
                wxOK | wxICON_INFORMATION, this);
 
   event.Skip();
 }
+
+Argon2Data &FirstRunWizard::getAuthData() { return pendingAuthData; }

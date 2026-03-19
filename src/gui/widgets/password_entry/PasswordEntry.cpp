@@ -1,5 +1,4 @@
 #include "PasswordEntry.h"
-#include "../src/core/memory_zero.h"
 #include <wx/clipbrd.h>
 #include <wx/msgdlg.h>
 
