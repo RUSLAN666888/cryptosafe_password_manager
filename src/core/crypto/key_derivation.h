@@ -8,8 +8,7 @@
 #include <vector>
 
 // Выводит ключ из пароля и соли используя PBKDF2-HMAC-SHA256
-inline void
-derive_encryption_key(const std::string &password,
+inline void derive_encryption_key(const std::string &password,
                       const std::vector<uint8_t> &salt,
                       std::vector<uint8_t> &key) // выходной параметр
 {

@@ -44,8 +44,7 @@ inline void hash_password(const std::string &password, Argon2Data &data)
   data.hash.resize(data.hash_len);
 
   // Вызываем argon2
-  int rc =
-      argon2id_hash_raw(data.time_cost, memory_kib, data.parallelism,
+  int rc = argon2id_hash_raw(data.time_cost, memory_kib, data.parallelism,
                         password.c_str(), password.length(), data.salt.data(),
                         data.salt.size(), data.hash.data(), data.hash.size());
 

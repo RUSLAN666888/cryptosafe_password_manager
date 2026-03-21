@@ -10,14 +10,14 @@ public:
   virtual bool OnInit() override
   {
     // Создаем конфиг
-    ConfigHander config;
+    static ConfigHander config;
 
     // Создаем базу данных
     std::string dbPath = config.getDatabasePath();
     std::cout << "bd path: " << dbPath << std::endl;
 
     // Создаем базу данных с путем из конфига
-    Database db(dbPath);
+    static Database db(dbPath);
     db.initialize();
 
     // Создаем главное окно

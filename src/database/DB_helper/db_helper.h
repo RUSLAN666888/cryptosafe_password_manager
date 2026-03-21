@@ -61,8 +61,8 @@ class Database
 private:
   std::string db_path;
   std::vector<sqlite3 *> connection_pool; // пул соединений
-  std::recursive_mutex pool_mutex;        // мьютекс для доступа к пулу
-  std::mutex db_mutex;                    // мьютекс для операций с БД
+  std::mutex pool_mutex;        // мьютекс для доступа к пулу
+  //std::mutex db_mutex;                    // мьютекс для операций с БД
   int max_connections;
 
   // Внутренние вспомогательные методы

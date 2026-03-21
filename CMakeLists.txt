@@ -4,6 +4,9 @@ project(CryptoSafe)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -DDEBUG")
+
 # Название исполняемого файла
 set(TARGET_NAME cryptosafe)
 
@@ -14,6 +17,8 @@ set(TARGET_NAME cryptosafe)
 # 1. Поиск wxWidgets
 find_package(wxWidgets REQUIRED COMPONENTS core base)
 include(${wxWidgets_USE_FILE})
+
+add_definitions(-D__WXDEBUG__)
 
 # 2. Поиск SQLite3
 find_package(SQLite3 REQUIRED)
@@ -86,6 +91,7 @@ set(SOURCES
     src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp
     src/gui/dialogs/settings_dialog/SettingsDialog.cpp
     src/gui/dialogs/login_dialog/LoginDialog.cpp
+    src/gui/dialogs/password_change/password_change.cpp
 
     # GUI Widgets
     src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp
@@ -107,14 +113,19 @@ add_executable(${TARGET_NAME} ${SOURCES})
 # ============================================================
 
 target_include_directories(${TARGET_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/crypto
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/database
     ${CMAKE_CURRENT_SOURCE_DIR}/src/database/DB_helper
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/first_run_wizard
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/settings_dialog
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/login_dialog
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/password_change
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets/audit_log_viewer
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets/password_entry
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets/secure_table
@@ -149,3 +160,5 @@ message(STATUS "C++ Standard: ${CMAKE_CXX_STANDARD}")
 message(STATUS "wxWidgets found: ${wxWidgets_FOUND}")
 message(STATUS "SQLite3 found: ${SQLite3_FOUND}")
 message(STATUS "nlohmann_json found: ${nlohmann_json_FOUND}")
+
+

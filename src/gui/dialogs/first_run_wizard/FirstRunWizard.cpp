@@ -5,24 +5,23 @@
 #include <wx/stattext.h>
 #include <wx/timer.h>
 #include <zxcvbn.h>
+#include "../src/core/crypto/key_derivation.h"
+#include "../src/core/key_manager.h"
 
 #define ID_BrowseButton 10001
 #define ID_STRENGTH_TIMER 10002
 
-wxBEGIN_EVENT_TABLE(FirstRunWizard,
-                    wxWizard) EVT_BUTTON(ID_BrowseButton,
-                                         FirstRunWizard::onBrowseDatabase)
+wxBEGIN_EVENT_TABLE(FirstRunWizard, wxWizard)
+    EVT_BUTTON(ID_BrowseButton,FirstRunWizard::onBrowseDatabase)
     EVT_WIZARD_PAGE_CHANGING(wxID_ANY, FirstRunWizard::onPasswordPageChanging)
-        EVT_WIZARD_FINISHED(wxID_ANY, FirstRunWizard::onWizardFinished)
-            EVT_TEXT(wxID_ANY, FirstRunWizard::onPasswordTextChanged)
-                EVT_TIMER(ID_STRENGTH_TIMER, FirstRunWizard::onStrengthTimer)
-                    wxEND_EVENT_TABLE()
+    EVT_WIZARD_FINISHED(wxID_ANY, FirstRunWizard::onWizardFinished)
+    EVT_TEXT(wxID_ANY, FirstRunWizard::onPasswordTextChanged)
+    EVT_TIMER(ID_STRENGTH_TIMER, FirstRunWizard::onStrengthTimer)
+    wxEND_EVENT_TABLE()
 
-                        FirstRunWizard::FirstRunWizard(wxWindow *parent,
-                                                       ConfigHander &cfg)
+FirstRunWizard::FirstRunWizard(wxWindow *parent, ConfigHander &cfg)
     : wxWizard(parent, wxID_ANY, "CryptoSafe Setup Wizard", wxNullBitmap,
-               wxDefaultPosition, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
-      config(cfg)
+               wxDefaultPosition, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER), config(cfg)
 {
   // Создаем страницы
   welcomePage = createWelcomePage();
@@ -470,6 +469,15 @@ void FirstRunWizard::onWizardFinished(wxWizardEvent &event)
   // (БД будет создана после закрытия мастера)
   pendingAuthData = std::move(authData);
 
+  std::vector<uint8_t> key;
+  encSalt.resize(16);
+
+  randombytes_buf(encSalt.data(), encSalt.size());
+
+  derive_encryption_key(pwdStr, encSalt, key);
+
+  KeyManager::getInstance().store_key(key);
+
   // Зануляем пароль в памяти
   volatile char *p = const_cast<char *>(pwdStr.data());
   for (size_t i = 0; i < pwdStr.size(); ++i)
@@ -482,3 +490,4 @@ void FirstRunWizard::onWizardFinished(wxWizardEvent &event)
 }
 
 Argon2Data &FirstRunWizard::getAuthData() { return pendingAuthData; }
+

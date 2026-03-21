@@ -9,6 +9,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o.d"
   "CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.o"
   "CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.o.d"
+  "CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.o"
+  "CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.o.d"
   "CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o"
   "CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o.d"
   "CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o"

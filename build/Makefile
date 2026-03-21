@@ -249,6 +249,30 @@ src/gui/dialogs/login_dialog/LoginDialog.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.s
 .PHONY : src/gui/dialogs/login_dialog/LoginDialog.cpp.s
 
+src/gui/dialogs/password_change/password_change.o: src/gui/dialogs/password_change/password_change.cpp.o
+.PHONY : src/gui/dialogs/password_change/password_change.o
+
+# target to build an object file
+src/gui/dialogs/password_change/password_change.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.o
+.PHONY : src/gui/dialogs/password_change/password_change.cpp.o
+
+src/gui/dialogs/password_change/password_change.i: src/gui/dialogs/password_change/password_change.cpp.i
+.PHONY : src/gui/dialogs/password_change/password_change.i
+
+# target to preprocess a source file
+src/gui/dialogs/password_change/password_change.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.i
+.PHONY : src/gui/dialogs/password_change/password_change.cpp.i
+
+src/gui/dialogs/password_change/password_change.s: src/gui/dialogs/password_change/password_change.cpp.s
+.PHONY : src/gui/dialogs/password_change/password_change.s
+
+# target to generate assembly for a file
+src/gui/dialogs/password_change/password_change.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.s
+.PHONY : src/gui/dialogs/password_change/password_change.cpp.s
+
 src/gui/dialogs/settings_dialog/SettingsDialog.o: src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o
 .PHONY : src/gui/dialogs/settings_dialog/SettingsDialog.o
 
@@ -369,6 +393,9 @@ help:
 	@echo "... src/gui/dialogs/login_dialog/LoginDialog.o"
 	@echo "... src/gui/dialogs/login_dialog/LoginDialog.i"
 	@echo "... src/gui/dialogs/login_dialog/LoginDialog.s"
+	@echo "... src/gui/dialogs/password_change/password_change.o"
+	@echo "... src/gui/dialogs/password_change/password_change.i"
+	@echo "... src/gui/dialogs/password_change/password_change.s"
 	@echo "... src/gui/dialogs/settings_dialog/SettingsDialog.o"
 	@echo "... src/gui/dialogs/settings_dialog/SettingsDialog.i"
 	@echo "... src/gui/dialogs/settings_dialog/SettingsDialog.s"

@@ -700,4 +700,8 @@ CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o: \
  /usr/local/include/wx-3.2/wx/gtk/notebook.h \
  /home/master666/development/cryptosafe_password_manager/src/../src/gui/widgets/audit_log_viewer/AuditLogViewer.h \
  /usr/local/include/wx-3.2/wx/aboutdlg.h \
- /usr/local/include/wx-3.2/wx/artprov.h
+ /usr/local/include/wx-3.2/wx/artprov.h \
+ /home/master666/development/cryptosafe_password_manager/src/../src/gui/dialogs/password_change/password_change.h \
+ /home/master666/development/cryptosafe_password_manager/src/../src/gui/dialogs/password_change/../../../database/DB_helper/db_helper.h \
+ /home/master666/development/cryptosafe_password_manager/src/../src/gui/dialogs/password_change/../../../core/crypto/authentication.h \
+ /home/master666/development/cryptosafe_password_manager/src/../src/gui/dialogs/password_change/../../../core/key_manager.h

@@ -17,6 +17,7 @@ private:
   wxStaticText *strengthText;
   wxTimer *strengthTimer;
   Argon2Data pendingAuthData; // для временного хранения
+  std::vector<uint8_t> encSalt;
 
   // Страницы
   wxWizardPageSimple *welcomePage;
@@ -58,6 +59,7 @@ public:
   wxWizardPage *GetFirstPage() const { return welcomePage; }
   FirstRunWizard(wxWindow *parent, ConfigHander &cfg);
   Argon2Data &getAuthData();
+  std::vector<uint8_t> getEncSalt(){return encSalt;}
 
   wxDECLARE_EVENT_TABLE();
 };
