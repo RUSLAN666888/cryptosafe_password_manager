@@ -28,9 +28,10 @@ wxBEGIN_EVENT_TABLE(MainWindow, wxFrame)
     EVT_BUTTON(ID_DeleteEntry, MainWindow::onDeleteEntry)
     EVT_TIMER(ID_InactivityTimer, MainWindow::onInactivityTimer)
     EVT_MENU(ID_ChangePassword, MainWindow::onChangePassword)
+    //EVT_ACTIVATE(MainWindow::onActivate)
 wxEND_EVENT_TABLE()
 
-    MainWindow::MainWindow(ConfigHander &cfg, Database &database)
+MainWindow::MainWindow(ConfigHander &cfg, Database &database)
     : wxFrame(nullptr, wxID_ANY, "CryptoSafe Manager", wxDefaultPosition, wxSize(900, 600)),
     config(cfg), db(database), isLoggedIn(false), isFirstRun(false),
     isShowingLoginDialog(false)
@@ -41,8 +42,11 @@ wxEND_EVENT_TABLE()
     createStatusBar();
     Center();
 
+    // Регистрируем обработчики событий
+    registerEventHandlers();
+
     // Скрываем содержимое до логина
-    passwordTable->Hide();
+    //passwordTable->Hide();
 
     // Проверяем первый запуск
     if (config.isFirstRun())
@@ -69,6 +73,16 @@ MainWindow::~MainWindow()
         inactivityTimer->Stop();
         delete inactivityTimer;
     }
+}
+
+void MainWindow::registerEventHandlers()
+{
+    // Подписываемся на события через EventBus
+    eventBus.subscribe(EventType::UserLoggedIn,
+                       [this](const Event& event) { this->onUserLoggedIn(event); });
+
+    eventBus.subscribe(EventType::UserLoggedOut,
+                       [this](const Event& event) { this->onUserLoggedOut(event); });
 }
 
 void MainWindow::createMenuBar()
@@ -233,7 +247,26 @@ void MainWindow::lockApplication()
     }
 }
 
-// onActivate полностью удален - ничего не делаем при сворачивании
+// void MainWindow::onActivate(wxActivateEvent& event)
+// {
+//     if (!event.GetActive()) {
+//         // Окно потеряло активность (свернули или переключились)
+//         KeyManager::getInstance().on_app_inactive();
+//         lockApplication();
+//     } else {
+//         // Окно стало активным
+//         KeyManager::getInstance().on_app_active();
+
+//         KeyManager::KeyData keyData;
+//         KeyManager::getInstance().get_key(keyData);
+//         if (keyData.data == nullptr) {
+//             showLoginDialog();
+//         } else {
+//             unlockApplication();
+//         }
+//     }
+//     event.Skip();
+// }
 
 void MainWindow::onInactivityTimer(wxTimerEvent &event)
 {
@@ -390,4 +423,23 @@ void MainWindow::onChangePassword(wxCommandEvent &event)
         // Показываем диалог логина
         showLoginDialog();
     }
+}
+
+void MainWindow::onUserLoggedIn(const Event& event)
+{
+    std::cout << "User logged in event received" << std::endl;
+
+    // Вызываем в главном потоке, так как EventBus может вызывать из любого потока
+    wxTheApp->CallAfter([this]() {
+        unlockApplication();
+    });
+}
+
+void MainWindow::onUserLoggedOut(const Event& event)
+{
+    std::cout << "User logged out event received" << std::endl;
+
+    wxTheApp->CallAfter([this]() {
+        lockApplication();
+    });
 }

@@ -1155,6 +1155,10 @@ CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o
  /home/master666/development/cryptosafe_password_manager/src/gui/MainWindow.h
  /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/first_run_wizard/FirstRunWizard.h
  /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/login_dialog/LoginDialog.h
+ /home/master666/development/cryptosafe_password_manager/src/core/crypto/authentication.h
+ /home/master666/development/cryptosafe_password_manager/src/core/key_manager.h
+ /home/master666/development/cryptosafe_password_manager/src/database/DB_helper/db_helper.h
+ /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/password_change/password_change.h
  /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/settings_dialog/SettingsDialog.h
  /home/master666/development/cryptosafe_password_manager/src/gui/widgets/audit_log_viewer/AuditLogViewer.h
  /home/master666/development/cryptosafe_password_manager/src/gui/widgets/password_entry/PasswordEntry.h
@@ -1938,6 +1942,9 @@ CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
  /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp
  /home/master666/development/cryptosafe_password_manager/src/core/config_handler.h
  /home/master666/development/cryptosafe_password_manager/src/core/crypto/authentication.h
+ /home/master666/development/cryptosafe_password_manager/src/core/crypto/key_derivation.h
+ /home/master666/development/cryptosafe_password_manager/src/core/events.h
+ /home/master666/development/cryptosafe_password_manager/src/core/key_manager.h
  /home/master666/development/cryptosafe_password_manager/src/gui/widgets/password_entry/PasswordEntry.h
  /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/first_run_wizard/FirstRunWizard.h
  /usr/include/alloca.h
@@ -2030,6 +2037,8 @@ CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
  /usr/include/c++/13/bits/sstream.tcc
  /usr/include/c++/13/bits/std_abs.h
  /usr/include/c++/13/bits/std_function.h
+ /usr/include/c++/13/bits/std_mutex.h
+ /usr/include/c++/13/bits/std_thread.h
  /usr/include/c++/13/bits/stl_algo.h
  /usr/include/c++/13/bits/stl_algobase.h
  /usr/include/c++/13/bits/stl_bvector.h
@@ -2054,7 +2063,9 @@ CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
  /usr/include/c++/13/bits/streambuf_iterator.h
  /usr/include/c++/13/bits/string_view.tcc
  /usr/include/c++/13/bits/stringfwd.h
+ /usr/include/c++/13/bits/this_thread_sleep.h
  /usr/include/c++/13/bits/uniform_int_dist.h
+ /usr/include/c++/13/bits/unique_lock.h
  /usr/include/c++/13/bits/unique_ptr.h
  /usr/include/c++/13/bits/unordered_map.h
  /usr/include/c++/13/bits/uses_allocator.h
@@ -2068,6 +2079,7 @@ CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
  /usr/include/c++/13/cassert
  /usr/include/c++/13/cctype
  /usr/include/c++/13/cerrno
+ /usr/include/c++/13/chrono
  /usr/include/c++/13/clocale
  /usr/include/c++/13/cmath
  /usr/include/c++/13/codecvt
@@ -2106,8 +2118,10 @@ CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
  /usr/include/c++/13/map
  /usr/include/c++/13/math.h
  /usr/include/c++/13/memory
+ /usr/include/c++/13/mutex
  /usr/include/c++/13/new
  /usr/include/c++/13/numeric
+ /usr/include/c++/13/optional
  /usr/include/c++/13/ostream
  /usr/include/c++/13/pstl/execution_defs.h
  /usr/include/c++/13/pstl/glue_algorithm_defs.h
@@ -2122,6 +2136,7 @@ CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
  /usr/include/c++/13/string
  /usr/include/c++/13/string_view
  /usr/include/c++/13/system_error
+ /usr/include/c++/13/thread
  /usr/include/c++/13/tr1/bessel_function.tcc
  /usr/include/c++/13/tr1/beta_function.tcc
  /usr/include/c++/13/tr1/ell_integral.tcc
@@ -2206,6 +2221,30 @@ CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
  /usr/include/nlohmann/ordered_map.hpp
  /usr/include/nlohmann/thirdparty/hedley/hedley.hpp
  /usr/include/nlohmann/thirdparty/hedley/hedley_undef.hpp
+ /usr/include/openssl/asn1.h
+ /usr/include/openssl/asn1err.h
+ /usr/include/openssl/bio.h
+ /usr/include/openssl/bioerr.h
+ /usr/include/openssl/bn.h
+ /usr/include/openssl/bnerr.h
+ /usr/include/openssl/core.h
+ /usr/include/openssl/core_dispatch.h
+ /usr/include/openssl/crypto.h
+ /usr/include/openssl/cryptoerr.h
+ /usr/include/openssl/cryptoerr_legacy.h
+ /usr/include/openssl/e_os2.h
+ /usr/include/openssl/evp.h
+ /usr/include/openssl/evperr.h
+ /usr/include/openssl/macros.h
+ /usr/include/openssl/obj_mac.h
+ /usr/include/openssl/objects.h
+ /usr/include/openssl/objectserr.h
+ /usr/include/openssl/opensslv.h
+ /usr/include/openssl/params.h
+ /usr/include/openssl/safestack.h
+ /usr/include/openssl/stack.h
+ /usr/include/openssl/symhacks.h
+ /usr/include/openssl/types.h
  /usr/include/pthread.h
  /usr/include/sched.h
  /usr/include/signal.h
@@ -2415,6 +2454,8 @@ CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
  /usr/include/x86_64-linux-gnu/c++/13/bits/time_members.h
  /usr/include/x86_64-linux-gnu/gnu/stubs-64.h
  /usr/include/x86_64-linux-gnu/gnu/stubs.h
+ /usr/include/x86_64-linux-gnu/openssl/configuration.h
+ /usr/include/x86_64-linux-gnu/openssl/opensslconf.h
  /usr/include/x86_64-linux-gnu/sys/cdefs.h
  /usr/include/x86_64-linux-gnu/sys/select.h
  /usr/include/x86_64-linux-gnu/sys/single_threaded.h

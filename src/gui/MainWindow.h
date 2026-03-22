@@ -61,8 +61,17 @@ private:
     void onTableItemSelected(wxListEvent &event);
     void onChangePassword(wxCommandEvent &event);
 
+    // Обработчики событий
+    void onUserLoggedIn(const Event& event);
+    void onUserLoggedOut(const Event& event);
+
+    // Для хранения ID подписок
+    void registerEventHandlers();
+    void unregisterEventHandlers();
+
     // Обработчики состояния
     void onInactivityTimer(wxTimerEvent &event);
+    //void onActivate(wxActivateEvent& event);
 
 public:
     MainWindow(ConfigHander &cfg, Database &database);

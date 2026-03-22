@@ -11,7 +11,7 @@ wxBEGIN_EVENT_TABLE(LoginDialog, wxDialog)
                 LoginDialog::LoginDialog(wxWindow *parent, ConfigHander &cfg,
                                          Database &database)
     : wxDialog(parent, wxID_ANY, "Login to CryptoSafe", wxDefaultPosition,
-               wxSize(400, 500)),
+               wxSize(700, 500)),
       config(cfg), db(database), failedAttempts(0), currentDelay(0),
       backoffTimer(nullptr)
 {
@@ -197,7 +197,7 @@ void LoginDialog::onLogin(wxCommandEvent &event)
     return;
   }
 
-  // Шаг 2: Derive encryption key via PBKDF2
+  // Шаг 2: выводим ключ через PBKDF2
   std::vector<uint8_t> encKey;
   derive_encryption_key(pwdStr, encSalt, encKey);
 
@@ -209,7 +209,7 @@ void LoginDialog::onLogin(wxCommandEvent &event)
   }
 
   // Шаг 3: Cache encryption key in secure memory
-  KeyManager::getInstance().store_key(encKey); // ← используем синглтон!
+  KeyManager::getInstance().store_key(encKey);
 
   // Шаг 4: Publish UserLoggedIn event
   struct LoginEventData
