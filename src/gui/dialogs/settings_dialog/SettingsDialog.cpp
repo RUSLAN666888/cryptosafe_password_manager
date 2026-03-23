@@ -1,156 +1,278 @@
 #include "SettingsDialog.h"
-#include <wx/msgdlg.h>
+#include <QMessageBox>
+#include <QGroupBox>
+#include <QFormLayout>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QSpinBox>
+#include <QComboBox>
+#include <QApplication>
+#include <QScreen>
 
-wxBEGIN_EVENT_TABLE(SettingsDialog, wxDialog)
-    EVT_BUTTON(wxID_OK, SettingsDialog::onOk)
-        EVT_BUTTON(wxID_CANCEL, SettingsDialog::onCancel) wxEND_EVENT_TABLE()
-
-            SettingsDialog::SettingsDialog(wxWindow *parent, ConfigHander &cfg)
-    : wxDialog(parent, wxID_ANY, "Settings", wxDefaultPosition,
-               wxSize(450, 300)),
-      config(cfg)
+SettingsDialog::SettingsDialog(QWidget *parent, ConfigHander &cfg)
+    : QDialog(parent)
+    , config(cfg)
 {
-  std::cout << "SettingsDialog constructor start" << std::endl;
+    setWindowTitle("Settings");
+    setMinimumSize(500, 400);
+    setModal(true);
 
-  wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
-  std::cout << "MainSizer created" << std::endl;
+    // Основной layout
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-  // Создаем вкладки (все с заглушками)
-  notebook = new wxNotebook(this, wxID_ANY);
-  std::cout << "Notebook created" << std::endl;
+    // Создаем вкладки
+    tabWidget = new QTabWidget(this);
 
-  std::cout << "Creating General tab..." << std::endl;
-  createGeneralTab(notebook);
-  std::cout << "General tab created" << std::endl;
+    createGeneralTab();
+    createSecurityTab();
+    createAdvancedTab();
 
-  std::cout << "Creating Security tab..." << std::endl;
-  createSecurityTab(notebook);
-  std::cout << "Security tab created" << std::endl;
+    mainLayout->addWidget(tabWidget);
 
-  std::cout << "Creating Advanced tab..." << std::endl;
-  createAdvancedTab(notebook);
-  std::cout << "Advanced tab created" << std::endl;
+    // Кнопки OK/Cancel
+    QHBoxLayout *buttonLayout = new QHBoxLayout();
+    buttonLayout->addStretch();
 
-  mainSizer->Add(notebook, 1, wxEXPAND | wxALL, 10);
-  std::cout << "Notebook added to sizer" << std::endl;
+    QPushButton *okButton = new QPushButton("OK", this);
+    QPushButton *cancelButton = new QPushButton("Cancel", this);
 
-  // Кнопки OK/Cancel
-  wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
-  buttonSizer->AddStretchSpacer();
-  std::cout << "Button sizer created" << std::endl;
+    buttonLayout->addWidget(okButton);
+    buttonLayout->addSpacing(10);
+    buttonLayout->addWidget(cancelButton);
+    buttonLayout->addSpacing(20);
 
-  wxButton *okButton = new wxButton(this, wxID_OK, "OK");
-  wxButton *cancelButton = new wxButton(this, wxID_CANCEL, "Cancel");
-  std::cout << "Buttons created" << std::endl;
+    mainLayout->addLayout(buttonLayout);
 
-  buttonSizer->Add(okButton, 0, wxRIGHT, 10);
-  buttonSizer->Add(cancelButton, 0);
-  std::cout << "Buttons added to sizer" << std::endl;
+    setLayout(mainLayout);
 
-  mainSizer->Add(buttonSizer, 0, wxEXPAND | wxALL, 10);
-  std::cout << "Button sizer added to main sizer" << std::endl;
+    // Подключаем сигналы
+    connect(okButton, &QPushButton::clicked, this, &SettingsDialog::onOk);
+    connect(cancelButton, &QPushButton::clicked, this, &SettingsDialog::onCancel);
 
-  SetSizer(mainSizer);
-  std::cout << "Sizer set" << std::endl;
-
-  Centre();
-  std::cout << "Dialog centered" << std::endl;
+    // Центрируем окно
+    adjustSize();
+    QRect screenGeometry = QApplication::primaryScreen()->geometry();
+    int x = (screenGeometry.width() - width()) / 2;
+    int y = (screenGeometry.height() - height()) / 2;
+    move(x, y);
 }
 
-// ============== ВКЛАДКА GENERAL (единственная с реальными данными в Sprint 1)
-// ==============
-void SettingsDialog::createGeneralTab(wxNotebook *notebook)
+SettingsDialog::~SettingsDialog()
 {
-  std::cout << "createGeneralTab: start" << std::endl;
-
-  // Минимальный код, который точно должен работать
-  wxPanel *panel = new wxPanel(notebook);
-  std::cout << "panel created" << std::endl;
-
-  wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
-  std::cout << "sizer created" << std::endl;
-
-  // Простой текст без всяких вызовов config
-  wxStaticText *simpleText = new wxStaticText(panel, wxID_ANY, "Test Text");
-  std::cout << "static text created" << std::endl;
-
-  mainSizer->Add(simpleText, 0, wxALL, 10);
-  std::cout << "text added to sizer" << std::endl;
-
-  panel->SetSizer(mainSizer);
-  std::cout << "sizer set" << std::endl;
-
-  notebook->AddPage(panel, "General");
-  std::cout << "page added to notebook" << std::endl;
-
-  std::cout << "createGeneralTab: end" << std::endl;
 }
 
-// ============== ВКЛАДКА SECURITY (ЗАГЛУШКА) ==============
-void SettingsDialog::createSecurityTab(wxNotebook *notebook)
+void SettingsDialog::createGeneralTab()
 {
-  wxPanel *panel = new wxPanel(notebook);
-  wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
+    QWidget *panel = new QWidget();
+    QVBoxLayout *layout = new QVBoxLayout(panel);
 
-  wxStaticText *title = new wxStaticText(panel, wxID_ANY, "Security Settings");
-  wxFont titleFont = title->GetFont();
-  titleFont.SetWeight(wxFONTWEIGHT_BOLD);
-  title->SetFont(titleFont);
-  mainSizer->Add(title, 0, wxALL, 10);
+    // Заголовок
+    QLabel *title = new QLabel("General Settings", panel);
+    QFont titleFont = title->font();
+    titleFont.setPointSize(12);
+    titleFont.setBold(true);
+    title->setFont(titleFont);
+    layout->addWidget(title);
 
-  wxStaticText *placeholder =
-      new wxStaticText(panel, wxID_ANY,
-                       "Security settings will be available in Sprint 4:\n"
-                       "- Clipboard timeout\n"
-                       "- Auto-lock timeout\n"
-                       "- Panic key\n"
-                       "- Memory wipe options");
-  mainSizer->Add(placeholder, 0, wxALL, 10);
+    layout->addSpacing(10);
 
-  mainSizer->AddStretchSpacer();
-  panel->SetSizer(mainSizer);
-  notebook->AddPage(panel, "Security");
+    // Группа настроек
+    QGroupBox *settingsGroup = new QGroupBox("Application Settings", panel);
+    QFormLayout *formLayout = new QFormLayout(settingsGroup);
+    formLayout->setSpacing(10);
+    formLayout->setContentsMargins(15, 15, 15, 15);
+
+    // Database path (отображаем, но не редактируем в Sprint 1)
+    QLabel *dbPathLabel = new QLabel(QString::fromStdString(config.getDatabasePath()), settingsGroup);
+    dbPathLabel->setWordWrap(true);
+    dbPathLabel->setStyleSheet("color: #666;");
+    formLayout->addRow("Database Path:", dbPathLabel);
+
+    // Startup behavior
+    QCheckBox *startMinimized = new QCheckBox("Start minimized to tray", settingsGroup);
+    startMinimized->setChecked(false);
+    startMinimized->setEnabled(false); // Заглушка
+    formLayout->addRow("", startMinimized);
+
+    settingsGroup->setLayout(formLayout);
+    layout->addWidget(settingsGroup);
+
+    layout->addStretch();
+
+    // Информация
+    QLabel *info = new QLabel("General settings will be fully implemented in Sprint 4-5", panel);
+    info->setStyleSheet("color: #888;");
+    info->setWordWrap(true);
+    layout->addWidget(info);
+
+    panel->setLayout(layout);
+    tabWidget->addTab(panel, "General");
 }
 
-// ============== ВКЛАДКА ADVANCED (ЗАГЛУШКА) ==============
-void SettingsDialog::createAdvancedTab(wxNotebook *notebook)
+void SettingsDialog::createSecurityTab()
 {
-  wxPanel *panel = new wxPanel(notebook);
-  wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
+    QWidget *panel = new QWidget();
+    QVBoxLayout *layout = new QVBoxLayout(panel);
 
-  wxStaticText *title = new wxStaticText(panel, wxID_ANY, "Advanced Settings");
-  wxFont titleFont = title->GetFont();
-  titleFont.SetWeight(wxFONTWEIGHT_BOLD);
-  title->SetFont(titleFont);
-  mainSizer->Add(title, 0, wxALL, 10);
+    // Заголовок
+    QLabel *title = new QLabel("Security Settings", panel);
+    QFont titleFont = title->font();
+    titleFont.setPointSize(12);
+    titleFont.setBold(true);
+    title->setFont(titleFont);
+    layout->addWidget(title);
 
-  wxStaticText *placeholder = new wxStaticText(
-      panel, wxID_ANY,
-      "Advanced settings will be available in future sprints:\n"
-      "- Import/Export (Sprint 6)\n"
-      "- Backup (Sprint 8)\n"
-      "- Theme (future)\n"
-      "- Language (future)");
-  mainSizer->Add(placeholder, 0, wxALL, 10);
+    layout->addSpacing(10);
 
-  mainSizer->AddStretchSpacer();
-  panel->SetSizer(mainSizer);
-  notebook->AddPage(panel, "Advanced");
+    // Группа настроек
+    QGroupBox *settingsGroup = new QGroupBox("Auto-Lock Settings", panel);
+    QFormLayout *formLayout = new QFormLayout(settingsGroup);
+    formLayout->setSpacing(10);
+    formLayout->setContentsMargins(15, 15, 15, 15);
+
+    QSpinBox *autoLockSpin = new QSpinBox(settingsGroup);
+    autoLockSpin->setRange(1, 60);
+    autoLockSpin->setValue(5);
+    autoLockSpin->setSuffix(" minutes");
+    autoLockSpin->setEnabled(false); // Заглушка
+    formLayout->addRow("Auto-lock after inactivity:", autoLockSpin);
+
+    QCheckBox *lockOnMinimize = new QCheckBox("Lock when minimized", settingsGroup);
+    lockOnMinimize->setChecked(true);
+    lockOnMinimize->setEnabled(false); // Заглушка
+    formLayout->addRow("", lockOnMinimize);
+
+    QSpinBox *clipboardSpin = new QSpinBox(settingsGroup);
+    clipboardSpin->setRange(5, 60);
+    clipboardSpin->setValue(10);
+    clipboardSpin->setSuffix(" seconds");
+    clipboardSpin->setEnabled(false); // Заглушка
+    formLayout->addRow("Clear clipboard after:", clipboardSpin);
+
+    settingsGroup->setLayout(formLayout);
+    layout->addWidget(settingsGroup);
+
+    layout->addSpacing(10);
+
+    // Группа дополнительных настроек
+    QGroupBox *extraGroup = new QGroupBox("Additional Protection", panel);
+    QVBoxLayout *extraLayout = new QVBoxLayout(extraGroup);
+
+    QCheckBox *panicKey = new QCheckBox("Enable panic key (Ctrl+Shift+P)", extraGroup);
+    panicKey->setChecked(false);
+    panicKey->setEnabled(false); // Заглушка
+    extraLayout->addWidget(panicKey);
+
+    QCheckBox *memoryWipe = new QCheckBox("Wipe memory on lock", extraGroup);
+    memoryWipe->setChecked(true);
+    memoryWipe->setEnabled(false); // Заглушка
+    extraLayout->addWidget(memoryWipe);
+
+    extraGroup->setLayout(extraLayout);
+    layout->addWidget(extraGroup);
+
+    layout->addStretch();
+
+    // Информация
+    QLabel *info = new QLabel("Security settings will be fully implemented in Sprint 4", panel);
+    info->setStyleSheet("color: #888;");
+    info->setWordWrap(true);
+    layout->addWidget(info);
+
+    panel->setLayout(layout);
+    tabWidget->addTab(panel, "Security");
 }
 
-// ============== ОБРАБОТЧИКИ ==============
-void SettingsDialog::onOk(wxCommandEvent &event)
+void SettingsDialog::createAdvancedTab()
 {
-  // В Sprint 1 ничего не сохраняем, просто показываем сообщение
-  wxMessageBox("Settings dialog is a placeholder for Sprint 1.\n\n"
-               "Real settings will be implemented in future sprints:\n"
-               "- Security settings - Sprint 4\n"
-               "- Import/Export - Sprint 6\n"
-               "- Backup - Sprint 8\n"
-               "- Theme/Language - future",
-               "CryptoSafe Manager", wxOK | wxICON_INFORMATION, this);
+    QWidget *panel = new QWidget();
+    QVBoxLayout *layout = new QVBoxLayout(panel);
 
-  EndModal(wxID_OK);
+    // Заголовок
+    QLabel *title = new QLabel("Advanced Settings", panel);
+    QFont titleFont = title->font();
+    titleFont.setPointSize(12);
+    titleFont.setBold(true);
+    title->setFont(titleFont);
+    layout->addWidget(title);
+
+    layout->addSpacing(10);
+
+    // Группа импорта/экспорта
+    QGroupBox *importExportGroup = new QGroupBox("Import/Export", panel);
+    QVBoxLayout *importExportLayout = new QVBoxLayout(importExportGroup);
+
+    QPushButton *importBtn = new QPushButton("Import from CSV...", importExportGroup);
+    importBtn->setEnabled(false); // Заглушка
+    QPushButton *exportBtn = new QPushButton("Export to CSV...", importExportGroup);
+    exportBtn->setEnabled(false); // Заглушка
+
+    importExportLayout->addWidget(importBtn);
+    importExportLayout->addWidget(exportBtn);
+
+    importExportGroup->setLayout(importExportLayout);
+    layout->addWidget(importExportGroup);
+
+    layout->addSpacing(10);
+
+    // Группа резервного копирования
+    QGroupBox *backupGroup = new QGroupBox("Backup", panel);
+    QVBoxLayout *backupLayout = new QVBoxLayout(backupGroup);
+
+    QPushButton *backupBtn = new QPushButton("Create Backup...", backupGroup);
+    backupBtn->setEnabled(false); // Заглушка
+    QPushButton *restoreBtn = new QPushButton("Restore from Backup...", backupGroup);
+    restoreBtn->setEnabled(false); // Заглушка
+
+    backupLayout->addWidget(backupBtn);
+    backupLayout->addWidget(restoreBtn);
+
+    backupGroup->setLayout(backupLayout);
+    layout->addWidget(backupGroup);
+
+    layout->addSpacing(10);
+
+    // Группа темы
+    QGroupBox *themeGroup = new QGroupBox("Appearance", panel);
+    QFormLayout *themeLayout = new QFormLayout(themeGroup);
+
+    QComboBox *themeCombo = new QComboBox(themeGroup);
+    themeCombo->addItem("System Default");
+    themeCombo->addItem("Light");
+    themeCombo->addItem("Dark");
+    themeCombo->setEnabled(false); // Заглушка
+    themeLayout->addRow("Theme:", themeCombo);
+
+    themeGroup->setLayout(themeLayout);
+    layout->addWidget(themeGroup);
+
+    layout->addStretch();
+
+    // Информация
+    QLabel *info = new QLabel("Advanced settings will be implemented in Sprint 6-8", panel);
+    info->setStyleSheet("color: #888;");
+    info->setWordWrap(true);
+    layout->addWidget(info);
+
+    panel->setLayout(layout);
+    tabWidget->addTab(panel, "Advanced");
 }
 
-void SettingsDialog::onCancel(wxCommandEvent &event) { EndModal(wxID_CANCEL); }
+void SettingsDialog::onOk()
+{
+    QMessageBox::information(this, "CryptoSafe Manager",
+                             "Settings dialog is a placeholder for Sprint 2.\n\n"
+                             "Real settings will be implemented in future sprints:\n"
+                             "• Security settings - Sprint 4\n"
+                             "• Import/Export - Sprint 6\n"
+                             "• Backup - Sprint 8\n"
+                             "• Theme/Language - future",
+                             QMessageBox::Ok);
+
+    accept();
+}
+
+void SettingsDialog::onCancel()
+{
+    reject();
+}

@@ -1,108 +1,127 @@
 #include "AuditLogViewer.h"
-#include <wx/msgdlg.h>
+#include <QHeaderView>
 
-wxBEGIN_EVENT_TABLE(AuditLogViewer, wxDialog)
-    EVT_BUTTON(wxID_ANY, AuditLogViewer::onRefresh) wxEND_EVENT_TABLE()
-
-        AuditLogViewer::AuditLogViewer(wxWindow *parent, Database &database)
-    : wxDialog(parent, wxID_ANY, "Audit Logs", wxDefaultPosition,
-               wxSize(700, 500)),
-      db(database)
+AuditLogViewer::AuditLogViewer(QWidget *parent, Database &database)
+    : QDialog(parent)
+    , db(database)
 {
+    initUI();
+    refreshLogs();
 
-  // Основной вертикальный sizer
-  wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
+    // Центрируем окно
+    setWindowTitle("Audit Logs");
+    resize(700, 500);
+}
 
-  // Создаем список с колонками
-  logList =
-      new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-                     wxLC_REPORT | wxLC_SINGLE_SEL | wxLC_HRULES | wxLC_VRULES);
+void AuditLogViewer::initUI()
+{
+    // Основной вертикальный layout
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-  // Добавляем колонки
-  logList->AppendColumn("ID", wxLIST_FORMAT_LEFT, 50);
-  logList->AppendColumn("Action", wxLIST_FORMAT_LEFT, 150);
-  logList->AppendColumn("Timestamp", wxLIST_FORMAT_LEFT, 180);
-  logList->AppendColumn("Entry ID", wxLIST_FORMAT_LEFT, 80);
-  logList->AppendColumn("Details", wxLIST_FORMAT_LEFT, 200);
+    // Создаем таблицу для логов
+    logTable = new QTableWidget(this);
+    logTable->setColumnCount(5);
 
-  mainSizer->Add(logList, 1, wxEXPAND | wxALL, 5);
+    // Устанавливаем заголовки колонок
+    QStringList headers;
+    headers << "ID" << "Action" << "Timestamp" << "Entry ID" << "Details";
+    logTable->setHorizontalHeaderLabels(headers);
 
-  // Панель с кнопками
-  wxPanel *buttonPanel = new wxPanel(this);
-  wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
+    // Настройки таблицы
+    logTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    logTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    logTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    logTable->setAlternatingRowColors(true);
 
-  refreshButton = new wxButton(buttonPanel, wxID_ANY, "Refresh");
-  closeButton = new wxButton(buttonPanel, wxID_CANCEL, "Close");
+    // Устанавливаем ширину колонок
+    logTable->setColumnWidth(0, 50);   // ID
+    logTable->setColumnWidth(1, 150);  // Action
+    logTable->setColumnWidth(2, 180);  // Timestamp
+    logTable->setColumnWidth(3, 80);   // Entry ID
+    logTable->setColumnWidth(4, 200);  // Details
 
-  buttonSizer->AddStretchSpacer();
-  buttonSizer->Add(refreshButton, 0, wxALL, 5);
-  buttonSizer->Add(closeButton, 0, wxALL, 5);
+    mainLayout->addWidget(logTable, 1);
 
-  buttonPanel->SetSizer(buttonSizer);
-  mainSizer->Add(buttonPanel, 0, wxEXPAND | wxALL, 5);
+    // Панель с кнопками
+    QHBoxLayout *buttonLayout = new QHBoxLayout();
+    buttonLayout->addStretch();
 
-  SetSizer(mainSizer);
+    refreshButton = new QPushButton("Refresh", this);
+    closeButton = new QPushButton("Close", this);
 
-  // Загружаем логи
-  refreshLogs();
+    buttonLayout->addWidget(refreshButton);
+    buttonLayout->addWidget(closeButton);
 
-  // Центрируем окно
-  Centre();
+    mainLayout->addLayout(buttonLayout);
+
+    // Подключаем сигналы
+    connect(refreshButton, &QPushButton::clicked, this, &AuditLogViewer::onRefresh);
+    connect(closeButton, &QPushButton::clicked, this, &AuditLogViewer::onClose);
 }
 
 void AuditLogViewer::refreshLogs()
 {
-  // Очищаем список
-  logList->DeleteAllItems();
+    // Очищаем таблицу
+    logTable->clearContents();
+    logTable->setRowCount(0);
 
-  // Получаем логи из базы данных
-  auto logs = db.getAuditLogs(100); // Последние 100 записей
+    // Получаем логи из базы данных (последние 100 записей)
+    auto logs = db.getAuditLogs(100);
 
-  int index = 0;
-  for (const auto &log : logs)
-  {
-    // Вставляем новую строку
-    long itemIndex =
-        logList->InsertItem(index, wxString::Format("%ld", log.id));
-
-    // Заполняем колонки
-    logList->SetItem(itemIndex, 1, log.action);
-    logList->SetItem(itemIndex, 2, log.timestamp);
-
-    if (log.entry_id >= 0)
+    int row = 0;
+    for (const auto &log : logs)
     {
-      logList->SetItem(itemIndex, 3, wxString::Format("%d", log.entry_id));
+        logTable->insertRow(row);
+
+        // Конвертируем данные в QString (предполагаем, что поля - std::string или wxString)
+        logTable->setItem(row, 0, new QTableWidgetItem(QString::number(log.id)));
+        logTable->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(log.action)));
+        logTable->setItem(row, 2, new QTableWidgetItem(QString::fromStdString(log.timestamp)));
+
+        // Entry ID
+        if (log.entry_id >= 0)
+        {
+            logTable->setItem(row, 3, new QTableWidgetItem(QString::number(log.entry_id)));
+        }
+        else
+        {
+            logTable->setItem(row, 3, new QTableWidgetItem("-"));
+        }
+
+        logTable->setItem(row, 4, new QTableWidgetItem(QString::fromStdString(log.details)));
+
+        row++;
     }
-    else
+
+    // Если нет логов, показываем сообщение
+    if (logs.empty())
     {
-      logList->SetItem(itemIndex, 3, "-");
+        logTable->insertRow(0);
+        logTable->setItem(0, 0, new QTableWidgetItem("-"));
+        logTable->setItem(0, 1, new QTableWidgetItem("No audit logs found"));
+        logTable->setItem(0, 2, new QTableWidgetItem(""));
+        logTable->setItem(0, 3, new QTableWidgetItem(""));
+        logTable->setItem(0, 4, new QTableWidgetItem(""));
     }
 
-    logList->SetItem(itemIndex, 4, log.details);
-
-    index++;
-  }
-
-  // Если нет логов, показываем сообщение
-  if (logs.empty())
-  {
-    long itemIndex = logList->InsertItem(0, "-");
-    logList->SetItem(itemIndex, 1, "No audit logs found");
-    logList->SetItem(itemIndex, 2, "");
-    logList->SetItem(itemIndex, 3, "");
-    logList->SetItem(itemIndex, 4, "");
-  }
-
-  // Автоматически подгоняем ширину колонок
-  for (int i = 0; i < 5; i++)
-  {
-    logList->SetColumnWidth(i, wxLIST_AUTOSIZE);
-    // Минимальная ширина для некоторых колонок
-    if (i == 4 && logList->GetColumnWidth(i) < 200)
+    // Автоматически подгоняем ширину колонок
+    for (int i = 0; i < 5; i++)
     {
-      logList->SetColumnWidth(i, 200);
+        logTable->resizeColumnToContents(i);
+        // Минимальная ширина для колонки Details
+        if (i == 4 && logTable->columnWidth(i) < 200)
+        {
+            logTable->setColumnWidth(i, 200);
+        }
     }
-  }
 }
 
-void AuditLogViewer::onRefresh(wxCommandEvent &event) { refreshLogs(); }
+void AuditLogViewer::onRefresh()
+{
+    refreshLogs();
+}
+
+void AuditLogViewer::onClose()
+{
+    accept();  // Закрываем диалог
+}

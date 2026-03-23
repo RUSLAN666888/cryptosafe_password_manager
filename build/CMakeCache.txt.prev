@@ -32,19 +32,16 @@ CMAKE_BUILD_TYPE:STRING=Debug
 //Enable colored diagnostics throughout.
 CMAKE_COLOR_DIAGNOSTICS:BOOL=1
 
-//Enable/Disable color output during build.
-CMAKE_COLOR_MAKEFILE:BOOL=ON
-
-//No help, variable specified on the command line.
-CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/g++
+//CXX compiler
+CMAKE_CXX_COMPILER:STRING=/usr/bin/x86_64-linux-gnu-g++-13
 
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler
-CMAKE_CXX_COMPILER_AR:FILEPATH=/usr/bin/gcc-ar-13
+CMAKE_CXX_COMPILER_AR:FILEPATH=/usr/bin/x86_64-linux-gnu-gcc-ar-13
 
 //A wrapper around 'ranlib' adding the appropriate '--plugin' option
 // for the GCC compiler
-CMAKE_CXX_COMPILER_RANLIB:FILEPATH=/usr/bin/gcc-ranlib-13
+CMAKE_CXX_COMPILER_RANLIB:FILEPATH=/usr/bin/x86_64-linux-gnu-gcc-ranlib-13
 
 //Flags used by the CXX compiler during all build types.
 CMAKE_CXX_FLAGS:STRING=
@@ -61,8 +58,10 @@ CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 //Flags used by the CXX compiler during RELWITHDEBINFO builds.
 CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
-//No help, variable specified on the command line.
-CMAKE_C_COMPILER:FILEPATH=/usr/bin/gcc
+CMAKE_CXX_OUTPUT_EXTENSION:STRING=.o
+
+//C compiler
+CMAKE_C_COMPILER:STRING=/usr/bin/gcc-13
 
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler
@@ -87,6 +86,8 @@ CMAKE_C_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 //Flags used by the C compiler during RELWITHDEBINFO builds.
 CMAKE_C_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
+CMAKE_C_OUTPUT_EXTENSION:STRING=.o
+
 //Path to a program.
 CMAKE_DLLTOOL:FILEPATH=CMAKE_DLLTOOL-NOTFOUND
 
@@ -105,11 +106,14 @@ CMAKE_EXE_LINKER_FLAGS_RELEASE:STRING=
 //Flags used by the linker during RELWITHDEBINFO builds.
 CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
-//No help, variable specified on the command line.
-CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE
+//Enable/Disable output of compile commands during generation.
+CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=
 
 //Value Computed by CMake.
 CMAKE_FIND_PACKAGE_REDIRECTS_DIR:STATIC=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles/pkgRedirects
+
+//No help, variable specified on the command line.
+CMAKE_GENERATOR:STRING=Unix Makefiles
 
 //Install path prefix, prepended onto install directories.
 CMAKE_INSTALL_PREFIX:PATH=/usr/local
@@ -149,11 +153,17 @@ CMAKE_OBJCOPY:FILEPATH=/usr/bin/objcopy
 //Path to a program.
 CMAKE_OBJDUMP:FILEPATH=/usr/bin/objdump
 
+//No help, variable specified on the command line.
+CMAKE_PREFIX_PATH:PATH=
+
 //Value Computed by CMake
 CMAKE_PROJECT_DESCRIPTION:STATIC=
 
 //Value Computed by CMake
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
+
+//No help, variable specified on the command line.
+CMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=/home/master666/development/cryptosafe_password_manager/build/.qtc/package-manager/auto-setup.cmake
 
 //Value Computed by CMake
 CMAKE_PROJECT_NAME:STATIC=CryptoSafe
@@ -232,9 +242,6 @@ CryptoSafe_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 CryptoSafe_SOURCE_DIR:STATIC=/home/master666/development/cryptosafe_password_manager
 
-//The directory containing a CMake configuration file for GTest.
-GTest_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/GTest
-
 //Path to a file.
 LIBSODIUM_INCLUDE:PATH=/usr/include
 
@@ -255,6 +262,24 @@ PKG_CONFIG_ARGN:STRING=
 
 //pkg-config executable
 PKG_CONFIG_EXECUTABLE:FILEPATH=/usr/bin/pkg-config
+
+//Skip Qt Creator's package manager auto-setup
+QT_CREATOR_SKIP_PACKAGE_MANAGER_SETUP:BOOL=OFF
+
+//No help, variable specified on the command line.
+QT_QMAKE_EXECUTABLE:FILEPATH=
+
+//The directory containing a CMake configuration file for Qt5Core.
+Qt5Core_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt5Core
+
+//The directory containing a CMake configuration file for Qt5Gui.
+Qt5Gui_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui
+
+//The directory containing a CMake configuration file for Qt5Widgets.
+Qt5Widgets_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets
+
+//The directory containing a CMake configuration file for Qt5.
+Qt5_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt5
 
 //Path to a file.
 SQLite3_INCLUDE_DIR:PATH=/usr/include
@@ -277,15 +302,6 @@ pkgcfg_lib__OPENSSL_crypto:FILEPATH=/usr/lib/x86_64-linux-gnu/libcrypto.so
 //Path to a library.
 pkgcfg_lib__OPENSSL_ssl:FILEPATH=/usr/lib/x86_64-linux-gnu/libssl.so
 
-//Location of wxWidgets library configuration provider binary (wx-config).
-wxWidgets_CONFIG_EXECUTABLE:FILEPATH=/usr/local/bin/wx-config
-
-//Use debug build?
-wxWidgets_USE_DEBUG:BOOL=OFF
-
-//Location of wxWidgets resource file compiler binary (wxrc)
-wxWidgets_wxrc_EXECUTABLE:FILEPATH=/usr/local/bin/wxrc
-
 
 ########################
 # INTERNAL cache entries
@@ -303,8 +319,6 @@ CMAKE_CACHE_MAJOR_VERSION:INTERNAL=3
 CMAKE_CACHE_MINOR_VERSION:INTERNAL=28
 //Patch version of cmake used to create the current loaded cache
 CMAKE_CACHE_PATCH_VERSION:INTERNAL=3
-//ADVANCED property for variable: CMAKE_COLOR_MAKEFILE
-CMAKE_COLOR_MAKEFILE-ADVANCED:INTERNAL=1
 //Path to CMake executable.
 CMAKE_COMMAND:INTERNAL=/usr/bin/cmake
 //Path to cpack program executable.
@@ -359,18 +373,12 @@ CMAKE_EXE_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_EXPORT_COMPILE_COMMANDS
 CMAKE_EXPORT_COMPILE_COMMANDS-ADVANCED:INTERNAL=1
-//Name of external makefile project generator.
-CMAKE_EXTRA_GENERATOR:INTERNAL=
-//Name of generator.
-CMAKE_GENERATOR:INTERNAL=Unix Makefiles
 //Generator instance identifier.
 CMAKE_GENERATOR_INSTANCE:INTERNAL=
 //Name of generator platform.
 CMAKE_GENERATOR_PLATFORM:INTERNAL=
 //Name of generator toolset.
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
-//Test CMAKE_HAVE_LIBC_PTHREAD
-CMAKE_HAVE_LIBC_PTHREAD:INTERNAL=1
 //Source directory with the top level CMakeLists.txt file for this
 // project
 CMAKE_HOME_DIRECTORY:INTERNAL=/home/master666/development/cryptosafe_password_manager
@@ -438,16 +446,12 @@ CMAKE_TAPI-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
-//Details about finding GTest
-FIND_PACKAGE_MESSAGE_DETAILS_GTest:INTERNAL=[/usr/lib/x86_64-linux-gnu/cmake/GTest/GTestConfig.cmake][c ][v1.14.0()]
 //Details about finding OpenSSL
 FIND_PACKAGE_MESSAGE_DETAILS_OpenSSL:INTERNAL=[/usr/lib/x86_64-linux-gnu/libcrypto.so][/usr/include][c ][v3.0.13()]
 //Details about finding SQLite3
 FIND_PACKAGE_MESSAGE_DETAILS_SQLite3:INTERNAL=[/usr/include][/usr/lib/x86_64-linux-gnu/libsqlite3.so][v3.45.1()]
 //Details about finding nlohmann_json
 FIND_PACKAGE_MESSAGE_DETAILS_nlohmann_json:INTERNAL=[/usr/share/cmake/nlohmann_json/nlohmann_jsonConfig.cmake][v3.11.3()]
-//Details about finding wxWidgets
-FIND_PACKAGE_MESSAGE_DETAILS_wxWidgets:INTERNAL=[-L/usr/local/lib;-pthread;;;/usr/local/lib/libwx_gtk3u_core-3.2.a;/usr/local/lib/libwx_baseu-3.2.a;-lgthread-2.0;-pthread;-lX11;-lSM;-lxkbcommon;-lgtk-3;-lgdk-3;-lpangocairo-1.0;-latk-1.0;-lcairo-gobject;-lcairo;-lgdk_pixbuf-2.0;-lgio-2.0;-lXtst;-lpangoft2-1.0;-lpango-1.0;-lgobject-2.0;-lglib-2.0;-lharfbuzz;-lfontconfig;-lfreetype;-lwxscintilla-3.2;-lexpat;-lpcre2-32;-lpng;-ljpeg;-ltiff;-ljbig;-lz;-lm][/usr/local/lib/wx/include/gtk3-unicode-static-3.2;/usr/local/include/wx-3.2][v3.2.4()]
 //ADVANCED property for variable: OPENSSL_CRYPTO_LIBRARY
 OPENSSL_CRYPTO_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: OPENSSL_INCLUDE_DIR

@@ -55,9 +55,7 @@ Database::~Database() { closeAllConnections(); }
 // Получить соединение из пула
 sqlite3 *Database::getConnection()
 {
-  std::cout << "2222222" << std::endl;
   std::lock_guard<std::mutex> lock(pool_mutex);
-  std::cout << "2222222" << std::endl;
 
   sqlite3 *conn = nullptr;
 
@@ -113,14 +111,8 @@ void Database::releaseConnection(sqlite3 *conn)
 // Закрыть все соединения
 void Database::closeAllConnections()
 {
-  std::cout << "Clearing " << std::endl;
   std::lock_guard<std::mutex> lock(pool_mutex);
 
-  std::cout << "Clearing " << connection_pool.size() << " connections from pool"
-            << std::endl;
-
-  // Просто очищаем пул, не закрывая соединения
-  // (они закроются сами при разрушении объектов)
   connection_pool.clear();
 }
 
@@ -195,7 +187,6 @@ void Database::setVersion(int version)
 // Инициализация базы данных
 bool Database::initialize()
 {
-  std::cout << "INIT" << std::endl;
 
   // Проверяем, существует ли файл БД
   bool dbExists = std::filesystem::exists(db_path);

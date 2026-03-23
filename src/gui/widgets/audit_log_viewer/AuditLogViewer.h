@@ -1,26 +1,33 @@
 #ifndef AUDITLOGVIEWER_H
 #define AUDITLOGVIEWER_H
 
+#include <QDialog>
+#include <QTableWidget>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 #include "../src/database/DB_helper/db_helper.h"
-#include <wx/dialog.h>
-#include <wx/listctrl.h>
-#include <wx/wx.h>
 
-class AuditLogViewer : public wxDialog
+class AuditLogViewer : public QDialog
 {
-private:
-  Database &db;
-  wxListCtrl *logList;
-  wxButton *refreshButton;
-  wxButton *closeButton;
+    Q_OBJECT
 
-  void refreshLogs();
-  void onRefresh(wxCommandEvent &event);
+private:
+    Database &db;
+    QTableWidget *logTable;
+    QPushButton *refreshButton;
+    QPushButton *closeButton;
+
+private slots:
+    void onRefresh();
+    void onClose();
 
 public:
-  AuditLogViewer(wxWindow *parent, Database &database);
+    AuditLogViewer(QWidget *parent, Database &database);
 
-  wxDECLARE_EVENT_TABLE();
+private:
+    void refreshLogs();
+    void initUI();
 };
 
-#endif // AUDITLOGVIEWER_
+#endif // AUDITLOGVIEWER_H

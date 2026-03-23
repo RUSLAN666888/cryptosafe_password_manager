@@ -1,3 +1,5 @@
 /home/master666/development/cryptosafe_password_manager/build/CMakeFiles/cryptosafe.dir
 /home/master666/development/cryptosafe_password_manager/build/CMakeFiles/edit_cache.dir
 /home/master666/development/cryptosafe_password_manager/build/CMakeFiles/rebuild_cache.dir
+/home/master666/development/cryptosafe_password_manager/build/CMakeFiles/cryptosafe_autogen_timestamp_deps.dir
+/home/master666/development/cryptosafe_password_manager/build/CMakeFiles/cryptosafe_autogen.dir

@@ -1,31 +1,54 @@
+#include <QApplication>
+#include <QMessageBox>
+#include <iostream>
 #include "src/core/config_handler.h"
 #include "src/database/DB_helper/db_helper.h"
 #include "src/gui/MainWindow.h"
-#include <wx/wx.h>
 
-// Простое приложение wxWidgets
-class CryptoSafeApp : public wxApp
+int main(int argc, char *argv[])
 {
-public:
-  virtual bool OnInit() override
-  {
-    // Создаем конфиг
-    static ConfigHander config;
+    QApplication app(argc, argv);
 
-    // Создаем базу данных
-    std::string dbPath = config.getDatabasePath();
-    std::cout << "bd path: " << dbPath << std::endl;
+    // Устанавливаем имя приложения
+    app.setApplicationName("CryptoSafe Manager");
+    app.setOrganizationName("CryptoSafe");
 
-    // Создаем базу данных с путем из конфига
-    static Database db(dbPath);
-    db.initialize();
+    try
+    {
+        // Создаем конфиг
+        static ConfigHander config;
 
-    // Создаем главное окно
-    MainWindow *frame = new MainWindow(config, db);
-    frame->Show(true);
+        // Создаем базу данных
+        std::string dbPath = config.getDatabasePath();
+        std::cout << "Database path: " << dbPath << std::endl;
 
-    return true;
-  }
-};
+        // Создаем базу данных с путем из конфига
+        static Database db(dbPath);
 
-wxIMPLEMENT_APP(CryptoSafeApp);
+        if (!db.initialize())
+        {
+            QMessageBox::critical(nullptr, "Error",
+                                  "Failed to initialize database!\n\n"
+                                  "Please check permissions and try again.");
+            return 1;
+        }
+
+        // Создаем главное окно
+        MainWindow mainWindow(config, db);
+        mainWindow.show();
+
+        return app.exec();
+    }
+    catch (const std::exception& e)
+    {
+        QMessageBox::critical(nullptr, "Fatal Error",
+                              QString("An unexpected error occurred:\n\n%1").arg(e.what()));
+        return 1;
+    }
+    catch (...)
+    {
+        QMessageBox::critical(nullptr, "Fatal Error",
+                              "An unknown error occurred!");
+        return 1;
+    }
+}

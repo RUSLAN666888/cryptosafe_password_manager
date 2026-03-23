@@ -1,77 +1,75 @@
-// MainWindow.h
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QMainWindow>
+#include <QMenuBar>
+#include <QToolBar>
+#include <QStatusBar>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <QTimer>
 #include "../src/core/config_handler.h"
 #include "../src/core/events.h"
 #include "../src/core/key_manager.h"
 #include "../src/database/DB_helper/db_helper.h"
-#include "../src/gui/dialogs/login_dialog/LoginDialog.h"
 #include "../src/gui/widgets/secure_table/SecureTable.h"
-#include <wx/listctrl.h>
-#include <wx/menu.h>
-#include <wx/statusbr.h>
-#include <wx/timer.h>
-#include <wx/wx.h>
 
-class MainWindow : public wxFrame
+class MainWindow : public QMainWindow
 {
+    Q_OBJECT
+
 private:
     ConfigHander &config;
     Database &db;
     bool isLoggedIn;
-    bool isFirstRun;
-    bool isShowingLoginDialog;
 
     // Элементы UI
-    wxMenuBar *menuBar;
-    wxToolBar *toolBar;
-    wxPanel *mainPanel;
-    wxBoxSizer *mainSizer;
+    QMenuBar *menuBar;
+    QToolBar *toolBar;
+    QWidget *centralWidget;
+    QVBoxLayout *mainLayout;
     SecureTable *passwordTable;
-    wxStatusBar *statusBar;
+    QStatusBar *statusBar;
 
-    // Таймер для проверки бездействия
-    wxTimer *inactivityTimer;
-    static const int ID_InactivityTimer = 10002;
+    // Таймер бездействия
+    QTimer *inactivityTimer;
+    static const int INACTIVITY_TIMEOUT_MS = 60 * 60 * 1000; // 1 час
 
     // Методы создания UI
     void createMenuBar();
     void createToolBar();
-    void createMainPanel();
+    void createCentralWidget();
     void createStatusBar();
 
     // Методы для работы с состоянием
-    void showLoginDialog();
-    void lockApplication();
+    bool showFirstRunWizard();
+    bool showLoginDialog();
     void unlockApplication();
-
-    // Обработчики
-    void onNewDatabase(wxCommandEvent &event);
-    void onOpenDatabase(wxCommandEvent &event);
-    void onBackup(wxCommandEvent &event);
-    void onExit(wxCommandEvent &event);
-    void onAddEntry(wxCommandEvent &event);
-    void onEditEntry(wxCommandEvent &event);
-    void onDeleteEntry(wxCommandEvent &event);
-    void onViewLogs(wxCommandEvent &event);
-    void onSettings(wxCommandEvent &event);
-    void onAbout(wxCommandEvent &event);
-    void onFirstRunWizard(wxCommandEvent &event);
-    void onTableItemSelected(wxListEvent &event);
-    void onChangePassword(wxCommandEvent &event);
+    void lockApplication();
+    void resetInactivityTimer();
 
     // Обработчики событий
+    void registerEventHandlers();
     void onUserLoggedIn(const Event& event);
     void onUserLoggedOut(const Event& event);
 
-    // Для хранения ID подписок
-    void registerEventHandlers();
-    void unregisterEventHandlers();
+private slots:
+    void onInactivityTimeout();
+    void onLock();
 
-    // Обработчики состояния
-    void onInactivityTimer(wxTimerEvent &event);
-    //void onActivate(wxActivateEvent& event);
+    // Обработчики меню
+    void onNewDatabase();
+    void onOpenDatabase();
+    void onBackup();
+    void onExit();
+    void onAddEntry();
+    void onEditEntry();
+    void onDeleteEntry();
+    void onViewLogs();
+    void onSettings();
+    void onAbout();
+    void onFirstRunWizard();
+    void onChangePassword();
 
 public:
     MainWindow(ConfigHander &cfg, Database &database);
@@ -79,26 +77,6 @@ public:
 
     void loadSampleData();
     void updateStatusBar();
-    void showFirstRunWizard();
-
-    wxDECLARE_EVENT_TABLE();
 };
 
-// ID для событий
-enum
-{
-    ID_NewDatabase = 1,
-    ID_OpenDatabase,
-    ID_Backup,
-    ID_Exit,
-    ID_AddEntry,
-    ID_EditEntry,
-    ID_DeleteEntry,
-    ID_ViewLogs,
-    ID_Settings,
-    ID_About,
-    ID_FirstRunWizard,
-    ID_ChangePassword
-};
-
-#endif
+#endif // MAINWINDOW_H

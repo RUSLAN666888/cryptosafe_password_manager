@@ -1,0 +1,4 @@
+# Hashes of file build rules.
+7d3e2fffa1debc6033864d5425a1f33c CMakeFiles/cryptosafe_autogen
+7d3e2fffa1debc6033864d5425a1f33c CMakeFiles/cryptosafe_autogen_timestamp_deps
+e93d508a78c7ae08a9f6da2ca6071e09 cryptosafe_autogen/timestamp

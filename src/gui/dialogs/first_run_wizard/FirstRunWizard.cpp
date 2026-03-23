@@ -1,493 +1,450 @@
 #include "FirstRunWizard.h"
 #include "../src/core/crypto/authentication.h"
-#include <wx/filedlg.h>
-#include <wx/msgdlg.h>
-#include <wx/stattext.h>
-#include <wx/timer.h>
-#include <zxcvbn.h>
 #include "../src/core/crypto/key_derivation.h"
 #include "../src/core/key_manager.h"
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QGridLayout>
+#include <QLabel>
+#include <QGroupBox>
+#include <zxcvbn.h>
 
-#define ID_BrowseButton 10001
-#define ID_STRENGTH_TIMER 10002
-
-wxBEGIN_EVENT_TABLE(FirstRunWizard, wxWizard)
-    EVT_BUTTON(ID_BrowseButton,FirstRunWizard::onBrowseDatabase)
-    EVT_WIZARD_PAGE_CHANGING(wxID_ANY, FirstRunWizard::onPasswordPageChanging)
-    EVT_WIZARD_FINISHED(wxID_ANY, FirstRunWizard::onWizardFinished)
-    EVT_TEXT(wxID_ANY, FirstRunWizard::onPasswordTextChanged)
-    EVT_TIMER(ID_STRENGTH_TIMER, FirstRunWizard::onStrengthTimer)
-    wxEND_EVENT_TABLE()
-
-FirstRunWizard::FirstRunWizard(wxWindow *parent, ConfigHander &cfg)
-    : wxWizard(parent, wxID_ANY, "CryptoSafe Setup Wizard", wxNullBitmap,
-               wxDefaultPosition, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER), config(cfg)
+FirstRunWizard::FirstRunWizard(QWidget *parent, ConfigHander &cfg)
+    : QWizard(parent)
+    , config(cfg)
 {
-  // Создаем страницы
-  welcomePage = createWelcomePage();
-  passwordPage = createPasswordPage();
-  databasePage = createDatabasePage();
-  encryptionPage = createEncryptionPage();
-  finishPage = createFinishPage();
+    setWindowTitle("CryptoSafe Setup Wizard");
+    setWizardStyle(QWizard::ModernStyle);
+    setMinimumSize(500, 500);
 
-  // Связываем страницы в цепочку
-  wxWizardPageSimple::Chain(welcomePage, passwordPage);
-  wxWizardPageSimple::Chain(passwordPage, databasePage);
-  wxWizardPageSimple::Chain(databasePage, encryptionPage);
-  wxWizardPageSimple::Chain(encryptionPage, finishPage);
+    // Создаем страницы
+    welcomePage = createWelcomePage();
+    passwordPage = createPasswordPage();
+    databasePage = createDatabasePage();
+    encryptionPage = createEncryptionPage();
+    finishPage = createFinishPage();
 
-  SetPageSize(wxSize(500, 400));
+    // Добавляем страницы в wizard
+    addPage(welcomePage);
+    addPage(passwordPage);
+    addPage(databasePage);
+    addPage(encryptionPage);
+    addPage(finishPage);
+
+    // Создаем таймер для задержки проверки
+    strengthTimer = new QTimer(this);
+    strengthTimer->setSingleShot(true);
+    connect(strengthTimer, &QTimer::timeout, this, &FirstRunWizard::onStrengthTimer);
 }
 
-wxWizardPageSimple *FirstRunWizard::createWelcomePage()
+QWizardPage *FirstRunWizard::createWelcomePage()
 {
-  wxWizardPageSimple *page = new wxWizardPageSimple(this);
+    QWizardPage *page = new QWizardPage;
+    page->setTitle("Welcome to CryptoSafe Manager!");
 
-  wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
+    QVBoxLayout *layout = new QVBoxLayout(page);
 
-  // Заголовок
-  wxStaticText *title =
-      new wxStaticText(page, wxID_ANY, "Welcome to CryptoSafe Manager!");
-  wxFont titleFont = title->GetFont();
-  titleFont.SetPointSize(16);
-  titleFont.SetWeight(wxFONTWEIGHT_BOLD);
-  title->SetFont(titleFont);
+    // Текст приветствия
+    QLabel *text = new QLabel(
+        "This wizard will help you set up your password manager.\n\n"
+        "You will need to:\n"
+        "- Create a master password\n"
+        "- Choose database location\n"
+        "- Configure encryption settings",
+        page);
+    text->setWordWrap(true);
+    layout->addWidget(text);
 
-  mainSizer->Add(title, 0, wxALL | wxALIGN_CENTER, 20);
+    // Инструкция
+    QLabel *instruction = new QLabel("Click Next to begin setup.", page);
+    instruction->setAlignment(Qt::AlignCenter);
+    layout->addWidget(instruction);
 
-  // Текст приветствия
-  wxStaticText *text = new wxStaticText(
-      page, wxID_ANY,
-      "This wizard will help you set up your password manager.\n\n"
-      "You will need to:\n"
-      "• Create a master password\n"
-      "• Choose database location\n"
-      "• Configure encryption settings",
-      wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
+    layout->addStretch();
 
-  mainSizer->Add(text, 0, wxALL | wxEXPAND, 20);
-
-  // Инструкция
-  wxStaticText *instruction =
-      new wxStaticText(page, wxID_ANY, "Click Next to begin setup.");
-  mainSizer->Add(instruction, 0, wxALL | wxALIGN_CENTER, 10);
-
-  mainSizer->AddStretchSpacer();
-  page->SetSizer(mainSizer);
-
-  return page;
+    return page;
 }
 
-wxWizardPageSimple *FirstRunWizard::createPasswordPage()
+QWizardPage *FirstRunWizard::createPasswordPage()
 {
-  wxWizardPageSimple *page = new wxWizardPageSimple(this);
-  wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
+    QWizardPage *page = new QWizardPage;
+    page->setTitle("Create Master Password");
+    page->setSubTitle("Choose a strong master password to protect your vault.");
 
-  // Заголовок
-  wxStaticText *title =
-      new wxStaticText(page, wxID_ANY, "Create Master Password");
-  wxFont titleFont = title->GetFont();
-  titleFont.SetPointSize(14);
-  titleFont.SetWeight(wxFONTWEIGHT_BOLD);
-  title->SetFont(titleFont);
-  mainSizer->Add(title, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 20);
+    QVBoxLayout *layout = new QVBoxLayout(page);
 
-  mainSizer->AddStretchSpacer();
+    // Поля ввода
+    QLabel *passLabel = new QLabel("Password:", page);
+    passwordCtrl = new PasswordEntry(page, "", QSize(300, -1));
 
-  // Панель с полями
-  wxPanel *panel = new wxPanel(page);
-  wxBoxSizer *panelSizer = new wxBoxSizer(wxVERTICAL);
+    QLabel *confirmLabel = new QLabel("Confirm:", page);
+    confirmCtrl = new PasswordEntry(page, "", QSize(300, -1));
 
-  // Поля ввода
-  wxStaticText *passLabel = new wxStaticText(panel, wxID_ANY, "Password:");
-  passwordCtrl = new PasswordEntry(panel, wxID_ANY, "", wxDefaultPosition,
-                                   wxSize(300, -1));
+    layout->addWidget(passLabel);
+    layout->addWidget(passwordCtrl);
 
-  wxStaticText *confirmLabel = new wxStaticText(panel, wxID_ANY, "Confirm:");
-  confirmCtrl = new PasswordEntry(panel, wxID_ANY, "", wxDefaultPosition,
-                                  wxSize(300, -1));
+    // Индикатор силы пароля
+    strengthGauge = new QProgressBar(page);
+    strengthGauge->setRange(0, 4);
+    strengthGauge->setValue(0);
+    strengthGauge->setMaximumHeight(20);
+    layout->addWidget(strengthGauge);
 
-  panelSizer->Add(passLabel, 0, wxLEFT | wxTOP, 5);
-  panelSizer->Add(passwordCtrl, 0, wxLEFT | wxRIGHT | wxEXPAND, 5);
+    // Текст с описанием силы пароля
+    strengthText = new QLabel("Enter password to check strength", page);
+    QPalette pal = strengthText->palette();
+    pal.setColor(QPalette::WindowText, QColor(100, 100, 100));
+    strengthText->setPalette(pal);
+    layout->addWidget(strengthText);
 
-  // Индикатор силы пароля
-  strengthGauge =
-      new wxGauge(panel, wxID_ANY, 4, wxDefaultPosition, wxSize(300, 20));
-  strengthGauge->SetValue(0);
-  panelSizer->Add(strengthGauge, 0, wxLEFT | wxRIGHT | wxTOP, 10);
+    layout->addSpacing(15);
+    layout->addWidget(confirmLabel);
+    layout->addWidget(confirmCtrl);
 
-  // Текст с описанием силы пароля
-  strengthText =
-      new wxStaticText(panel, wxID_ANY, "Enter password to check strength");
-  strengthText->SetForegroundColour(wxColour(100, 100, 100));
-  panelSizer->Add(strengthText, 0, wxLEFT | wxRIGHT | wxBOTTOM, 5);
+    layout->addStretch();
 
-  panelSizer->Add(confirmLabel, 0, wxLEFT | wxTOP, 15);
-  panelSizer->Add(confirmCtrl, 0, wxLEFT | wxRIGHT | wxEXPAND, 5);
+    // Подключаем сигналы изменения текста
+    connect(passwordCtrl, &PasswordEntry::textChanged,
+            this, &FirstRunWizard::onPasswordTextChanged);
+    connect(confirmCtrl, &PasswordEntry::textChanged,
+            this, &FirstRunWizard::onPasswordTextChanged);
 
-  panel->SetSizer(panelSizer);
-  mainSizer->Add(panel, 0, wxALIGN_CENTER, 0);
-
-  mainSizer->AddStretchSpacer();
-
-  page->SetSizer(mainSizer);
-
-  // Создаем таймер для задержки проверки
-  strengthTimer = new wxTimer(this, ID_STRENGTH_TIMER);
-
-  return page;
+    return page;
 }
 
-wxWizardPageSimple *FirstRunWizard::createDatabasePage()
+QWizardPage *FirstRunWizard::createDatabasePage()
 {
-  wxWizardPageSimple *page = new wxWizardPageSimple(this);
+    QWizardPage *page = new QWizardPage;
+    page->setTitle("Database Location");
+    page->setSubTitle("Choose where to store your encrypted vault.");
 
-  wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
+    QVBoxLayout *layout = new QVBoxLayout(page);
 
-  // Заголовок
-  wxStaticText *title = new wxStaticText(page, wxID_ANY, "Database Location");
-  wxFont titleFont = title->GetFont();
-  titleFont.SetPointSize(14);
-  titleFont.SetWeight(wxFONTWEIGHT_BOLD);
-  title->SetFont(titleFont);
+    // Поле выбора пути
+    QHBoxLayout *pathLayout = new QHBoxLayout;
 
-  mainSizer->Add(title, 0, wxALL | wxALIGN_CENTER, 20);
+    QLabel *pathLabel = new QLabel("Path:", page);
+    pathLayout->addWidget(pathLabel);
 
-  // Поле выбора пути
-  wxBoxSizer *pathSizer = new wxBoxSizer(wxHORIZONTAL);
+    dbPathCtrl = new QLineEdit(page);
+    dbPathCtrl->setText(QString::fromStdString(config.getDatabasePath()));
+    pathLayout->addWidget(dbPathCtrl);
 
-  wxStaticText *pathLabel = new wxStaticText(page, wxID_ANY, "Path:");
-  pathSizer->Add(pathLabel, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 10);
+    browseButton = new QPushButton("Browse...", page);
+    pathLayout->addWidget(browseButton);
 
-  dbPathCtrl = new wxTextCtrl(page, wxID_ANY, config.getDatabasePath(),
-                              wxDefaultPosition, wxSize(300, -1));
-  pathSizer->Add(dbPathCtrl, 1, wxRIGHT, 10);
+    layout->addLayout(pathLayout);
 
-  browseButton = new wxButton(page, ID_BrowseButton, "Browse...");
-  pathSizer->Add(browseButton, 0);
+    // Пояснение
+    QLabel *info = new QLabel("All passwords will be stored in this file", page);
+    QPalette pal = info->palette();
+    pal.setColor(QPalette::WindowText, QColor(100, 100, 100));
+    info->setPalette(pal);
+    layout->addWidget(info);
 
-  mainSizer->Add(pathSizer, 0, wxEXPAND | wxALL, 20);
+    layout->addStretch();
 
-  // Пояснение
-  wxStaticText *info = new wxStaticText(
-      page, wxID_ANY, "All passwords will be stored in this file");
-  info->SetForegroundColour(wxColour(100, 100, 100));
-  mainSizer->Add(info, 0, wxALL | wxALIGN_CENTER, 5);
+    // Подключаем сигнал
+    connect(browseButton, &QPushButton::clicked, this, &FirstRunWizard::onBrowseDatabase);
 
-  mainSizer->AddStretchSpacer();
-  page->SetSizer(mainSizer);
-
-  return page;
+    return page;
 }
 
-wxWizardPageSimple *FirstRunWizard::createEncryptionPage()
+QWizardPage *FirstRunWizard::createEncryptionPage()
 {
-  wxWizardPageSimple *page = new wxWizardPageSimple(this);
-  wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
+    QWizardPage *page = new QWizardPage;
+    page->setTitle("Encryption Settings");
+    page->setSubTitle("Configure Argon2id parameters for key derivation.");
 
-  // Заголовок
-  wxStaticText *title = new wxStaticText(page, wxID_ANY, "Encryption Settings");
-  wxFont titleFont = title->GetFont();
-  titleFont.SetPointSize(14);
-  titleFont.SetWeight(wxFONTWEIGHT_BOLD);
-  title->SetFont(titleFont);
-  mainSizer->Add(title, 0, wxALL | wxALIGN_CENTER, 20);
+    QVBoxLayout *layout = new QVBoxLayout(page);
 
-  // Пояснение
-  wxStaticText *note = new wxStaticText(
-      page, wxID_ANY,
-      "These settings control how your master password is strengthened.\n"
-      "Higher values = more secure but slower unlock.");
-  note->SetForegroundColour(wxColour(100, 100, 100));
-  mainSizer->Add(note, 0, wxALL | wxALIGN_CENTER, 5);
+    // Пояснение
+    QLabel *note = new QLabel(
+        "These settings control how your master password is strengthened.\n"
+        "Higher values = more secure but slower unlock.",
+        page);
+    note->setWordWrap(true);
+    QPalette pal = note->palette();
+    pal.setColor(QPalette::WindowText, QColor(100, 100, 100));
+    note->setPalette(pal);
+    layout->addWidget(note);
 
-  // Растягиваемый пробел сверху
-  mainSizer->AddStretchSpacer();
+    layout->addSpacing(20);  // Добавляем отступ
 
-  // Панель с настройками
-  wxPanel *panel = new wxPanel(page);
-  wxBoxSizer *panelSizer = new wxBoxSizer(wxVERTICAL);
+    // Группа настроек Argon2id
+    QGroupBox *settingsGroup = new QGroupBox("Argon2id Parameters", page);
+    QGridLayout *gridLayout = new QGridLayout(settingsGroup);
 
-  // Сетка для настроек Argon2id
-  wxFlexGridSizer *gridSizer = new wxFlexGridSizer(2, 15, 15);
-  gridSizer->AddGrowableCol(1);
+    // Устанавливаем отступы внутри группы
+    gridLayout->setContentsMargins(20, 20, 20, 20);
+    gridLayout->setSpacing(15);  // Расстояние между строками
 
-  // 1. Time cost (итерации)
-  wxStaticText *iterLabel =
-      new wxStaticText(panel, wxID_ANY, "Time cost (iterations):");
-  iterationsSpin =
-      new wxSpinCtrl(panel, wxID_ANY, "3", wxDefaultPosition, wxSize(100, -1));
-  iterationsSpin->SetRange(1, 20);
-  iterationsSpin->SetValue(3); // минимум 3 по требованию
+    // 1. Time cost (итерации)
+    QLabel *timeLabel = new QLabel("Time cost (iterations):", settingsGroup);
+    timeLabel->setMinimumHeight(30);
+    gridLayout->addWidget(timeLabel, 0, 0);
 
-  gridSizer->Add(iterLabel, 0, wxALIGN_CENTER_VERTICAL);
-  gridSizer->Add(iterationsSpin, 0, wxEXPAND);
+    iterationsSpin = new QSpinBox(settingsGroup);
+    iterationsSpin->setRange(1, 20);
+    iterationsSpin->setValue(3);
+    iterationsSpin->setMinimumWidth(120);
+    gridLayout->addWidget(iterationsSpin, 0, 1);
 
-  // 2. Memory cost (MB)
-  wxStaticText *memoryLabel =
-      new wxStaticText(panel, wxID_ANY, "Memory cost (MiB):");
-  memorySpin =
-      new wxSpinCtrl(panel, wxID_ANY, "64", wxDefaultPosition, wxSize(100, -1));
-  memorySpin->SetRange(16, 1024);
-  memorySpin->SetValue(64); // 64 MiB по умолчанию
+    // 2. Memory cost (MB)
+    QLabel *memoryLabel = new QLabel("Memory cost (MiB):", settingsGroup);
+    memoryLabel->setMinimumHeight(30);
+    gridLayout->addWidget(memoryLabel, 1, 0);
 
-  gridSizer->Add(memoryLabel, 0, wxALIGN_CENTER_VERTICAL);
-  gridSizer->Add(memorySpin, 0, wxEXPAND);
+    memorySpin = new QSpinBox(settingsGroup);
+    memorySpin->setRange(16, 1024);
+    memorySpin->setValue(64);
+    memorySpin->setMinimumWidth(120);
+    gridLayout->addWidget(memorySpin, 1, 1);
 
-  // 3. Parallelism (потоки)
-  wxStaticText *parallelLabel =
-      new wxStaticText(panel, wxID_ANY, "Parallelism (threads):");
-  parallelSpin =
-      new wxSpinCtrl(panel, wxID_ANY, "4", wxDefaultPosition, wxSize(100, -1));
-  parallelSpin->SetRange(1, 16);
-  parallelSpin->SetValue(4); // 4 потока по умолчанию
+    // 3. Parallelism (потоки)
+    QLabel *parallelLabel = new QLabel("Parallelism (threads):", settingsGroup);
+    parallelLabel->setMinimumHeight(30);
+    gridLayout->addWidget(parallelLabel, 2, 0);
 
-  gridSizer->Add(parallelLabel, 0, wxALIGN_CENTER_VERTICAL);
-  gridSizer->Add(parallelSpin, 0, wxEXPAND);
+    parallelSpin = new QSpinBox(settingsGroup);
+    parallelSpin->setRange(1, 16);
+    parallelSpin->setValue(4);
+    parallelSpin->setMinimumWidth(120);
+    gridLayout->addWidget(parallelSpin, 2, 1);
 
-  // 4. Hash length (bytes)
-  wxStaticText *hashLengthLabel =
-      new wxStaticText(panel, wxID_ANY, "Hash length (bytes):");
-  hashLengthSpin =
-      new wxSpinCtrl(panel, wxID_ANY, "32", wxDefaultPosition, wxSize(100, -1));
-  hashLengthSpin->SetRange(16, 64);
-  hashLengthSpin->SetValue(32); // 32 bytes = 256 bits
+    // 4. Hash length (bytes)
+    QLabel *hashLabel = new QLabel("Hash length (bytes):", settingsGroup);
+    hashLabel->setMinimumHeight(30);
+    gridLayout->addWidget(hashLabel, 3, 0);
 
-  gridSizer->Add(hashLengthLabel, 0, wxALIGN_CENTER_VERTICAL);
-  gridSizer->Add(hashLengthSpin, 0, wxEXPAND);
+    hashLengthSpin = new QSpinBox(settingsGroup);
+    hashLengthSpin->setRange(16, 64);
+    hashLengthSpin->setValue(32);
+    hashLengthSpin->setMinimumWidth(120);
+    gridLayout->addWidget(hashLengthSpin, 3, 1);
 
-  panelSizer->Add(gridSizer, 0, wxEXPAND | wxALL, 20);
+    // Настройка растяжения колонок
+    gridLayout->setColumnStretch(0, 1);
+    gridLayout->setColumnStretch(1, 0);
 
-  // Пояснение про настройки Argon2id
-  wxStaticText *helpText = new wxStaticText(
-      panel, wxID_ANY,
-      "Argon2id parameters (NIST recommended minimums):\n"
-      "• Time cost: 3 iterations (higher = slower brute-force)\n"
-      "• Memory cost: 64 MiB (higher = more RAM required for attack)\n"
-      "• Parallelism: 4 threads (higher = faster on multi-core)\n"
-      "• Hash length: 32 bytes (256 bits) - sufficient for AES-256",
-      wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
-  helpText->SetForegroundColour(wxColour(80, 80, 80));
-  panelSizer->Add(helpText, 0, wxALL | wxEXPAND, 10);
+    // Выравнивание содержимого
+    gridLayout->setAlignment(Qt::AlignTop);
 
-  panel->SetSizer(panelSizer);
-  mainSizer->Add(panel, 0, wxALIGN_CENTER, 0);
+    settingsGroup->setLayout(gridLayout);
+    settingsGroup->setMinimumHeight(250);  // Минимальная высота группы
+    settingsGroup->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-  // Растягиваемый пробел снизу
-  mainSizer->AddStretchSpacer();
+    layout->addWidget(settingsGroup);
 
-  page->SetSizer(mainSizer);
-  return page;
+    layout->addSpacing(20);  // Отступ перед пояснением
+
+
+
+    layout->addStretch();  // Растягиваем вниз
+
+    return page;
 }
 
-wxWizardPageSimple *FirstRunWizard::createFinishPage()
+QWizardPage *FirstRunWizard::createFinishPage()
 {
-  wxWizardPageSimple *page = new wxWizardPageSimple(this);
+    QWizardPage *page = new QWizardPage;
+    page->setTitle("Setup Complete!");
 
-  wxBoxSizer *mainSizer = new wxBoxSizer(wxVERTICAL);
+    QVBoxLayout *layout = new QVBoxLayout(page);
 
-  // Заголовок
-  wxStaticText *title = new wxStaticText(page, wxID_ANY, "Setup Complete!");
-  wxFont titleFont = title->GetFont();
-  titleFont.SetPointSize(16);
-  titleFont.SetWeight(wxFONTWEIGHT_BOLD);
-  title->SetFont(titleFont);
+    // Текст завершения
+    QLabel *text = new QLabel(
+        "Your password manager is ready to use.\n\n"
+        "Click Finish to start the application.",
+        page);
+    text->setWordWrap(true);
+    text->setAlignment(Qt::AlignCenter);
+    layout->addWidget(text);
 
-  mainSizer->Add(title, 0, wxALL | wxALIGN_CENTER, 20);
+    layout->addStretch();
 
-  // Текст завершения
-  wxStaticText *text =
-      new wxStaticText(page, wxID_ANY,
-                       "Your password manager is ready to use.\n\n"
-                       "Click Finish to start the application.",
-                       wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
-
-  mainSizer->Add(text, 0, wxALL | wxEXPAND, 20);
-
-  mainSizer->AddStretchSpacer();
-  page->SetSizer(mainSizer);
-
-  return page;
+    return page;
 }
 
-void FirstRunWizard::onBrowseDatabase(wxCommandEvent &event)
+void FirstRunWizard::onBrowseDatabase()
 {
-  wxFileDialog dialog(this, "Select database file", "", "",
-                      "SQLite files (*.db)|*.db|All files (*.*)|*.*",
-                      wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+    QString filename = QFileDialog::getSaveFileName(
+        this,
+        "Select database file",
+        "",
+        "SQLite files (*.db);;All files (*.*)"
+        );
 
-  if (dialog.ShowModal() == wxID_OK)
-  {
-    dbPathCtrl->SetValue(dialog.GetPath());
-  }
-}
-
-void FirstRunWizard::onPasswordPageChanging(wxWizardEvent &event)
-{
-  // Проверяем, пытаемся ли мы уйти СО страницы пароля ВПЕРЕД
-  if (event.GetDirection() && GetCurrentPage() == passwordPage)
-  {
-    if (!validatePassword())
+    if (!filename.isEmpty())
     {
-      event.Veto(); // Отменяем переход
+        dbPathCtrl->setText(filename);
     }
-  }
+}
+
+void FirstRunWizard::onPasswordTextChanged()
+{
+    // Перезапускаем таймер при каждом изменении текста
+    strengthTimer->stop();
+    strengthTimer->start(500);
+}
+
+void FirstRunWizard::onStrengthTimer()
+{
+    QString password = passwordCtrl->getValue();
+
+    if (password.isEmpty())
+    {
+        strengthGauge->setValue(0);
+        strengthText->setText("Enter password to check strength");
+        QPalette pal = strengthText->palette();
+        pal.setColor(QPalette::WindowText, QColor(100, 100, 100));
+        strengthText->setPalette(pal);
+        return;
+    }
+
+    // Конвертируем QString в std::string
+    std::string pwdStr = password.toStdString();
+
+    // Получаем оценку силы пароля (0-4)
+    int score = check_password_strength(pwdStr);
+
+    // Обновляем индикатор
+    strengthGauge->setValue(score);
+
+    // Обновляем текст и цвет в зависимости от оценки
+    QColor color;
+    QString message;
+
+    switch (score)
+    {
+    case 0:
+        color = QColor(255, 0, 0);
+        message = "Too weak - easily guessable";
+        break;
+    case 1:
+        color = QColor(255, 100, 0);
+        message = "Very weak";
+        break;
+    case 2:
+        color = QColor(255, 255, 0);
+        message = "Weak";
+        break;
+    case 3:
+        color = QColor(0, 255, 0);
+        message = "Strong";
+        break;
+    case 4:
+        color = QColor(0, 200, 0);
+        message = "Very strong";
+        break;
+    default:
+        color = QColor(100, 100, 100);
+        message = "Unknown";
+    }
+
+    strengthText->setText(message);
+    QPalette pal = strengthText->palette();
+    pal.setColor(QPalette::WindowText, color);
+    strengthText->setPalette(pal);
 }
 
 bool FirstRunWizard::validatePassword()
 {
-  wxString password = passwordCtrl->GetValue();
-  wxString confirm = confirmCtrl->GetValue();
+    QString password = passwordCtrl->getValue();
+    QString confirm = confirmCtrl->getValue();
 
-  if (password.IsEmpty())
-  {
-    wxMessageBox("Password cannot be empty!", "Error", wxOK | wxICON_ERROR,
-                 this);
-    return false;
-  }
+    if (password.isEmpty())
+    {
+        QMessageBox::critical(this, "Error", "Password cannot be empty!");
+        return false;
+    }
 
-  if (password != confirm)
-  {
-    wxMessageBox("Passwords do not match!", "Error", wxOK | wxICON_ERROR, this);
-    return false;
-  }
+    if (password != confirm)
+    {
+        QMessageBox::critical(this, "Error", "Passwords do not match!");
+        return false;
+    }
 
-  if (password.length() < 12)
-  {
-    wxMessageBox("Password must be at least 12 characters!", "Error",
-                 wxOK | wxICON_ERROR, this);
-    return false;
-  }
+    if (password.length() < 12)
+    {
+        QMessageBox::critical(this, "Error",
+                              "Password must be at least 12 characters!");
+        return false;
+    }
 
-  // Проверка силы пароля через zxcvbn
-  wxScopedCharBuffer pwdBuf = password.ToUTF8();
-  std::string pwdStr(pwdBuf.data(), pwdBuf.length());
-  int score = check_password_strength(pwdStr);
+    // Проверка силы пароля через zxcvbn
+    std::string pwdStr = password.toStdString();
+    int score = check_password_strength(pwdStr);
 
-  if (score < 3)
-  {
-    wxMessageBox("Password is not strong enough!\n\n"
-                 "Please choose a stronger password that is not common, "
-                 "doesn't contain dictionary words, and has good entropy.",
-                 "Weak Password", wxOK | wxICON_WARNING, this);
-    return false;
-  }
+    if (score < 3)
+    {
+        QMessageBox::warning(this, "Weak Password",
+                             "Password is not strong enough!\n\n"
+                             "Please choose a stronger password that is not common, "
+                             "doesn't contain dictionary words, and has good entropy.");
+        return false;
+    }
 
-  temp_password = password;
-  return true;
+    temp_password = password;
+    return true;
 }
 
-void FirstRunWizard::onStrengthTimer(wxTimerEvent &event)
+bool FirstRunWizard::validateCurrentPage()
 {
-  wxString password = passwordCtrl->GetValue();
-
-  if (password.IsEmpty())
-  {
-    strengthGauge->SetValue(0);
-    strengthText->SetLabel("Enter password to check strength");
-    strengthText->SetForegroundColour(wxColour(100, 100, 100));
-    return;
-  }
-
-  // Конвертируем wxString в std::string
-  wxScopedCharBuffer pwdBuf = password.ToUTF8();
-  std::string pwdStr(pwdBuf.data(), pwdBuf.length());
-
-  // Получаем оценку силы пароля (0-4)
-  int score = check_password_strength(pwdStr);
-  std::cout << "====================== " << score << std::endl;
-
-  // Обновляем индикатор
-  strengthGauge->SetValue(score);
-
-  // Обновляем текст и цвет в зависимости от оценки
-  wxColour color;
-  wxString message;
-
-  switch (score)
-  {
-  case 0:
-    color = wxColour(255, 0, 0); // Красный
-    message = "Too weak - easily guessable";
-    break;
-  case 1:
-    color = wxColour(255, 100, 0); // Оранжевый
-    message = "Very weak";
-    break;
-  case 2:
-    color = wxColour(255, 255, 0); // Желтый
-    message = "Weak";
-    break;
-  case 3:
-    color = wxColour(0, 255, 0); // Зеленый
-    message = "Strong";
-    break;
-  case 4:
-    color = wxColour(0, 200, 0); // Темно-зеленый
-    message = "Very strong";
-    break;
-  default:
-    color = wxColour(100, 100, 100); // Серый
-    message = "Unknown";
-  }
-
-  strengthText->SetLabel(message);
-  strengthText->SetForegroundColour(color);
+    // Проверяем валидацию только для страницы пароля
+    if (currentPage() == passwordPage)
+    {
+        return validatePassword();
+    }
+    return QWizard::validateCurrentPage();
 }
 
-void FirstRunWizard::onPasswordTextChanged(wxCommandEvent &event)
+void FirstRunWizard::accept()
 {
-  // Перезапускаем таймер при каждом изменении текста
-  strengthTimer->Stop();
-  strengthTimer->Start(
-      500, wxTIMER_ONE_SHOT); // Проверка через 500 мс после остановки ввода
+    // 1. Database path
+    config.setDatabasePath(dbPathCtrl->text().toStdString());
+
+    // 2. Argon2id parameters
+    config.setArgon2TimeCost(iterationsSpin->value());
+    config.setArgon2MemoryCost(memorySpin->value());
+    config.setArgon2Parallelism(parallelSpin->value());
+    config.setArgon2HashLength(hashLengthSpin->value());
+
+    // БД еще нет, но мы готовим данные
+    Argon2Data authData(iterationsSpin->value(), memorySpin->value(),
+                        parallelSpin->value(), hashLengthSpin->value());
+
+    // Конвертируем QString в std::string для хеширования
+    std::string pwdStr = temp_password.toStdString();
+
+    // Хешируем пароль
+    hash_password(pwdStr, authData);
+
+    // Сохраняем данные аутентификации во временные поля мастера
+    pendingAuthData = std::move(authData);
+
+    encSalt.resize(16);
+    randombytes_buf(encSalt.data(), encSalt.size());
+
+    std::vector<uint8_t> key;
+    derive_encryption_key(pwdStr, encSalt, key);
+
+    KeyManager::getInstance().store_key(key);
+
+    // Зануляем пароль в памяти
+    volatile char *p = const_cast<char*>(pwdStr.data());
+    for (size_t i = 0; i < pwdStr.size(); ++i)
+        p[i] = 0;
+
+    QMessageBox::information(this, "CryptoSafe",
+                             "Setup completed successfully!");
+
+    QWizard::accept();
 }
 
-void FirstRunWizard::onWizardFinished(wxWizardEvent &event)
+Argon2Data& FirstRunWizard::getAuthData()
 {
-  // 1. Database path
-  config.setDatabasePath(dbPathCtrl->GetValue().ToStdString());
-
-  // 2. Argon2id parameters
-  config.setArgon2TimeCost(iterationsSpin->GetValue());   // iterations
-  config.setArgon2MemoryCost(memorySpin->GetValue());     // MB
-  config.setArgon2Parallelism(parallelSpin->GetValue());  // threads
-  config.setArgon2HashLength(hashLengthSpin->GetValue()); // bytes
-
-  // БД еще нет, но мы готовим данные
-  Argon2Data authData(iterationsSpin->GetValue(), memorySpin->GetValue(),
-                      parallelSpin->GetValue(), hashLengthSpin->GetValue());
-
-  // Конвертируем wxString в std::string для хеширования
-  wxScopedCharBuffer pwdBuf = temp_password.ToUTF8();
-  std::string pwdStr(pwdBuf.data(), pwdBuf.length());
-
-  // Хешируем пароль
-  hash_password(pwdStr, authData);
-
-  // Сохраняем данные аутентификации во временные поля мастера
-  // (БД будет создана после закрытия мастера)
-  pendingAuthData = std::move(authData);
-
-  std::vector<uint8_t> key;
-  encSalt.resize(16);
-
-  randombytes_buf(encSalt.data(), encSalt.size());
-
-  derive_encryption_key(pwdStr, encSalt, key);
-
-  KeyManager::getInstance().store_key(key);
-
-  // Зануляем пароль в памяти
-  volatile char *p = const_cast<char *>(pwdStr.data());
-  for (size_t i = 0; i < pwdStr.size(); ++i)
-    p[i] = 0;
-
-  wxMessageBox("Setup completed successfully!", "CryptoSafe",
-               wxOK | wxICON_INFORMATION, this);
-
-  event.Skip();
+    return pendingAuthData;
 }
-
-Argon2Data &FirstRunWizard::getAuthData() { return pendingAuthData; }
-

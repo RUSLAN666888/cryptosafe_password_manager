@@ -77,7 +77,7 @@ public:
     eb.publish(EventType::UserLoggedIn, "KeyManager", "store_key");
   }
 
-  // Получить ключ (если доступен)
+  // Получить ключ
   void get_key(KeyData &d)
   {
     std::lock_guard<std::mutex> lock(mutex);
@@ -113,29 +113,29 @@ public:
 
       EventBus &eb = EventBus::getInstance();
 
-      eventBus.publish(EventType::UserLoggedOut, "auto_lock", "KeyManager");
+      eb.publish(EventType::UserLoggedOut, "auto_lock", "KeyManager");
     }
   }
 
-  // Приложение свернулось/потеряло фокус
-  void on_app_inactive()
-  {
-    std::lock_guard<std::mutex> lock(mutex);
-    is_active = false;
-    zero_memory();
-    is_unlocked = false;
+  // // Приложение свернулось/потеряло фокус
+  // void on_app_inactive()
+  // {
+  //   std::lock_guard<std::mutex> lock(mutex);
+  //   is_active = false;
+  //   zero_memory();
+  //   is_unlocked = false;
 
-    EventBus &eb = EventBus::getInstance();
+  //   EventBus &eb = EventBus::getInstance();
 
-    eventBus.publish(EventType::UserLoggedOut, "app_minimized", "KeyManager");
-  }
+  //   eb.publish(EventType::UserLoggedOut, "app_minimized", "KeyManager");
+  // }
 
-  // Приложение активно
-  void on_app_active()
-  {
-    std::lock_guard<std::mutex> lock(mutex);
-    is_active = true;
-  }
+  // // Приложение активно
+  // void on_app_active()
+  // {
+  //   std::lock_guard<std::mutex> lock(mutex);
+  //   is_active = true;
+  // }
 
   // Выход из системы
   void logout()
@@ -145,7 +145,7 @@ public:
     is_unlocked = false;
 
     EventBus &eb = EventBus::getInstance();
-    eventBus.publish(EventType::UserLoggedOut, "user_logout", "KeyManager");
+    eb.publish(EventType::UserLoggedOut, "user_logout", "KeyManager");
   }
 
   ~KeyManager() { logout(); }

@@ -1,35 +1,44 @@
 #ifndef PASSWORD_CHANGE_H
 #define PASSWORD_CHANGE_H
 
-#include <wx/wx.h>
+#include <QDialog>
+#include <QStackedWidget>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QProgressBar>
+#include <QTimer>
 #include "../../../database/DB_helper/db_helper.h"
 #include "../../../core/crypto/authentication.h"
 #include "../../../core/key_manager.h"
 #include "../src/gui/widgets/password_entry/PasswordEntry.h"
 
-class ChangePasswordDialog : public wxDialog
+class ChangePasswordDialog : public QDialog
 {
+    Q_OBJECT
+
 private:
     Database &db;
 
-    // Панели
-    wxPanel *verifyPanel;
-    wxPanel *changePanel;
-    wxBoxSizer *mainSizer;
+    // Stacked widget для переключения страниц
+    QStackedWidget *stackedWidget;
 
     // Страница 1: верификация
+    QWidget *verifyPage;
     PasswordEntry *currentPasswordCtrl;
-    wxStaticText *errorText;
-    wxButton *verifyNextButton;
+    QLabel *errorText;
+    QPushButton *verifyNextButton;
 
     // Страница 2: смена пароля
+    QWidget *changePage;
     PasswordEntry *newPasswordCtrl;
     PasswordEntry *confirmPasswordCtrl;
-    wxGauge *strengthGauge;
-    wxStaticText *strengthText;
-    wxButton *changeButton;
-    wxButton *cancelButton;
-    wxTimer *strengthTimer;
+    QProgressBar *strengthGauge;
+    QLabel *strengthText;
+    QPushButton *changeButton;
+    QPushButton *cancelButton;
+    QTimer *strengthTimer;
 
     // Данные для аутентификации
     Argon2Data authData;
@@ -38,27 +47,24 @@ private:
     // Временное хранение пароля
     std::string tempPassword;
 
-    static const int ID_STRENGTH_TIMER = 10005;
-
-    void onVerifyNext(wxCommandEvent &event);
-    void onChange(wxCommandEvent &event);
-    void onCancel(wxCommandEvent &event);
-    void onPasswordTextChanged(wxCommandEvent &event);
-    void onStrengthTimer(wxTimerEvent &event);
-    void updatePasswordStrength();
+    void createVerifyPage();
+    void createChangePage();
     bool loadAuthData();
     bool verifyCurrentPassword();
     bool validateNewPassword();
+    void updatePasswordStrength();
     void switchToChangePage();
 
-    wxPanel* createVerifyPage();
-    wxPanel* createChangePage();
+private slots:
+    void onVerifyNext();
+    void onChange();
+    void onCancel();
+    void onPasswordTextChanged();
+    void onStrengthTimer();
 
 public:
-    ChangePasswordDialog(wxWindow* parent, Database& database);
+    ChangePasswordDialog(QWidget *parent, Database &database);
     ~ChangePasswordDialog();
-
-    wxDECLARE_EVENT_TABLE();
 };
 
 #endif // PASSWORD_CHANGE_H

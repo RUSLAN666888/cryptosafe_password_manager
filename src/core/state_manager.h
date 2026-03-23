@@ -1,32 +1,78 @@
 #ifndef STATE_MANAGER_H
 #define STATE_MANAGER_H
 
-#include <string>
+#include <chrono>
+#include <mutex>
 
 class StateManager
 {
 private:
-  bool m_isLoggedIn;         // Вошел ли пользователь
-  std::string m_currentUser; // Имя текущего пользователя
+    bool loggedIn;
+    std::chrono::system_clock::time_point loginTime;
+    std::chrono::steady_clock::time_point lastActivity;
+    int failedAttempts;
+    std::mutex mutex;
+
+    StateManager() : loggedIn(false), failedAttempts(0) {}
 
 public:
-  StateManager() : m_isLoggedIn(false) {}
+    static StateManager& getInstance()
+    {
+        static StateManager instance;
+        return instance;
+    }
 
-  // Простейшие методы - только каркас
-  void login(const std::string &username)
-  {
-    m_isLoggedIn = true;
-    m_currentUser = username;
-  }
+    void login()
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        loggedIn = true;
+        loginTime = std::chrono::system_clock::now();
+        lastActivity = std::chrono::steady_clock::now();
+        failedAttempts = 0;
+    }
 
-  void logout()
-  {
-    m_isLoggedIn = false;
-    m_currentUser.clear();
-  }
+    void logout()
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        loggedIn = false;
+    }
 
-  bool isLoggedIn() const { return m_isLoggedIn; }
-  std::string getCurrentUser() const { return m_currentUser; }
+    void updateActivity()
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        if (loggedIn)
+        {
+            lastActivity = std::chrono::steady_clock::now();
+        }
+    }
+
+    void addFailedAttempt()
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        failedAttempts++;
+    }
+
+    bool isLoggedIn()
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        return loggedIn;
+    }
+
+    int getFailedAttempts()
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        return failedAttempts;
+    }
+
+    // Получить время бездействия в секундах
+    long getInactivitySeconds()
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        if (!loggedIn) return 0;
+
+        auto now = std::chrono::steady_clock::now();
+        return std::chrono::duration_cast<std::chrono::seconds>(now - lastActivity).count();
+    }
 };
 
 #endif

@@ -1,79 +1,100 @@
 #include "PasswordEntry.h"
-#include <wx/clipbrd.h>
-#include <wx/msgdlg.h>
+#include <QClipboard>
+#include <QApplication>
+#include <QMessageBox>
+#include <QStyle>
 
-#define wxID_PasswordCheckBox 1
-#define wxID_PasswordField 2
-
-wxBEGIN_EVENT_TABLE(PasswordEntry, wxPanel)
-    EVT_CHECKBOX(wxID_PasswordCheckBox, PasswordEntry::onShowPassword)
-        wxEND_EVENT_TABLE()
-
-            PasswordEntry::PasswordEntry(wxWindow *parent, wxWindowID id,
-                                         const wxString &value,
-                                         const wxPoint &pos, const wxSize &size)
-    : wxPanel(parent, id, pos, size), passwordVisible(false)
+PasswordEntry::PasswordEntry(QWidget *parent,
+                             const QString &value,
+                             const QSize &size)
+    : QWidget(parent)
+    , passwordVisible(false)
 {
+    // Создаем горизонтальный layout
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->setContentsMargins(2, 2, 2, 2);
+    layout->setSpacing(2);
 
-  wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+    // Поле ввода пароля
+    passwordInput = new QLineEdit(this);
+    passwordInput->setEchoMode(QLineEdit::Password);
+    passwordInput->setText(value);
+    passwordInput->setMinimumSize(size);
 
-  // Поле ввода пароля
-  passwordInput =
-      new wxTextCtrl(this, wxID_PasswordField, value, wxDefaultPosition,
-                     wxSize(200, -1), wxTE_PASSWORD);
+    // Настройка размера поля
+    if (size.width() > 0) {
+        passwordInput->setFixedWidth(size.width());
+    }
 
-  // Чекбокс "Показать пароль"
-  showPasswordCheck = new wxCheckBox(this, wxID_PasswordCheckBox, "Show");
+    // Чекбокс "Показать пароль"
+    showPasswordCheck = new QCheckBox(tr("Show"), this);
 
-  sizer->Add(passwordInput, 1, wxALL | wxEXPAND, 2);
-  sizer->Add(showPasswordCheck, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
+    // Добавляем виджеты в layout
+    layout->addWidget(passwordInput, 1);
+    layout->addWidget(showPasswordCheck, 0, Qt::AlignVCenter);
 
-  SetSizer(sizer);
-  Layout();
+    // Устанавливаем layout для виджета
+    setLayout(layout);
+
+    // Подключаем сигнал от чекбокса
+    connect(showPasswordCheck, &QCheckBox::toggled,
+            this, &PasswordEntry::onShowPassword);
+
+    // Пробрасываем сигнал textChanged от QLineEdit
+    connect(passwordInput, &QLineEdit::textChanged,
+            this, &PasswordEntry::textChanged);
 }
 
 PasswordEntry::~PasswordEntry()
 {
-  // Здесь будет затирание памяти в будущих спринтах
+    // Безопасное затирание памяти (будет улучшено в будущих спринтах)
+    if (passwordInput) {
+        // Затираем содержимое QLineEdit
+        passwordInput->setText(QString(passwordInput->text().size(), QChar(0)));
+        passwordInput->clear();
+    }
+
+    // Qt автоматически удалит дочерние объекты
 }
 
-wxString PasswordEntry::GetValue() const { return passwordInput->GetValue(); }
-
-void PasswordEntry::SetValue(const wxString &value)
+QString PasswordEntry::getValue() const
 {
-  passwordInput->SetValue(value);
+    return passwordInput->text();
 }
 
-void PasswordEntry::SetEditable(bool editable)
+void PasswordEntry::setValue(const QString &value)
 {
-  passwordInput->SetEditable(editable);
+    passwordInput->setText(value);
 }
 
-void PasswordEntry::onShowPassword(wxCommandEvent &event)
+void PasswordEntry::setEditable(bool editable)
 {
-  passwordVisible = showPasswordCheck->IsChecked();
+    passwordInput->setReadOnly(!editable);
+}
 
-  // Получаем текущее значение
-  wxString value = passwordInput->GetValue();
+void PasswordEntry::setPlaceholderText(const QString &text)
+{
+    passwordInput->setPlaceholderText(text);
+}
 
-  // Сохраняем размеры старого поля
-  wxSize oldSize = passwordInput->GetSize();
+void PasswordEntry::onShowPassword(bool checked)
+{
+    passwordVisible = checked;
 
-  // Создаём новое текстовое поле с нужным стилем
-  int style = wxTE_PROCESS_ENTER;
-  if (!passwordVisible)
-  {
-    style |= wxTE_PASSWORD; // Добавляем флаг скрытия
-  }
+    if (passwordVisible) {
+        // Показываем пароль в открытом виде
+        passwordInput->setEchoMode(QLineEdit::Normal);
+    } else {
+        // Скрываем пароль
+        passwordInput->setEchoMode(QLineEdit::Password);
+    }
 
-  // Удаляем старое поле
-  passwordInput->Destroy();
+    // Сохраняем позицию курсора
+    int cursorPos = passwordInput->cursorPosition();
 
-  // Создаём новое с тем же размером и стилем
-  passwordInput = new wxTextCtrl(this, wxID_PasswordField, value,
-                                 wxDefaultPosition, oldSize, style);
+    // Принудительно обновляем виджет
+    passwordInput->update();
 
-  // Обновляем layout
-  GetSizer()->Insert(0, passwordInput, 1, wxALL | wxEXPAND, 2);
-  GetSizer()->Layout();
+    // Восстанавливаем позицию курсора
+    passwordInput->setCursorPosition(cursorPos);
 }

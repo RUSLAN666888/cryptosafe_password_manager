@@ -1,32 +1,46 @@
 #ifndef PASSWORDENTRY_H
 #define PASSWORDENTRY_H
 
-#include <wx/textctrl.h>
-#include <wx/wx.h>
+#include <QWidget>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QHBoxLayout>
 
-class PasswordEntry : public wxPanel
+class PasswordEntry : public QWidget
 {
+    Q_OBJECT
+
 private:
-  wxTextCtrl *passwordInput;
-  wxCheckBox *showPasswordCheck;
+    QLineEdit *passwordInput;
+    QCheckBox *showPasswordCheck;
+    bool passwordVisible;
 
-  bool passwordVisible;
-
-  void onShowPassword(wxCommandEvent &event);
+private slots:
+    void onShowPassword(bool checked);
 
 public:
-  PasswordEntry(wxWindow *parent, wxWindowID id = wxID_ANY,
-                const wxString &value = "",
-                const wxPoint &pos = wxDefaultPosition,
-                const wxSize &size = wxDefaultSize);
+    explicit PasswordEntry(QWidget *parent = nullptr,
+                           const QString &value = "",
+                           const QSize &size = QSize(200, -1));
 
-  ~PasswordEntry(); // Деструктор для затирания
+    ~PasswordEntry();
 
-  wxString GetValue() const;
-  void SetValue(const wxString &value);
-  void SetEditable(bool editable);
+    QString getValue() const;
+    void setValue(const QString &value);
+    void setEditable(bool editable);
+    void setPlaceholderText(const QString &text);
 
-  wxDECLARE_EVENT_TABLE();
+    // Для доступа к QLineEdit (для сигналов)
+    QLineEdit* getLineEdit() const { return passwordInput; }
+
+    // Для совместимости с wxWidgets API
+    void SetValue(const QString &value) { setValue(value); }
+    QString GetValue() const { return getValue(); }
+    void SetEditable(bool editable) { setEditable(editable); }
+
+signals:
+    void textChanged(const QString &text);  // Добавляем сигнал
+
 };
 
-#endif
+#endif // PASSWORDENTRY_H

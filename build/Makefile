@@ -129,6 +129,56 @@ cryptosafe/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/build
 .PHONY : cryptosafe/fast
 
+#=============================================================================
+# Target rules for targets named cryptosafe_autogen_timestamp_deps
+
+# Build rule for target.
+cryptosafe_autogen_timestamp_deps: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 cryptosafe_autogen_timestamp_deps
+.PHONY : cryptosafe_autogen_timestamp_deps
+
+# fast build rule for target.
+cryptosafe_autogen_timestamp_deps/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_autogen_timestamp_deps.dir/build.make CMakeFiles/cryptosafe_autogen_timestamp_deps.dir/build
+.PHONY : cryptosafe_autogen_timestamp_deps/fast
+
+#=============================================================================
+# Target rules for targets named cryptosafe_autogen
+
+# Build rule for target.
+cryptosafe_autogen: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 cryptosafe_autogen
+.PHONY : cryptosafe_autogen
+
+# fast build rule for target.
+cryptosafe_autogen/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_autogen.dir/build.make CMakeFiles/cryptosafe_autogen.dir/build
+.PHONY : cryptosafe_autogen/fast
+
+cryptosafe_autogen/mocs_compilation.o: cryptosafe_autogen/mocs_compilation.cpp.o
+.PHONY : cryptosafe_autogen/mocs_compilation.o
+
+# target to build an object file
+cryptosafe_autogen/mocs_compilation.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/cryptosafe_autogen/mocs_compilation.cpp.o
+.PHONY : cryptosafe_autogen/mocs_compilation.cpp.o
+
+cryptosafe_autogen/mocs_compilation.i: cryptosafe_autogen/mocs_compilation.cpp.i
+.PHONY : cryptosafe_autogen/mocs_compilation.i
+
+# target to preprocess a source file
+cryptosafe_autogen/mocs_compilation.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/cryptosafe_autogen/mocs_compilation.cpp.i
+.PHONY : cryptosafe_autogen/mocs_compilation.cpp.i
+
+cryptosafe_autogen/mocs_compilation.s: cryptosafe_autogen/mocs_compilation.cpp.s
+.PHONY : cryptosafe_autogen/mocs_compilation.s
+
+# target to generate assembly for a file
+cryptosafe_autogen/mocs_compilation.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/cryptosafe_autogen/mocs_compilation.cpp.s
+.PHONY : cryptosafe_autogen/mocs_compilation.cpp.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -377,7 +427,12 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... cryptosafe_autogen"
+	@echo "... cryptosafe_autogen_timestamp_deps"
 	@echo "... cryptosafe"
+	@echo "... cryptosafe_autogen/mocs_compilation.o"
+	@echo "... cryptosafe_autogen/mocs_compilation.i"
+	@echo "... cryptosafe_autogen/mocs_compilation.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

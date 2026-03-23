@@ -1,83 +1,70 @@
-// MainWindow.cpp
-#include "../src/gui/MainWindow.h"
-#include "../src/core/crypto/authentication.h"
+#include "MainWindow.h"
 #include "../src/gui/dialogs/first_run_wizard/FirstRunWizard.h"
+#include "../src/gui/dialogs/login_dialog/LoginDialog.h"
+#include "../src/gui/dialogs/password_change/password_change.h"
 #include "../src/gui/dialogs/settings_dialog/SettingsDialog.h"
-#include "../src/gui/widgets/audit_log_viewer/AuditLogViewer.h"
-#include <wx/aboutdlg.h>
-#include <wx/artprov.h>
-#include <wx/icon.h>
-#include <wx/msgdlg.h>
-#include <../src/gui/dialogs/password_change/password_change.h>
-
-wxBEGIN_EVENT_TABLE(MainWindow, wxFrame)
-    EVT_MENU(ID_NewDatabase, MainWindow::onNewDatabase)
-    EVT_MENU(ID_OpenDatabase, MainWindow::onOpenDatabase)
-    EVT_MENU(ID_Backup, MainWindow::onBackup)
-    EVT_MENU(ID_Exit, MainWindow::onExit)
-    EVT_MENU(ID_AddEntry, MainWindow::onAddEntry)
-    EVT_MENU(ID_EditEntry, MainWindow::onEditEntry)
-    EVT_MENU(ID_DeleteEntry, MainWindow::onDeleteEntry)
-    EVT_MENU(ID_ViewLogs, MainWindow::onViewLogs)
-    EVT_MENU(ID_Settings, MainWindow::onSettings)
-    EVT_MENU(ID_About, MainWindow::onAbout)
-    EVT_MENU(ID_FirstRunWizard, MainWindow::onFirstRunWizard)
-    EVT_LIST_ITEM_SELECTED(wxID_ANY, MainWindow::onTableItemSelected)
-    EVT_BUTTON(ID_AddEntry, MainWindow::onAddEntry)
-    EVT_BUTTON(ID_EditEntry, MainWindow::onEditEntry)
-    EVT_BUTTON(ID_DeleteEntry, MainWindow::onDeleteEntry)
-    EVT_TIMER(ID_InactivityTimer, MainWindow::onInactivityTimer)
-    EVT_MENU(ID_ChangePassword, MainWindow::onChangePassword)
-    //EVT_ACTIVATE(MainWindow::onActivate)
-wxEND_EVENT_TABLE()
+#include "../src/core/state_manager.h"
+#include <QMessageBox>
+#include <QApplication>
+#include <QDebug>
 
 MainWindow::MainWindow(ConfigHander &cfg, Database &database)
-    : wxFrame(nullptr, wxID_ANY, "CryptoSafe Manager", wxDefaultPosition, wxSize(900, 600)),
-    config(cfg), db(database), isLoggedIn(false), isFirstRun(false),
-    isShowingLoginDialog(false)
+    : QMainWindow(nullptr)
+    , config(cfg)
+    , db(database)
+    , isLoggedIn(false)
 {
+    setWindowTitle("CryptoSafe Manager");
+    resize(900, 600);
+
     createMenuBar();
     createToolBar();
-    createMainPanel();
+    createCentralWidget();
     createStatusBar();
-    Center();
+
+    // Создаем таймер бездействия
+    inactivityTimer = new QTimer(this);
+    inactivityTimer->setSingleShot(true);
+    connect(inactivityTimer, &QTimer::timeout, this, &MainWindow::onInactivityTimeout);
+
 
     // Регистрируем обработчики событий
     registerEventHandlers();
 
-    // Скрываем содержимое до логина
-    //passwordTable->Hide();
+    // Скрываем таблицу до логина
+    passwordTable->hide();
 
     // Проверяем первый запуск
     if (config.isFirstRun())
     {
-        showFirstRunWizard();
+        if (!showFirstRunWizard())
+        {
+            QMetaObject::invokeMethod(this, &MainWindow::close, Qt::QueuedConnection);
+            return;
+        }
     }
     else
     {
-        // Показываем диалог входа
-        showLoginDialog();
+        if (!showLoginDialog())
+        {
+            QMetaObject::invokeMethod(this, &MainWindow::close, Qt::QueuedConnection);
+            return;
+        }
     }
-
-    // Запускаем таймер проверки бездействия (каждую минуту)
-    inactivityTimer = new wxTimer(this, ID_InactivityTimer);
-    inactivityTimer->Start(60000);
 
     updateStatusBar();
 }
 
 MainWindow::~MainWindow()
 {
-    if (inactivityTimer)
+    if (isLoggedIn)
     {
-        inactivityTimer->Stop();
-        delete inactivityTimer;
+        KeyManager::getInstance().logout();
     }
 }
 
 void MainWindow::registerEventHandlers()
 {
-    // Подписываемся на события через EventBus
     eventBus.subscribe(EventType::UserLoggedIn,
                        [this](const Event& event) { this->onUserLoggedIn(event); });
 
@@ -87,129 +74,96 @@ void MainWindow::registerEventHandlers()
 
 void MainWindow::createMenuBar()
 {
-    menuBar = new wxMenuBar();
+    menuBar = new QMenuBar(this);
 
-    wxMenu *fileMenu = new wxMenu();
-    fileMenu->Append(ID_NewDatabase, "&New Database\tCtrl+N", "Create new database");
-    fileMenu->Append(ID_OpenDatabase, "&Open Database\tCtrl+O", "Open existing database");
-    fileMenu->AppendSeparator();
-    fileMenu->Append(ID_Backup, "&Backup...", "Create backup");
-    fileMenu->AppendSeparator();
-    fileMenu->Append(ID_Exit, "E&xit\tAlt+F4", "Exit application");
+    QMenu *fileMenu = menuBar->addMenu("&File");
+    fileMenu->addAction("&New Database", this, &MainWindow::onNewDatabase, QKeySequence::New);
+    fileMenu->addAction("&Open Database", this, &MainWindow::onOpenDatabase, QKeySequence::Open);
+    fileMenu->addSeparator();
+    fileMenu->addAction("&Backup...", this, &MainWindow::onBackup);
+    fileMenu->addSeparator();
+    fileMenu->addAction("E&xit", this, &MainWindow::onExit, QKeySequence::Quit);
 
-    wxMenu *editMenu = new wxMenu();
-    editMenu->Append(ID_AddEntry, "&Add Entry\tCtrl+A", "Add new password entry");
-    editMenu->Append(ID_EditEntry, "&Edit Entry\tCtrl+E", "Edit selected entry");
-    editMenu->Append(ID_DeleteEntry, "&Delete Entry\tDel", "Delete selected entry");
+    QMenu *editMenu = menuBar->addMenu("&Edit");
+    editMenu->addAction("&Add Entry", this, &MainWindow::onAddEntry, QKeySequence("Ctrl+A"));
+    editMenu->addAction("&Edit Entry", this, &MainWindow::onEditEntry, QKeySequence("Ctrl+E"));
+    editMenu->addAction("&Delete Entry", this, &MainWindow::onDeleteEntry, QKeySequence::Delete);
+    editMenu->addSeparator();
+    editMenu->addAction("&Lock", this, &MainWindow::onLock, QKeySequence("Ctrl+L"));  // Добавить кнопку Lock
+    editMenu->addSeparator();
+    editMenu->addAction("&Change Master Password", this, &MainWindow::onChangePassword, QKeySequence("Ctrl+Shift+P"));
 
-    editMenu->AppendSeparator();
+    QMenu *viewMenu = menuBar->addMenu("&View");
+    viewMenu->addAction("&Audit Logs", this, &MainWindow::onViewLogs);
+    viewMenu->addSeparator();
+    viewMenu->addAction("&Settings", this, &MainWindow::onSettings);
 
-    editMenu->Append(ID_ChangePassword, "&Change Master Password\tCtrl+Shift+P",
-                     "Change master password");
+    QMenu *helpMenu = menuBar->addMenu("&Help");
+    helpMenu->addAction("Setup &Wizard", this, &MainWindow::onFirstRunWizard);
+    helpMenu->addSeparator();
+    helpMenu->addAction("&About", this, &MainWindow::onAbout);
 
-
-    wxMenu *viewMenu = new wxMenu();
-    viewMenu->Append(ID_ViewLogs, "&Audit Logs", "View audit logs");
-    viewMenu->AppendSeparator();
-    viewMenu->Append(ID_Settings, "&Settings", "Application settings");
-
-    wxMenu *helpMenu = new wxMenu();
-    helpMenu->Append(ID_FirstRunWizard, "Setup &Wizard", "Run first-time setup");
-    helpMenu->AppendSeparator();
-    helpMenu->Append(ID_About, "&About", "About CryptoSafe Manager");
-
-    menuBar->Append(fileMenu, "&File");
-    menuBar->Append(editMenu, "&Edit");
-    menuBar->Append(viewMenu, "&View");
-    menuBar->Append(helpMenu, "&Help");
-
-    SetMenuBar(menuBar);
+    setMenuBar(menuBar);
 }
 
 void MainWindow::createToolBar()
 {
-    toolBar = CreateToolBar();
-
-    toolBar->AddTool(ID_AddEntry, "Add",
-                     wxArtProvider::GetBitmap(wxART_PLUS, wxART_TOOLBAR));
-    toolBar->AddTool(ID_EditEntry, "Edit",
-                     wxArtProvider::GetBitmap(wxART_EDIT, wxART_TOOLBAR));
-    toolBar->AddTool(ID_DeleteEntry, "Delete",
-                     wxArtProvider::GetBitmap(wxART_DELETE, wxART_TOOLBAR));
-    toolBar->AddSeparator();
-    toolBar->AddTool(ID_Backup, "Backup",
-                     wxArtProvider::GetBitmap(wxART_FLOPPY, wxART_TOOLBAR));
-    toolBar->AddSeparator();
-    toolBar->AddTool(ID_Settings, "Settings",
-                     wxArtProvider::GetBitmap(wxART_HELP, wxART_TOOLBAR));
-
-    toolBar->Realize();
+    toolBar = addToolBar("Main");
+    toolBar->addAction("Add", this, &MainWindow::onAddEntry);
+    toolBar->addAction("Edit", this, &MainWindow::onEditEntry);
+    toolBar->addAction("Delete", this, &MainWindow::onDeleteEntry);
+    toolBar->addSeparator();
+    toolBar->addAction("Backup", this, &MainWindow::onBackup);
+    toolBar->addSeparator();
+    toolBar->addAction("Settings", this, &MainWindow::onSettings);
 }
 
-void MainWindow::createMainPanel()
+void MainWindow::createCentralWidget()
 {
-    mainPanel = new wxPanel(this);
-    mainSizer = new wxBoxSizer(wxVERTICAL);
-
-    passwordTable = new SecureTable(mainPanel, wxID_ANY);
-    mainSizer->Add(passwordTable, 1, wxEXPAND | wxALL, 5);
-
-    mainPanel->SetSizer(mainSizer);
+    centralWidget = new QWidget(this);
+    mainLayout = new QVBoxLayout(centralWidget);
+    passwordTable = new SecureTable(centralWidget);
+    mainLayout->addWidget(passwordTable);
+    setCentralWidget(centralWidget);
 }
 
 void MainWindow::createStatusBar()
 {
-    statusBar = CreateStatusBar(2);
-    int widths[] = {200, -1};
-    statusBar->SetStatusWidths(2, widths);
-    statusBar->SetStatusText("Not logged in", 0);
-    statusBar->SetStatusText("CryptoSafe Manager", 1);
+    statusBar = new QStatusBar(this);
+    setStatusBar(statusBar);
+    statusBar->showMessage("Not logged in");
 }
-
-void MainWindow::loadSampleData() { passwordTable->addSampleData(); }
 
 void MainWindow::updateStatusBar()
 {
-    wxString loginStatus = isLoggedIn ? "Logged in" : "Not logged in";
-    statusBar->SetStatusText(loginStatus, 0);
+    QString loginStatus = isLoggedIn ? "Logged in" : "Not logged in";
+    statusBar->showMessage(loginStatus);
 }
 
-void MainWindow::showFirstRunWizard()
+bool MainWindow::showFirstRunWizard()
 {
     FirstRunWizard wizard(this, config);
-    if (wizard.RunWizard(wizard.GetFirstPage()))
+    if (wizard.exec() == QDialog::Accepted)
     {
         config.setFirstRun(false);
-
         Argon2Data d = wizard.getAuthData();
         db.saveAuthData(d.hash, d.salt, d.time_cost, d.memory_cost_mb,
                         d.parallelism, d.hash_len);
-
-
         db.saveEncSalt(wizard.getEncSalt());
+        return showLoginDialog();
     }
+    return false;
 }
 
-void MainWindow::showLoginDialog()
+bool MainWindow::showLoginDialog()
 {
-    if (isShowingLoginDialog) {
-        return;
-    }
-
-    isShowingLoginDialog = true;
-
     LoginDialog dialog(this, config, db);
-
-    if (dialog.ShowModal() == wxID_OK)
+    if (dialog.exec() == QDialog::Accepted)
     {
         unlockApplication();
+        return true;
     }
-    else
-    {
-        Close(true);
-    }
-
-    isShowingLoginDialog = false;
+    return false;
 }
 
 void MainWindow::unlockApplication()
@@ -217,17 +171,17 @@ void MainWindow::unlockApplication()
     if (!isLoggedIn)
     {
         isLoggedIn = true;
-        passwordTable->Show();
-        Layout();
+        passwordTable->show();
         updateStatusBar();
 
-        KeyManager::getInstance().update_activity();
+        StateManager::getInstance().login();
 
-        if (inactivityTimer)
+        if (passwordTable->rowCount() == 0)
         {
-            inactivityTimer->Stop();
-            inactivityTimer->Start(60000);
+            passwordTable->addSampleData();
         }
+
+        resetInactivityTimer();
     }
 }
 
@@ -236,210 +190,190 @@ void MainWindow::lockApplication()
     if (isLoggedIn)
     {
         isLoggedIn = false;
-        passwordTable->Hide();
-        Layout();
+        passwordTable->hide();
         updateStatusBar();
 
-        if (inactivityTimer)
+        StateManager::getInstance().logout();
+
+        if (inactivityTimer->isActive())
         {
-            inactivityTimer->Stop();
+            inactivityTimer->stop();
         }
+
+        struct EmptyData {};
+        EmptyData emptyData;
+        eventBus.publish(EventType::UserLoggedOut, emptyData, "MainWindow");
     }
 }
 
-// void MainWindow::onActivate(wxActivateEvent& event)
-// {
-//     if (!event.GetActive()) {
-//         // Окно потеряло активность (свернули или переключились)
-//         KeyManager::getInstance().on_app_inactive();
-//         lockApplication();
-//     } else {
-//         // Окно стало активным
-//         KeyManager::getInstance().on_app_active();
-
-//         KeyManager::KeyData keyData;
-//         KeyManager::getInstance().get_key(keyData);
-//         if (keyData.data == nullptr) {
-//             showLoginDialog();
-//         } else {
-//             unlockApplication();
-//         }
-//     }
-//     event.Skip();
-// }
-
-void MainWindow::onInactivityTimer(wxTimerEvent &event)
+void MainWindow::resetInactivityTimer()
 {
-    if (!isLoggedIn)
-        return;
+    if (isLoggedIn)
+    {
+        StateManager::getInstance().updateActivity();
+        KeyManager::getInstance().update_activity();
+        inactivityTimer->start(INACTIVITY_TIMEOUT_MS);
+    }
+}
 
-    KeyManager::getInstance().update_activity();
-
-    KeyManager::KeyData keyData;
-    KeyManager::getInstance().get_key(keyData);
-
-    if (keyData.data == nullptr && isLoggedIn)
+void MainWindow::onInactivityTimeout()
+{
+    if (isLoggedIn)
     {
         lockApplication();
-        wxMessageBox("Application locked due to inactivity", "Auto-Lock",
-                     wxOK | wxICON_INFORMATION);
+        KeyManager::getInstance().logout();
+        QMessageBox::information(this, "Auto-Lock", "Application locked due to inactivity.");
         showLoginDialog();
     }
 }
 
 // ============== ОБРАБОТЧИКИ МЕНЮ ==============
 
-void MainWindow::onNewDatabase(wxCommandEvent &event)
+void MainWindow::onNewDatabase()
 {
-    wxMessageBox("New Database - will be implemented in Sprint 2", "Info",
-                 wxOK | wxICON_INFORMATION);
+    QMessageBox::information(this, "Info", "New Database - will be implemented in Sprint 2");
 }
 
-void MainWindow::onOpenDatabase(wxCommandEvent &event)
+void MainWindow::onOpenDatabase()
 {
-    wxMessageBox("Open Database - will be implemented in Sprint 2", "Info",
-                 wxOK | wxICON_INFORMATION);
+    QMessageBox::information(this, "Info", "Open Database - will be implemented in Sprint 2");
 }
 
-void MainWindow::onBackup(wxCommandEvent &event)
+void MainWindow::onBackup()
 {
-    wxMessageBox("Backup - will be implemented in Sprint 8", "Info",
-                 wxOK | wxICON_INFORMATION);
+    QMessageBox::information(this, "Info", "Backup - will be implemented in Sprint 8");
 }
 
-void MainWindow::onExit(wxCommandEvent &event)
+void MainWindow::onExit()
 {
-    KeyManager::getInstance().logout();
-    Close(true);
+    if (isLoggedIn)
+    {
+        KeyManager::getInstance().logout();
+    }
+    close();
 }
 
-void MainWindow::onAddEntry(wxCommandEvent &event)
-{
-    wxMessageBox("Add Entry - will be implemented in Sprint 3", "Info",
-                 wxOK | wxICON_INFORMATION);
-}
-
-void MainWindow::onEditEntry(wxCommandEvent &event)
+void MainWindow::onAddEntry()
 {
     if (!isLoggedIn)
     {
         showLoginDialog();
         return;
     }
-
-    long selected = passwordTable->getSelectedId();
-    if (selected == -1)
-    {
-        wxMessageBox("Please select an entry", "No Selection",
-                     wxOK | wxICON_WARNING);
-        return;
-    }
-
-    wxMessageBox(wxString::Format("Edit Entry %ld - Sprint 3", selected), "Info",
-                 wxOK | wxICON_INFORMATION);
+    resetInactivityTimer();
+    QMessageBox::information(this, "Info", "Add Entry - will be implemented in Sprint 3");
 }
 
-void MainWindow::onDeleteEntry(wxCommandEvent &event)
+void MainWindow::onEditEntry()
 {
     if (!isLoggedIn)
     {
         showLoginDialog();
         return;
     }
-
+    resetInactivityTimer();
     long selected = passwordTable->getSelectedId();
     if (selected == -1)
     {
-        wxMessageBox("Please select an entry", "No Selection",
-                     wxOK | wxICON_WARNING);
+        QMessageBox::warning(this, "No Selection", "Please select an entry");
         return;
     }
-
-    wxMessageBox(wxString::Format("Delete Entry %ld - Sprint 3", selected),
-                 "Info", wxOK | wxICON_INFORMATION);
+    QMessageBox::information(this, "Info", QString("Edit Entry %1 - Sprint 3").arg(selected));
 }
 
-void MainWindow::onViewLogs(wxCommandEvent &event)
+void MainWindow::onDeleteEntry()
 {
-    wxMessageBox("Audit Logs - will be implemented in Sprint 5", "Info",
-                 wxOK | wxICON_INFORMATION);
+    if (!isLoggedIn)
+    {
+        showLoginDialog();
+        return;
+    }
+    resetInactivityTimer();
+    long selected = passwordTable->getSelectedId();
+    if (selected == -1)
+    {
+        QMessageBox::warning(this, "No Selection", "Please select an entry");
+        return;
+    }
+    QMessageBox::information(this, "Info", QString("Delete Entry %1 - Sprint 3").arg(selected));
 }
 
-void MainWindow::onSettings(wxCommandEvent &event)
+void MainWindow::onViewLogs()
+{
+    QMessageBox::information(this, "Info", "Audit Logs - will be implemented in Sprint 5");
+}
+
+void MainWindow::onSettings()
 {
     SettingsDialog dialog(this, config);
-    dialog.ShowModal();
+    dialog.exec();
 }
 
-void MainWindow::onAbout(wxCommandEvent &event)
+void MainWindow::onAbout()
 {
-    wxAboutDialogInfo info;
-    info.SetName("CryptoSafe Manager");
-    info.SetVersion("2.0 (Sprint 2)");
-    info.SetDescription("Secure Password Manager\n\n"
-                        "Sprint 2: Authentication & Key Management");
-    info.SetCopyright("(C) 2024");
-    wxAboutBox(info, this);
+    QMessageBox::about(this, "About CryptoSafe Manager",
+                       "<h2>CryptoSafe Manager</h2>"
+                       "<p>Version 2.0 (Sprint 2)</p>"
+                       "<p>Secure Password Manager</p>"
+                       "<p>Sprint 2: Authentication & Key Management</p>"
+                       "<p>Copyright (C) 2024</p>");
 }
 
-void MainWindow::onFirstRunWizard(wxCommandEvent &event)
+void MainWindow::onFirstRunWizard()
 {
     showFirstRunWizard();
 }
 
-void MainWindow::onTableItemSelected(wxListEvent &event)
+void MainWindow::onChangePassword()
 {
-    if (isLoggedIn)
-    {
-        // Можно активировать кнопки Edit/Delete
-    }
-}
-
-void MainWindow::onChangePassword(wxCommandEvent &event)
-{
-    // Проверяем, залогинен ли пользователь
     if (!isLoggedIn)
     {
-        wxMessageBox("You must be logged in to change password",
-                     "Not Logged In", wxOK | wxICON_WARNING);
+        QMessageBox::warning(this, "Not Logged In", "You must be logged in to change password");
         return;
     }
+    resetInactivityTimer();
 
-    // Создаем и показываем диалог смены пароля
     ChangePasswordDialog dialog(this, db);
-
-    if (dialog.ShowModal() == wxID_OK)
+    if (dialog.exec() == QDialog::Accepted)
     {
-        // Пароль успешно изменен
-        // Блокируем приложение и выходим
         lockApplication();
         KeyManager::getInstance().logout();
-
-        // Показываем сообщение
-        wxMessageBox("Password changed successfully!\n\n"
-                     "Please log in again with your new password.",
-                     "Success", wxOK | wxICON_INFORMATION, this);
-
-        // Показываем диалог логина
-        showLoginDialog();
+        if (!showLoginDialog())
+        {
+            QMetaObject::invokeMethod(this, &MainWindow::close, Qt::QueuedConnection);
+            return;
+        }
     }
 }
+
+// ============== ОБРАБОТЧИКИ СОБЫТИЙ ==============
 
 void MainWindow::onUserLoggedIn(const Event& event)
 {
-    std::cout << "User logged in event received" << std::endl;
-
-    // Вызываем в главном потоке, так как EventBus может вызывать из любого потока
-    wxTheApp->CallAfter([this]() {
+    QMetaObject::invokeMethod(this, [this]() {
         unlockApplication();
-    });
+    }, Qt::QueuedConnection);
 }
 
 void MainWindow::onUserLoggedOut(const Event& event)
 {
-    std::cout << "User logged out event received" << std::endl;
-
-    wxTheApp->CallAfter([this]() {
+    QMetaObject::invokeMethod(this, [this]() {
         lockApplication();
-    });
+    }, Qt::QueuedConnection);
+}
+
+void MainWindow::onLock()
+{
+    if (isLoggedIn)
+    {
+        qDebug() << "User manually locked application";
+        lockApplication();
+        KeyManager::getInstance().logout();
+
+        if (!showLoginDialog())
+        {
+            QMetaObject::invokeMethod(this, &MainWindow::close, Qt::QueuedConnection);
+            return;
+        }
+    }
 }
