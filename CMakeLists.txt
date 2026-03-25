@@ -116,7 +116,9 @@ set(HEADERS
 # Включаем только исходники программы, НЕ тесты!
 set(ALL_SOURCES ${SOURCES} ${HEADERS})
 
-add_executable(${TARGET_NAME} ${ALL_SOURCES})
+add_executable(${TARGET_NAME} ${ALL_SOURCES}
+    src/core/Vault/VaultManager.h
+)
 
 # ============================================================
 # ПОДКЛЮЧЕНИЕ ЗАГОЛОВОЧНЫХ ФАЙЛОВ

@@ -3,17 +3,16 @@
 
 #include <cstdint>
 #include <../src/core/key_manager.h>
+#include "../src/database/plaintext_entry.h"
 #include <vector>
 
 
 class EncryptionService
 {
 public:
-  virtual std::vector<uint8_t> encrypt(const std::vector<uint8_t> &data,
-                                       const KeyManager::KeyData& key) = 0;
+  virtual std::vector<uint8_t> encrypt(const KeyManager::KeyData& key, const PlaintextEntry& entry) = 0;
 
-  virtual std::vector<uint8_t> decrypt(const std::vector<uint8_t> &ciphertext,
-                                       const KeyManager::KeyData& key) = 0;
+  virtual PlaintextEntry decrypt(const std::vector<uint8_t> &ciphertext, const KeyManager::KeyData& key) = 0;
 };
 
 

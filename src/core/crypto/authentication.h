@@ -9,6 +9,7 @@
 #include <vector>
 #include <zxcvbn.h>
 
+
 struct Argon2Data
 {
   std::vector<uint8_t> salt;

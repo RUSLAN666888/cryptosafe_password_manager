@@ -1,0 +1,4 @@
+#ifndef VAULTMANAGER_H
+#define VAULTMANAGER_H
+
+#endif // VAULTMANAGER_H

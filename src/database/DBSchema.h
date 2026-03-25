@@ -107,26 +107,33 @@ const std::string CREATE_TABLES_V2 = R"(
             -- Таблица: vault_entries (Основное хранилище паролей)
             -- =====================================================
             CREATE TABLE IF NOT EXISTS vault_entries (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                -- Зашифрованные данные в формате: nonce(12) || ciphertext || tag(16)
+                encrypted_data BLOB NOT NULL,
+
+                -- Метаданные для индексации и поиска (не шифруются)
                 title TEXT NOT NULL,
                 username TEXT NOT NULL,
-                encrypted_password BLOB NOT NULL,
-                url TEXT,
-                notes TEXT,
                 tags TEXT,
+
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                format_version INTEGER DEFAULT 1
             );
 
+            -- Индексы для быстрого поиска (требование DB-1)
             CREATE INDEX IF NOT EXISTS idx_vault_title ON vault_entries(title);
             CREATE INDEX IF NOT EXISTS idx_vault_username ON vault_entries(username);
             CREATE INDEX IF NOT EXISTS idx_vault_created ON vault_entries(created_at);
+            CREATE INDEX IF NOT EXISTS idx_vault_updated ON vault_entries(updated_at);
             CREATE INDEX IF NOT EXISTS idx_vault_tags ON vault_entries(tags);
 
-            CREATE TRIGGER IF NOT EXISTS update_vault_entries_timestamp 
+            -- Триггер для автоматического обновления updated_at
+            CREATE TRIGGER IF NOT EXISTS update_vault_entries_timestamp
             AFTER UPDATE ON vault_entries
             BEGIN
-                UPDATE vault_entries SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+                UPDATE vault_entries
+                SET updated_at = CURRENT_TIMESTAMP
+                WHERE id = NEW.id;
             END;
 
             -- =====================================================

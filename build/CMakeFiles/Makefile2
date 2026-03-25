@@ -80,16 +80,15 @@ clean: CMakeFiles/cryptosafe_autogen.dir/clean
 # Target rules for target CMakeFiles/cryptosafe.dir
 
 # All Build rule for target.
-CMakeFiles/cryptosafe.dir/all: CMakeFiles/cryptosafe_autogen_timestamp_deps.dir/all
 CMakeFiles/cryptosafe.dir/all: CMakeFiles/cryptosafe_autogen.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13 "Built target cryptosafe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=1,2 "Built target cryptosafe"
 .PHONY : CMakeFiles/cryptosafe.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/cryptosafe.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/master666/development/cryptosafe_password_manager/build/CMakeFiles 14
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/master666/development/cryptosafe_password_manager/build/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/cryptosafe.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/master666/development/cryptosafe_password_manager/build/CMakeFiles 0
 .PHONY : CMakeFiles/cryptosafe.dir/rule
@@ -136,7 +135,7 @@ CMakeFiles/cryptosafe_autogen_timestamp_deps.dir/clean:
 CMakeFiles/cryptosafe_autogen.dir/all: CMakeFiles/cryptosafe_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_autogen.dir/build.make CMakeFiles/cryptosafe_autogen.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_autogen.dir/build.make CMakeFiles/cryptosafe_autogen.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=14 "Built target cryptosafe_autogen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=3 "Built target cryptosafe_autogen"
 .PHONY : CMakeFiles/cryptosafe_autogen.dir/all
 
 # Build rule for subdir invocation for target.
