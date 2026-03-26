@@ -6,13 +6,29 @@
 #include "../src/core/vault/plaintext_entry.h"
 #include <vector>
 #include <memory>
-#include <map>
-
+#include <queue>
+#include <mutex>
+#include <atomic>
 
 class VaultManager{
     Database& db;
     AES256GCM& crypto;
     KeyManager& key_manager;
+
+    // Для миграции ключа
+    std::mutex migration_mutex;
+    std::atomic<bool> is_migrating{false};
+
+    // Очередь отложенных операций
+    struct PendingOperation
+    {
+        enum Type { CREATE, UPDATE, DELETE };
+        Type type;
+        int entry_id;
+        PlaintextEntry entry;
+    };
+    std::queue<PendingOperation> pending_operations;
+    std::mutex queue_mutex;
 
 public:
     VaultManager(Database& database, AES256GCM& crypto, KeyManager& key_mgr);
@@ -22,6 +38,8 @@ public:
     std::vector<PlaintextEntry> getAllEntries();
     bool updateEntry(int entry_id, const PlaintextEntry& entry);
     bool deleteEntry(int entry_id);
+
+    bool changeMasterPassword(const std::string& old_key);
 };
 
 #endif // VAULTMANAGER_H
