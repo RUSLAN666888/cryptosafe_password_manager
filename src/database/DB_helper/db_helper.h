@@ -65,8 +65,6 @@ private:
   int max_connections;
 
   // Внутренние вспомогательные методы
-  sqlite3 *getConnection();
-  void releaseConnection(sqlite3 *conn);
   bool executeScript(const std::string &script);
   int getCurrentVersion();
   void setVersion(int version);
@@ -76,6 +74,9 @@ public:
   // Конструктор/деструктор
   Database(const std::string &path, int max_conn = 5);
   ~Database();
+
+  sqlite3* getConnection();
+  void releaseConnection(sqlite3 *conn);
 
   // Инициализация и миграции
   bool initialize();

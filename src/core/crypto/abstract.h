@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <../src/core/key_manager.h>
-#include "../src/database/plaintext_entry.h"
+#include "../src/core/vault/plaintext_entry.h"
 #include <vector>
 
 

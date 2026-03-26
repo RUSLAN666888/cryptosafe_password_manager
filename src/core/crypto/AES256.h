@@ -1,13 +1,13 @@
 #ifndef AES256_PLACEHOLDER_H
 #define AES256_PLACEHOLDER_H
 
-#include "abstract.h"
+#include "../src/core/crypto/abstract.h"
 #include <cstring>
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include <../src/core/key_manager.h>
-#include "../src/database/plaintext_entry.h"
+#include "../src/core/vault/plaintext_entry.h"
 #include <openssl/evp.h>
 #include <openssl/err.h>
 #include <nlohmann/json.hpp>
@@ -19,7 +19,7 @@ using namespace std;
 using json = nlohmann::json;
 
 
-class AES256Placeholder : public EncryptionService
+class AES256GCM : public EncryptionService
 {
     static constexpr size_t KEY_SIZE = 32;   // 256 бит для AES-256
     static constexpr size_t NONCE_LEN = 12;  // 96 бит, рекомендуется для GCM режима

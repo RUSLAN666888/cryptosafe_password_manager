@@ -16,6 +16,7 @@ struct PlaintextEntry {
     std::string category;
     std::string creation_timestamp;
     int version = 1;
+    std::string tags;
 
     // Конструктор по умолчанию
     PlaintextEntry() = default;
@@ -28,10 +29,11 @@ struct PlaintextEntry {
         const std::string& url,
         const std::string& notes,
         const std::string& category,
-        const std::string& timestamp
+        const std::string& timestamp,
+        const std::string& tags
         ) : title(title), username(username), password(password),
         url(url), notes(notes), category(category),
-        creation_timestamp(timestamp) {}
+        creation_timestamp(timestamp), tags(tags) {}
 
     // Сериализация в JSON
     static void to_json(json& j, const PlaintextEntry& entry) {

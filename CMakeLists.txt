@@ -63,7 +63,7 @@ find_path(LIBSODIUM_INCLUDE
 )
 
 # ============================================================
-# ВСЕ ИСХОДНЫЕ ФАЙЛЫ (ТОЛЬКО ПРОГРАММА, БЕЗ ТЕСТОВ)
+# ВСЕ ИСХОДНЫЕ ФАЙЛЫ
 # ============================================================
 
 set(SOURCES
@@ -71,7 +71,7 @@ set(SOURCES
     src/core/audit_logger.h
     src/core/config_handler.h
     src/core/crypto/abstract.h
-    src/core/crypto/AES256Placeholder.h
+    src/core/crypto/AES256.h
     src/core/events.h
     src/core/key_manager.h
     src/core/crypto/authentication.h
@@ -117,8 +117,7 @@ set(HEADERS
 set(ALL_SOURCES ${SOURCES} ${HEADERS})
 
 add_executable(${TARGET_NAME} ${ALL_SOURCES}
-    src/core/Vault/VaultManager.h
-)
+    src/core/vault/VaultManager.cpp)
 
 # ============================================================
 # ПОДКЛЮЧЕНИЕ ЗАГОЛОВОЧНЫХ ФАЙЛОВ

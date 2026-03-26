@@ -20,7 +20,7 @@ const std::string CREATE_TABLES = R"(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
                 username TEXT NOT NULL,
-                encrypted_password BLOB NOT NULL,  -- Данные шифруются до вставки
+                encrypted_password BLOB NOT NULL,
                 url TEXT,
                 notes TEXT,
                 tags TEXT,  -- JSON массив тегов для будущей фильтрации
