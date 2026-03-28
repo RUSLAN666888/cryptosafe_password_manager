@@ -21,7 +21,9 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/settings_dialog/SettingsDialog.cpp" "CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o" "gcc" "CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o.d"
   "/home/master666/development/cryptosafe_password_manager/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp" "CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o" "gcc" "CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o.d"
   "/home/master666/development/cryptosafe_password_manager/src/gui/widgets/password_entry/PasswordEntry.cpp" "CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o" "gcc" "CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o.d"
+  "/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SearchProxyModel.cpp" "CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o" "gcc" "CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o.d"
   "/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SecureTable.cpp" "CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o" "gcc" "CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o.d"
+  "/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/VaultTableModel.cpp" "CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.o" "gcc" "CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

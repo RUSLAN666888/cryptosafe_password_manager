@@ -90,10 +90,24 @@ CMakeFiles/cryptosafe.dir/cryptosafe_autogen/mocs_compilation.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cryptosafe.dir/cryptosafe_autogen/mocs_compilation.cpp.s"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/mocs_compilation.cpp -o CMakeFiles/cryptosafe.dir/cryptosafe_autogen/mocs_compilation.cpp.s
 
+CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
+CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o: /home/master666/development/cryptosafe_password_manager/src/core/vault/VaultManager.cpp
+CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o -MF CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o.d -o CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o -c /home/master666/development/cryptosafe_password_manager/src/core/vault/VaultManager.cpp
+
+CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/master666/development/cryptosafe_password_manager/src/core/vault/VaultManager.cpp > CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.i
+
+CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/master666/development/cryptosafe_password_manager/src/core/vault/VaultManager.cpp -o CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.s
+
 CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
 CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.o: /home/master666/development/cryptosafe_password_manager/src/database/DB_helper/db_helper.cpp
 CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.o -MF CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.o.d -o CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.o -c /home/master666/development/cryptosafe_password_manager/src/database/DB_helper/db_helper.cpp
 
 CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.i: cmake_force
@@ -107,7 +121,7 @@ CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.s: cmake_force
 CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
 CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o: /home/master666/development/cryptosafe_password_manager/src/gui/MainWindow.cpp
 CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o -MF CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o.d -o CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o -c /home/master666/development/cryptosafe_password_manager/src/gui/MainWindow.cpp
 
 CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.i: cmake_force
@@ -121,7 +135,7 @@ CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.s: cmake_force
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o: /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o -MF CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o.d -o CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o -c /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp
 
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.i: cmake_force
@@ -135,7 +149,7 @@ CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.s:
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o: /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/settings_dialog/SettingsDialog.cpp
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o -MF CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o.d -o CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o -c /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/settings_dialog/SettingsDialog.cpp
 
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.i: cmake_force
@@ -149,7 +163,7 @@ CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.s: 
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.o: /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/login_dialog/LoginDialog.cpp
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.o -MF CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.o.d -o CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.o -c /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/login_dialog/LoginDialog.cpp
 
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.i: cmake_force
@@ -163,7 +177,7 @@ CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.s: cmake_
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.o: /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/password_change/password_change.cpp
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.o -MF CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.o.d -o CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.o -c /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/password_change/password_change.cpp
 
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.i: cmake_force
@@ -177,7 +191,7 @@ CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.s:
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.o: /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/entry_dialog/entry_dialog.cpp
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.o -MF CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.o.d -o CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.o -c /home/master666/development/cryptosafe_password_manager/src/gui/dialogs/entry_dialog/entry_dialog.cpp
 
 CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.i: cmake_force
@@ -191,7 +205,7 @@ CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.s: cmake
 CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
 CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o: /home/master666/development/cryptosafe_password_manager/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp
 CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o -MF CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o.d -o CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o -c /home/master666/development/cryptosafe_password_manager/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp
 
 CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.i: cmake_force
@@ -205,7 +219,7 @@ CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.s:
 CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
 CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o: /home/master666/development/cryptosafe_password_manager/src/gui/widgets/password_entry/PasswordEntry.cpp
 CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o -MF CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o.d -o CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o -c /home/master666/development/cryptosafe_password_manager/src/gui/widgets/password_entry/PasswordEntry.cpp
 
 CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.i: cmake_force
@@ -219,7 +233,7 @@ CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.s: cm
 CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
 CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o: /home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SecureTable.cpp
 CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o -MF CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o.d -o CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o -c /home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SecureTable.cpp
 
 CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.i: cmake_force
@@ -230,10 +244,38 @@ CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.s: cmake_
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.s"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SecureTable.cpp -o CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.s
 
+CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
+CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.o: /home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/VaultTableModel.cpp
+CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.o -MF CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.o.d -o CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.o -c /home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/VaultTableModel.cpp
+
+CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/VaultTableModel.cpp > CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.i
+
+CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/VaultTableModel.cpp -o CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.s
+
+CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
+CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o: /home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SearchProxyModel.cpp
+CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o -MF CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o.d -o CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o -c /home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SearchProxyModel.cpp
+
+CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SearchProxyModel.cpp > CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.i
+
+CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SearchProxyModel.cpp -o CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.s
+
 CMakeFiles/cryptosafe.dir/main.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
 CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_password_manager/main.cpp
 CMakeFiles/cryptosafe.dir/main.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/cryptosafe.dir/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/cryptosafe.dir/main.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/main.cpp.o -MF CMakeFiles/cryptosafe.dir/main.cpp.o.d -o CMakeFiles/cryptosafe.dir/main.cpp.o -c /home/master666/development/cryptosafe_password_manager/main.cpp
 
 CMakeFiles/cryptosafe.dir/main.cpp.i: cmake_force
@@ -244,23 +286,10 @@ CMakeFiles/cryptosafe.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cryptosafe.dir/main.cpp.s"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/master666/development/cryptosafe_password_manager/main.cpp -o CMakeFiles/cryptosafe.dir/main.cpp.s
 
-CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o: CMakeFiles/cryptosafe.dir/flags.make
-CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o: /home/master666/development/cryptosafe_password_manager/src/core/vault/VaultManager.cpp
-CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o: CMakeFiles/cryptosafe.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o -MF CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o.d -o CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o -c /home/master666/development/cryptosafe_password_manager/src/core/vault/VaultManager.cpp
-
-CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/master666/development/cryptosafe_password_manager/src/core/vault/VaultManager.cpp > CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.i
-
-CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/master666/development/cryptosafe_password_manager/src/core/vault/VaultManager.cpp -o CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.s
-
 # Object files for target cryptosafe
 cryptosafe_OBJECTS = \
 "CMakeFiles/cryptosafe.dir/cryptosafe_autogen/mocs_compilation.cpp.o" \
+"CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o" \
 "CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.o" \
 "CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o" \
 "CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o" \
@@ -271,13 +300,15 @@ cryptosafe_OBJECTS = \
 "CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o" \
 "CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o" \
 "CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o" \
-"CMakeFiles/cryptosafe.dir/main.cpp.o" \
-"CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o"
+"CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.o" \
+"CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o" \
+"CMakeFiles/cryptosafe.dir/main.cpp.o"
 
 # External object files for target cryptosafe
 cryptosafe_EXTERNAL_OBJECTS =
 
 cryptosafe: CMakeFiles/cryptosafe.dir/cryptosafe_autogen/mocs_compilation.cpp.o
+cryptosafe: CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o
 cryptosafe: CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.o
 cryptosafe: CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o
 cryptosafe: CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
@@ -288,8 +319,9 @@ cryptosafe: CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.
 cryptosafe: CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o
 cryptosafe: CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o
 cryptosafe: CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o
+cryptosafe: CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.o
+cryptosafe: CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o
 cryptosafe: CMakeFiles/cryptosafe.dir/main.cpp.o
-cryptosafe: CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o
 cryptosafe: CMakeFiles/cryptosafe.dir/build.make
 cryptosafe: /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.15.13
 cryptosafe: /usr/lib/x86_64-linux-gnu/libsqlite3.so
@@ -301,7 +333,7 @@ cryptosafe: /usr/lib/x86_64-linux-gnu/libsodium.so
 cryptosafe: /usr/lib/x86_64-linux-gnu/libQt5Gui.so.5.15.13
 cryptosafe: /usr/lib/x86_64-linux-gnu/libQt5Core.so.5.15.13
 cryptosafe: CMakeFiles/cryptosafe.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Linking CXX executable cryptosafe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/master666/development/cryptosafe_password_manager/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Linking CXX executable cryptosafe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/cryptosafe.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

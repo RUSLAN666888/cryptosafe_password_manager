@@ -198,9 +198,21 @@
 			null
 		],
 		[
+			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SearchProxyModel.h",
+			"MU",
+			"KKM4S4MZM7/moc_SearchProxyModel.cpp",
+			null
+		],
+		[
 			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SecureTable.h",
 			"MU",
 			"KKM4S4MZM7/moc_SecureTable.cpp",
+			null
+		],
+		[
+			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/VaultTableModel.h",
+			"MU",
+			"KKM4S4MZM7/moc_VaultTableModel.cpp",
 			null
 		]
 	],
@@ -328,7 +340,17 @@
 			null
 		],
 		[
+			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SearchProxyModel.cpp",
+			"MU",
+			null
+		],
+		[
 			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SecureTable.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/VaultTableModel.cpp",
 			"MU",
 			null
 		]

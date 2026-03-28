@@ -443,6 +443,30 @@ src/gui/widgets/password_entry/PasswordEntry.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.s
 .PHONY : src/gui/widgets/password_entry/PasswordEntry.cpp.s
 
+src/gui/widgets/secure_table/SearchProxyModel.o: src/gui/widgets/secure_table/SearchProxyModel.cpp.o
+.PHONY : src/gui/widgets/secure_table/SearchProxyModel.o
+
+# target to build an object file
+src/gui/widgets/secure_table/SearchProxyModel.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o
+.PHONY : src/gui/widgets/secure_table/SearchProxyModel.cpp.o
+
+src/gui/widgets/secure_table/SearchProxyModel.i: src/gui/widgets/secure_table/SearchProxyModel.cpp.i
+.PHONY : src/gui/widgets/secure_table/SearchProxyModel.i
+
+# target to preprocess a source file
+src/gui/widgets/secure_table/SearchProxyModel.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.i
+.PHONY : src/gui/widgets/secure_table/SearchProxyModel.cpp.i
+
+src/gui/widgets/secure_table/SearchProxyModel.s: src/gui/widgets/secure_table/SearchProxyModel.cpp.s
+.PHONY : src/gui/widgets/secure_table/SearchProxyModel.s
+
+# target to generate assembly for a file
+src/gui/widgets/secure_table/SearchProxyModel.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.s
+.PHONY : src/gui/widgets/secure_table/SearchProxyModel.cpp.s
+
 src/gui/widgets/secure_table/SecureTable.o: src/gui/widgets/secure_table/SecureTable.cpp.o
 .PHONY : src/gui/widgets/secure_table/SecureTable.o
 
@@ -466,6 +490,30 @@ src/gui/widgets/secure_table/SecureTable.s: src/gui/widgets/secure_table/SecureT
 src/gui/widgets/secure_table/SecureTable.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.s
 .PHONY : src/gui/widgets/secure_table/SecureTable.cpp.s
+
+src/gui/widgets/secure_table/VaultTableModel.o: src/gui/widgets/secure_table/VaultTableModel.cpp.o
+.PHONY : src/gui/widgets/secure_table/VaultTableModel.o
+
+# target to build an object file
+src/gui/widgets/secure_table/VaultTableModel.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.o
+.PHONY : src/gui/widgets/secure_table/VaultTableModel.cpp.o
+
+src/gui/widgets/secure_table/VaultTableModel.i: src/gui/widgets/secure_table/VaultTableModel.cpp.i
+.PHONY : src/gui/widgets/secure_table/VaultTableModel.i
+
+# target to preprocess a source file
+src/gui/widgets/secure_table/VaultTableModel.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.i
+.PHONY : src/gui/widgets/secure_table/VaultTableModel.cpp.i
+
+src/gui/widgets/secure_table/VaultTableModel.s: src/gui/widgets/secure_table/VaultTableModel.cpp.s
+.PHONY : src/gui/widgets/secure_table/VaultTableModel.s
+
+# target to generate assembly for a file
+src/gui/widgets/secure_table/VaultTableModel.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.s
+.PHONY : src/gui/widgets/secure_table/VaultTableModel.cpp.s
 
 # Help Target
 help:
@@ -514,9 +562,15 @@ help:
 	@echo "... src/gui/widgets/password_entry/PasswordEntry.o"
 	@echo "... src/gui/widgets/password_entry/PasswordEntry.i"
 	@echo "... src/gui/widgets/password_entry/PasswordEntry.s"
+	@echo "... src/gui/widgets/secure_table/SearchProxyModel.o"
+	@echo "... src/gui/widgets/secure_table/SearchProxyModel.i"
+	@echo "... src/gui/widgets/secure_table/SearchProxyModel.s"
 	@echo "... src/gui/widgets/secure_table/SecureTable.o"
 	@echo "... src/gui/widgets/secure_table/SecureTable.i"
 	@echo "... src/gui/widgets/secure_table/SecureTable.s"
+	@echo "... src/gui/widgets/secure_table/VaultTableModel.o"
+	@echo "... src/gui/widgets/secure_table/VaultTableModel.i"
+	@echo "... src/gui/widgets/secure_table/VaultTableModel.s"
 .PHONY : help
 
 

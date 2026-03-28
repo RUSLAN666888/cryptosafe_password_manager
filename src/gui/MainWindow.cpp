@@ -5,9 +5,13 @@
 #include "../src/gui/dialogs/settings_dialog/SettingsDialog.h"
 #include "../src/core/state_manager.h"
 #include "../src/gui/dialogs/entry_dialog/entry_dialog.h"
+#include "../src/gui/widgets/secure_table/VaultTableModel.h"
+#include "../src/core/vault/VaultManager.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QDebug>
+#include <QHeaderView>
+#include <QShortcut>
 
 MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaultManager)
     : QMainWindow(nullptr)
@@ -33,8 +37,6 @@ MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaul
     // Регистрируем обработчики событий
     registerEventHandlers();
 
-    // Скрываем таблицу до логина
-    passwordTable->hide();
 
     // Проверяем первый запуск
     if (config.isFirstRun())
@@ -118,15 +120,68 @@ void MainWindow::createToolBar()
     toolBar->addAction("Backup", this, &MainWindow::onBackup);
     toolBar->addSeparator();
     toolBar->addAction("Settings", this, &MainWindow::onSettings);
+
+    toolBar->addSeparator();
+
+    // Кнопка для переключения видимости паролей
+    QAction* togglePasswordsAction = toolBar->addAction("👁");
+    togglePasswordsAction->setToolTip("Показать/скрыть пароли (Ctrl+Shift+P)");
+    togglePasswordsAction->setCheckable(true);
+    connect(togglePasswordsAction, &QAction::toggled, this, [this](bool checked) {
+        m_tableModel->setPasswordsVisible(checked);
+    });
+
+    // Горячая клавиша Ctrl+Shift+P
+    QShortcut* shortcut = new QShortcut(QKeySequence("Ctrl+Shift+P"), this);
+    connect(shortcut, &QShortcut::activated, togglePasswordsAction, &QAction::toggle);
 }
 
 void MainWindow::createCentralWidget()
 {
     centralWidget = new QWidget(this);
     mainLayout = new QVBoxLayout(centralWidget);
-    passwordTable = new SecureTable(centralWidget);
-    mainLayout->addWidget(passwordTable);
+
+    // Панель поиска
+    QHBoxLayout* searchLayout = new QHBoxLayout();
+    m_searchField = new QLineEdit(this);
+    m_searchField->setPlaceholderText("Поиск...");
+    m_searchField->setFixedWidth(250);
+    searchLayout->addStretch();
+    searchLayout->addWidget(m_searchField);
+    mainLayout->addLayout(searchLayout);
+
+    // Создаем модель и прокси
+    m_tableModel = new VaultTableModel(m_vaultManager, this);
+    m_proxyModel = new SearchProxyModel(this);
+    m_proxyModel->setSourceModel(m_tableModel);
+    m_proxyModel->setFilterKeyColumn(-1);  // поиск по всем колонкам
+
+    // Создаем таблицу
+    m_tableView = new QTableView(this);
+    m_tableView->setModel(m_proxyModel);
+
+    // Настройки таблицы
+    m_tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_tableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    m_tableView->setSortingEnabled(true);
+    m_tableView->setAlternatingRowColors(true);
+    m_tableView->horizontalHeader()->setSectionsMovable(true);
+    m_tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+
+    // Настройка ширины колонок
+    m_tableView->setColumnWidth(0, 200);  // Название
+    m_tableView->setColumnWidth(1, 150);  // Логин
+    m_tableView->setColumnWidth(2, 200);  // Сайт
+    m_tableView->setColumnWidth(3, 100);  // Дата
+
+    mainLayout->addWidget(m_tableView);
     setCentralWidget(centralWidget);
+
+    // Подключаем поиск
+    connect(m_searchField, &QLineEdit::textChanged, this, [this](const QString& text) {
+        m_proxyModel->setSearchText(text);
+    });
+
 }
 
 void MainWindow::createStatusBar()
@@ -173,27 +228,15 @@ void MainWindow::unlockApplication()
     if (!isLoggedIn)
     {
         isLoggedIn = true;
-        passwordTable->show();
+        refreshTable();
+
+        refreshTable();
+        m_tableView->show();
+
+
         updateStatusBar();
 
         StateManager::getInstance().login();
-
-
-        // Обновляем таблицу
-        auto metadata = m_vaultManager.getAllEntryMetadata();
-        passwordTable->clearAll();
-        for (const auto& meta : metadata)
-        {
-            VaultEntry vaultEntry;
-            vaultEntry.id = meta.id;
-            vaultEntry.title = meta.title;
-            vaultEntry.username = meta.username;
-            vaultEntry.url = meta.url;
-            vaultEntry.tags = meta.tags;
-            vaultEntry.created_at = meta.created_at;
-            vaultEntry.updated_at = meta.updated_at;
-            passwordTable->addEntry(vaultEntry);
-        }
 
         resetInactivityTimer();
     }
@@ -204,7 +247,7 @@ void MainWindow::lockApplication()
     if (isLoggedIn)
     {
         isLoggedIn = false;
-        passwordTable->hide();
+        m_tableView->hide();
         updateStatusBar();
 
         StateManager::getInstance().logout();
@@ -290,20 +333,7 @@ void MainWindow::onAddEntry()
         try {
             int id = m_vaultManager.createEntry(entry);
             if (id != -1) {
-                // Обновляем таблицу
-                auto metadata = m_vaultManager.getAllEntryMetadata();
-                passwordTable->clearAll();
-                for (const auto& meta : metadata) {
-                    VaultEntry vaultEntry;
-                    vaultEntry.id = meta.id;
-                    vaultEntry.title = meta.title;
-                    vaultEntry.username = meta.username;
-                    vaultEntry.url = meta.url;
-                    vaultEntry.tags = meta.tags;
-                    vaultEntry.created_at = meta.created_at;
-                    vaultEntry.updated_at = meta.updated_at;
-                    passwordTable->addEntry(vaultEntry);
-                }
+                refreshTable();  // обновляем таблицу
                 statusBar->showMessage("Запись успешно добавлена", 3000);
             } else {
                 QMessageBox::warning(this, "Ошибка", "Не удалось добавить запись");
@@ -317,36 +347,36 @@ void MainWindow::onAddEntry()
 
 void MainWindow::onEditEntry()
 {
-    if (!isLoggedIn)
-    {
-        showLoginDialog();
-        return;
-    }
-    resetInactivityTimer();
-    long selected = passwordTable->getSelectedId();
-    if (selected == -1)
-    {
-        QMessageBox::warning(this, "No Selection", "Please select an entry");
-        return;
-    }
-    QMessageBox::information(this, "Info", QString("Edit Entry %1 - Sprint 3").arg(selected));
+    // if (!isLoggedIn)
+    // {
+    //     showLoginDialog();
+    //     return;
+    // }
+    // resetInactivityTimer();
+    // long selected = passwordTable->getSelectedId();
+    // if (selected == -1)
+    // {
+    //     QMessageBox::warning(this, "No Selection", "Please select an entry");
+    //     return;
+    // }
+    // QMessageBox::information(this, "Info", QString("Edit Entry %1 - Sprint 3").arg(selected));
 }
 
 void MainWindow::onDeleteEntry()
 {
-    if (!isLoggedIn)
-    {
-        showLoginDialog();
-        return;
-    }
-    resetInactivityTimer();
-    long selected = passwordTable->getSelectedId();
-    if (selected == -1)
-    {
-        QMessageBox::warning(this, "No Selection", "Please select an entry");
-        return;
-    }
-    QMessageBox::information(this, "Info", QString("Delete Entry %1 - Sprint 3").arg(selected));
+    // if (!isLoggedIn)
+    // {
+    //     showLoginDialog();
+    //     return;
+    // }
+    // resetInactivityTimer();
+    // long selected = passwordTable->getSelectedId();
+    // if (selected == -1)
+    // {
+    //     QMessageBox::warning(this, "No Selection", "Please select an entry");
+    //     return;
+    // }
+    // QMessageBox::information(this, "Info", QString("Delete Entry %1 - Sprint 3").arg(selected));
 }
 
 void MainWindow::onViewLogs()
@@ -427,4 +457,9 @@ void MainWindow::onLock()
             return;
         }
     }
+}
+
+void MainWindow::refreshTable()
+{
+    m_tableModel->refresh();
 }

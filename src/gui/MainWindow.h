@@ -8,11 +8,14 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QTimer>
+#include <QTableView>
+#include <QLineEdit>
 #include "../src/core/config_handler.h"
 #include "../src/core/events.h"
 #include "../src/core/key_manager.h"
 #include "../src/database/DB_helper/db_helper.h"
-#include "../src/gui/widgets/secure_table/SecureTable.h"
+#include "../src/gui/widgets/secure_table/VaultTableModel.h"
+#include "../src/gui/widgets/secure_table/SearchProxyModel.h"
 #include "../src/core/vault/VaultManager.h"
 
 class MainWindow : public QMainWindow
@@ -31,8 +34,13 @@ private:
     QToolBar *toolBar;
     QWidget *centralWidget;
     QVBoxLayout *mainLayout;
-    SecureTable *passwordTable;
+    //SecureTable *passwordTable;
     QStatusBar *statusBar;
+
+    QTableView* m_tableView;
+    VaultTableModel* m_tableModel;
+    SearchProxyModel* m_proxyModel;
+    QLineEdit* m_searchField;
 
     // Таймер бездействия
     QTimer *inactivityTimer;
@@ -55,6 +63,8 @@ private:
     void registerEventHandlers();
     void onUserLoggedIn(const Event& event);
     void onUserLoggedOut(const Event& event);
+
+    void refreshTable();
 
 private slots:
     void onInactivityTimeout();

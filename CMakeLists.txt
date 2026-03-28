@@ -76,6 +76,9 @@ set(SOURCES
     src/core/key_manager.h
     src/core/crypto/authentication.h
 
+    # Vault
+    src/core/vault/VaultManager.cpp
+
     # Database
     src/database/DB_helper/db_helper.cpp
 
@@ -93,6 +96,8 @@ set(SOURCES
     src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp
     src/gui/widgets/password_entry/PasswordEntry.cpp
     src/gui/widgets/secure_table/SecureTable.cpp
+    src/gui/widgets/secure_table/VaultTableModel.cpp
+    src/gui/widgets/secure_table/SearchProxyModel.cpp
 
     # Main entry point
     main.cpp
@@ -104,10 +109,13 @@ set(HEADERS
     src/gui/dialogs/first_run_wizard/FirstRunWizard.h
     src/gui/dialogs/settings_dialog/SettingsDialog.h
     src/gui/dialogs/login_dialog/LoginDialog.h
+    src/gui/dialogs/entry_dialog/entry_dialog.h
     src/gui/dialogs/password_change/password_change.h
     src/gui/widgets/audit_log_viewer/AuditLogViewer.h
     src/gui/widgets/password_entry/PasswordEntry.h
     src/gui/widgets/secure_table/SecureTable.h
+    src/gui/widgets/secure_table/VaultTableModel.h
+    src/gui/widgets/secure_table/SearchProxyModel.h
 )
 
 # ============================================================
@@ -116,10 +124,7 @@ set(HEADERS
 
 set(ALL_SOURCES ${SOURCES} ${HEADERS})
 
-add_executable(${TARGET_NAME} ${ALL_SOURCES}
-    src/core/vault/VaultManager.cpp
-    src/gui/dialogs/entry_dialog/entry_dialog.h
-    src/gui/dialogs/entry_dialog/entry_dialog.cpp)
+add_executable(${TARGET_NAME} ${ALL_SOURCES})
 
 # ============================================================
 # ПОДКЛЮЧЕНИЕ ЗАГОЛОВОЧНЫХ ФАЙЛОВ

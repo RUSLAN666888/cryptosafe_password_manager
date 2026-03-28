@@ -35,8 +35,12 @@ cryptosafe_autogen/timestamp: \
 	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/audit_log_viewer/AuditLogViewer.h \
 	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/password_entry/PasswordEntry.cpp \
 	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/password_entry/PasswordEntry.h \
+	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SearchProxyModel.cpp \
+	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SearchProxyModel.h \
 	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SecureTable.cpp \
 	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SecureTable.h \
+	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/VaultTableModel.cpp \
+	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/VaultTableModel.h \
 	/usr/include/alloca.h \
 	/usr/include/argon2.h \
 	/usr/include/asm-generic/errno-base.h \
@@ -509,8 +513,11 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/gnu/stubs.h \
 	/usr/include/x86_64-linux-gnu/openssl/configuration.h \
 	/usr/include/x86_64-linux-gnu/openssl/opensslconf.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtCore/QAbstractTableModel \
+	/usr/include/x86_64-linux-gnu/qt5/QtCore/QSortFilterProxyModel \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qabstractitemmodel.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtCore/qabstractproxymodel.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qalgorithms.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qarraydata.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic.h \
@@ -560,6 +567,7 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qsharedpointer.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qsharedpointer_impl.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qsize.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtCore/qsortfilterproxymodel.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qstring.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qstringalgorithms.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qstringlist.h \
@@ -617,6 +625,7 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStackedWidget \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStatusBar \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTabWidget \
+	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTableView \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTableWidget \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTextEdit \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QToolBar \
