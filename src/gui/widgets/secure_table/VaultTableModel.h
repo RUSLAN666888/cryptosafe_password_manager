@@ -31,14 +31,21 @@ public:
     int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-
-    void setPasswordsVisible(bool visible);
-    bool passwordsVisible() const { return m_passwordsVisible; }
-
     // Обновление данных
     void refresh();
 
-    long getId(int row);
+
+    // Управление видимостью паролей
+    void setPasswordsVisible(bool visible);
+    bool passwordsVisible() const { return m_passwordsVisible; }
+
+    // Переключение видимости для конкретной строки (глаз в колонке)
+    void togglePasswordVisibilityForRow(int row);
+
+    // Получение реального пароля
+    QString getRealPassword(int row) const;
+
+    void updatePasswordInCache(long id, const std::string& newPassword);
 
 private:
     VaultManager& m_vaultManager;
@@ -52,6 +59,10 @@ private:
     bool m_passwordsVisible = false;
     QString getPasswordForRow(int row) const;
     mutable QHash<long, QString> m_passwordCache;  // кэш расшифрованных паролей
+
+    void loadPasswordForRow(int row) const;
+
+    QHash<int, bool> m_rowPasswordVisible;     // индивидуальное состояние для каждой строки
 };
 
 #endif // VAULTTABLEMODEL_H

@@ -7,6 +7,7 @@
 #include "O6SXBNBWUU/moc_SettingsDialog.cpp"
 #include "TJ42LMF5M5/moc_AuditLogViewer.cpp"
 #include "BVW642W5BV/moc_PasswordEntry.cpp"
+#include "KKM4S4MZM7/moc_PasswordDelegate.cpp"
 #include "KKM4S4MZM7/moc_SearchProxyModel.cpp"
 #include "KKM4S4MZM7/moc_SecureTable.cpp"
 #include "KKM4S4MZM7/moc_VaultTableModel.cpp"

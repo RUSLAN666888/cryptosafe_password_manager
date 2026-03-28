@@ -46,7 +46,7 @@ QVariant VaultTableModel::data(const QModelIndex& index, int role) const
             return extractDomain(QString::fromStdString(entry.url));
         case COL_PASSWORD:
             // Показываем маскировку, если пароли скрыты
-            if (m_passwordsVisible) {
+            if (m_passwordsVisible || m_rowPasswordVisible.value(index.row(), false)) {
                 // Нужно загрузить реальный пароль
                 return getPasswordForRow(index.row());
             }
@@ -56,6 +56,11 @@ QVariant VaultTableModel::data(const QModelIndex& index, int role) const
         default:
             return QVariant();
         }
+    }
+
+    // Передаем состояние видимости для делегата (UserRole + 1)
+    if (role == Qt::UserRole + 1) {
+        return m_passwordsVisible || m_rowPasswordVisible.value(index.row(), false);
     }
 
     // Qt::UserRole — для сортировки (оригинальные данные без форматирования)
@@ -124,6 +129,18 @@ long VaultTableModel::getId(int row) const
     return m_data[row].id;
 }
 
+
+void VaultTableModel::togglePasswordVisibilityForRow(int row)
+{
+    if (row < 0 || row >= static_cast<int>(m_data.size())) return;
+
+    bool current = m_rowPasswordVisible.value(row, false);
+    m_rowPasswordVisible[row] = !current;
+
+    // Обновляем только эту ячейку
+    emit dataChanged(index(row, COL_PASSWORD), index(row, COL_PASSWORD));
+}
+
 void VaultTableModel::setPasswordsVisible(bool visible)
 {
     if (m_passwordsVisible == visible) return;
@@ -131,33 +148,63 @@ void VaultTableModel::setPasswordsVisible(bool visible)
     m_passwordsVisible = visible;
 
     if (!visible) {
-        // Очищаем кэш, когда скрываем пароли (SEC-1)
+        // Сбрасываем индивидуальные переключения
+        m_rowPasswordVisible.clear();
+        // Очищаем кэш паролей (SEC-1)
         m_passwordCache.clear();
     }
 
-    // Обновляем только колонку пароля
-    emit dataChanged(index(0, COL_PASSWORD),
-                     index(rowCount() - 1, COL_PASSWORD));
+    // Обновляем всю колонку пароля
+    emit dataChanged(index(0, COL_PASSWORD), index(rowCount() - 1, COL_PASSWORD));
+}
+
+QString VaultTableModel::getRealPassword(int row) const
+{
+    return getPasswordForRow(row);
 }
 
 QString VaultTableModel::getPasswordForRow(int row) const
 {
+    if (row < 0 || row >= static_cast<int>(m_data.size())) return "Ошибка";
+
     long id = m_data[row].id;
 
-    // Проверяем кэш
     if (m_passwordCache.contains(id)) {
         return m_passwordCache[id];
     }
 
-    // Загружаем пароль из VaultManager
 
     auto entry = m_vaultManager.getEntry(static_cast<int>(id));
-    if (entry)
-    {
+    if (entry) {
         QString password = QString::fromStdString(entry->password);
         m_passwordCache[id] = password;
         return password;
     }
 
+
     return "Ошибка";
+}
+
+void VaultTableModel::loadPasswordForRow(int row) const
+{
+    getPasswordForRow(row);  // просто вызывает кэширование
+}
+
+void VaultTableModel::updatePasswordInCache(long id, const std::string& newPassword)
+{
+    if (m_passwordCache.contains(id)) {
+        // Обновляем кэш, если пароль был загружен
+        m_passwordCache[id] = QString::fromStdString(newPassword);
+
+        // Находим строку с этим id
+        for (int row = 0; row < static_cast<int>(m_data.size()); ++row) {
+            if (m_data[row].id == id) {
+                // Обновляем отображение, если пароль сейчас показан
+                if (m_passwordsVisible || m_rowPasswordVisible.value(row, false)) {
+                    emit dataChanged(index(row, COL_PASSWORD), index(row, COL_PASSWORD));
+                }
+                break;
+            }
+        }
+    }
 }

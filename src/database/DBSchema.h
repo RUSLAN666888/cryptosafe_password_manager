@@ -147,13 +147,11 @@ const std::string CREATE_TABLES_V2 = R"(
                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 entry_id INTEGER,
                 details TEXT,
-                signature BLOB,
-                FOREIGN KEY (entry_id) REFERENCES vault_entries(id) ON DELETE SET NULL
+                signature BLOB
             );
 
             CREATE INDEX IF NOT EXISTS idx_audit_timestamp ON audit_log(timestamp);
             CREATE INDEX IF NOT EXISTS idx_audit_action ON audit_log(action);
-            CREATE INDEX IF NOT EXISTS idx_audit_entry_id ON audit_log(entry_id);
 
             -- =====================================================
             -- Таблица: settings (Настройки приложения)
@@ -174,7 +172,7 @@ const std::string CREATE_TABLES_V2 = R"(
             END;
 
             -- =====================================================
-            -- Таблица: key_store (НОВАЯ СТРУКТУРА)
+            -- Таблица: key_store
             -- =====================================================
             CREATE TABLE IF NOT EXISTS key_store (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,

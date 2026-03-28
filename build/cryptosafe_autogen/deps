@@ -35,6 +35,8 @@ cryptosafe_autogen/timestamp: \
 	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/audit_log_viewer/AuditLogViewer.h \
 	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/password_entry/PasswordEntry.cpp \
 	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/password_entry/PasswordEntry.h \
+	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/PasswordDelegate.cpp \
+	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/PasswordDelegate.h \
 	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SearchProxyModel.cpp \
 	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SearchProxyModel.h \
 	/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SecureTable.cpp \
@@ -514,6 +516,7 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/openssl/configuration.h \
 	/usr/include/x86_64-linux-gnu/openssl/opensslconf.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/QAbstractTableModel \
+	/usr/include/x86_64-linux-gnu/qt5/QtCore/QModelIndex \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/QSortFilterProxyModel \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qabstractitemmodel.h \
@@ -531,7 +534,12 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qconfig.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qcontainerfwd.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qcontainertools_impl.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreevent.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qdatastream.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtCore/qeventloop.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtCore/qfile.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtCore/qfiledevice.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qflags.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qgenericatomic.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qglobal.h \
@@ -584,17 +592,23 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qvarlengtharray.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtGui/QMouseEvent \
+	/usr/include/x86_64-linux-gnu/qt5/QtGui/QPainter \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qbrush.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qcolor.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qcursor.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtGui/qevent.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qfont.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qfontinfo.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qfontmetrics.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtGui/qguiapplication.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qicon.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qimage.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtGui/qinputmethod.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qkeysequence.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qmatrix.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtGui/qpainter.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qpalette.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qpen.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qpixelformat.h \
@@ -609,9 +623,12 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qtextoption.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qtgui-config.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qtguiglobal.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtGui/qtouchdevice.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qtransform.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qvalidator.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtGui/qvector2d.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qwindowdefs.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QCheckBox \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QDialog \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QHBoxLayout \
@@ -624,6 +641,8 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QSpinBox \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStackedWidget \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStatusBar \
+	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStyleOptionViewItem \
+	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStyledItemDelegate \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTabWidget \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTableView \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTableWidget \
@@ -641,6 +660,7 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qabstractspinbox.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qaction.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qactiongroup.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qapplication.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qboxlayout.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qcheckbox.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qdialog.h \
@@ -662,6 +682,7 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstackedwidget.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstatusbar.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstyle.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstyleditemdelegate.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstyleoption.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtabbar.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtableview.h \

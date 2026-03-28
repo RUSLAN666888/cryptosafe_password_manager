@@ -6,6 +6,7 @@
 #include "../src/core/state_manager.h"
 #include "../src/gui/dialogs/entry_dialog/entry_dialog.h"
 #include "../src/gui/widgets/secure_table/VaultTableModel.h"
+#include "../src/gui/widgets/secure_table/PasswordDelegate.h"
 #include "../src/core/vault/VaultManager.h"
 #include <QMessageBox>
 #include <QApplication>
@@ -173,6 +174,19 @@ void MainWindow::createCentralWidget()
     m_tableView->setColumnWidth(1, 150);  // Логин
     m_tableView->setColumnWidth(2, 200);  // Сайт
     m_tableView->setColumnWidth(3, 100);  // Дата
+
+    PasswordDelegate* passwordDelegate = new PasswordDelegate(this);
+    m_tableView->setItemDelegateForColumn(VaultTableModel::COL_PASSWORD, passwordDelegate);
+
+    // Подключаем сигнал от делегата к модели
+    connect(passwordDelegate, &PasswordDelegate::togglePasswordVisibility,
+            this, [this](const QModelIndex& proxyIndex) {
+                // Преобразуем индекс из прокси в исходную модель
+                QModelIndex sourceIndex = m_proxyModel->mapToSource(proxyIndex);
+                if (sourceIndex.isValid()) {
+                    m_tableModel->togglePasswordVisibilityForRow(sourceIndex.row());
+                }
+            });
 
     mainLayout->addWidget(m_tableView);
     setCentralWidget(centralWidget);
@@ -347,36 +361,106 @@ void MainWindow::onAddEntry()
 
 void MainWindow::onEditEntry()
 {
-    // if (!isLoggedIn)
-    // {
-    //     showLoginDialog();
-    //     return;
-    // }
-    // resetInactivityTimer();
-    // long selected = passwordTable->getSelectedId();
-    // if (selected == -1)
-    // {
-    //     QMessageBox::warning(this, "No Selection", "Please select an entry");
-    //     return;
-    // }
-    // QMessageBox::information(this, "Info", QString("Edit Entry %1 - Sprint 3").arg(selected));
+    // олучаем ID выбранной записи
+    QModelIndexList selected = m_tableView->selectionModel()->selectedRows();
+    if (selected.isEmpty()) return;
+
+    QModelIndex sourceIdx = m_proxyModel->mapToSource(selected.first());
+    long entryId = m_tableModel->getId(sourceIdx.row());
+
+    // Загружаем текущую запись из БД
+    auto entry = m_vaultManager.getEntry(static_cast<int>(entryId));
+    if (!entry) {
+        QMessageBox::warning(this, "Ошибка", "Запись не найдена");
+        return;
+    }
+
+    // Открываем диалог с данными записи
+    EntryDialog dialog(*entry, this);  // конструктор для редактирования
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        PlaintextEntry updatedEntry = dialog.getEntry();
+
+        // Сохраняем оригинальные поля, которые не меняются
+        updatedEntry.creation_timestamp = entry->creation_timestamp;
+
+        // Обновляем в БД
+        if (m_vaultManager.updateEntry(static_cast<int>(entryId), updatedEntry)) {
+            // Обновляем модель (таблицу)
+            m_tableModel->refresh();
+
+            // Если пароль был в кэше - обновляем его
+            m_tableModel->updatePasswordInCache(entryId, updatedEntry.password);
+        }
+    }
 }
 
 void MainWindow::onDeleteEntry()
 {
-    // if (!isLoggedIn)
-    // {
-    //     showLoginDialog();
-    //     return;
-    // }
-    // resetInactivityTimer();
-    // long selected = passwordTable->getSelectedId();
-    // if (selected == -1)
-    // {
-    //     QMessageBox::warning(this, "No Selection", "Please select an entry");
-    //     return;
-    // }
-    // QMessageBox::information(this, "Info", QString("Delete Entry %1 - Sprint 3").arg(selected));
+    if (!isLoggedIn)
+    {
+        showLoginDialog();
+        return;
+    }
+    resetInactivityTimer();
+
+    // Получаем выделенные строки
+    QModelIndexList selected = m_tableView->selectionModel()->selectedRows();
+    if (selected.isEmpty())
+    {
+        QMessageBox::warning(this, "Нет выбора", "Пожалуйста, выберите запись для удаления");
+        return;
+    }
+
+    // Собираем ID выбранных записей
+    QList<long> ids;
+    for (const QModelIndex& idx : selected) {
+        QModelIndex sourceIdx = m_proxyModel->mapToSource(idx);
+        long id = m_tableModel->getId(sourceIdx.row());
+        if (id != -1) {
+            ids.append(id);
+        }
+    }
+
+    if (ids.isEmpty()) {
+        QMessageBox::warning(this, "Ошибка", "Не удалось получить ID записей");
+        return;
+    }
+
+    // Подтверждение удаления
+    QString message = ids.size() == 1
+                          ? "Вы уверены, что хотите удалить эту запись?"
+                          : QString("Вы уверены, что хотите удалить %1 записей?").arg(ids.size());
+
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        this, "Подтверждение удаления", message,
+        QMessageBox::Yes | QMessageBox::No
+        );
+
+    if (reply == QMessageBox::Yes)
+    {
+        bool allSuccess = true;
+        int deletedCount = 0;
+
+        for (long id : ids) {
+            if (m_vaultManager.deleteEntry(static_cast<int>(id))) {
+                deletedCount++;
+            } else {
+                allSuccess = false;
+            }
+        }
+
+        if (allSuccess) {
+            // Обновляем таблицу
+            m_tableModel->refresh();
+            statusBar->showMessage(QString("Удалено %1 записей").arg(deletedCount), 3000);
+        } else {
+            QMessageBox::warning(this, "Ошибка",
+                                 QString("Удалено %1 из %2 записей. Некоторые записи не удалось удалить.")
+                                     .arg(deletedCount).arg(ids.size()));
+            m_tableModel->refresh();  // все равно обновляем, чтобы показать актуальное состояние
+        }
+    }
 }
 
 void MainWindow::onViewLogs()

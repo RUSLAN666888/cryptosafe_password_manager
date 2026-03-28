@@ -7,12 +7,30 @@
 #include <random>
 #include <chrono>
 
-EntryDialog::EntryDialog(QWidget* parent)
-    : QDialog(parent)
+EntryDialog::EntryDialog(QWidget* parent) : QDialog(parent)
 {
     setupUI();
     setupConnections();
     setWindowTitle("Добавление записи");
+}
+
+EntryDialog::EntryDialog(const PlaintextEntry& entry, QWidget* parent) : QDialog(parent)
+{
+    setupUI();
+    setupConnections();
+    loadEntry(entry);
+    setWindowTitle("Редактирование записи");
+}
+
+void EntryDialog::loadEntry(const PlaintextEntry& entry)
+{
+    m_titleEdit->setText(QString::fromStdString(entry.title));
+    m_usernameEdit->setText(QString::fromStdString(entry.username));
+    m_passwordEdit->setText(QString::fromStdString(entry.password));
+    m_urlEdit->setText(QString::fromStdString(entry.url));
+    m_notesEdit->setPlainText(QString::fromStdString(entry.notes));
+    m_categoryEdit->setText(QString::fromStdString(entry.category));
+    m_tagsEdit->setText(QString::fromStdString(entry.tags));
 }
 
 void EntryDialog::setupUI()

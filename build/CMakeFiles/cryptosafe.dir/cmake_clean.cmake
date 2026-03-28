@@ -26,6 +26,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o.d"
   "CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o"
   "CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o.d"
+  "CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/PasswordDelegate.cpp.o"
+  "CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/PasswordDelegate.cpp.o.d"
   "CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o"
   "CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o.d"
   "CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o"

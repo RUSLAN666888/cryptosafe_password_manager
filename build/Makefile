@@ -443,6 +443,30 @@ src/gui/widgets/password_entry/PasswordEntry.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.s
 .PHONY : src/gui/widgets/password_entry/PasswordEntry.cpp.s
 
+src/gui/widgets/secure_table/PasswordDelegate.o: src/gui/widgets/secure_table/PasswordDelegate.cpp.o
+.PHONY : src/gui/widgets/secure_table/PasswordDelegate.o
+
+# target to build an object file
+src/gui/widgets/secure_table/PasswordDelegate.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/PasswordDelegate.cpp.o
+.PHONY : src/gui/widgets/secure_table/PasswordDelegate.cpp.o
+
+src/gui/widgets/secure_table/PasswordDelegate.i: src/gui/widgets/secure_table/PasswordDelegate.cpp.i
+.PHONY : src/gui/widgets/secure_table/PasswordDelegate.i
+
+# target to preprocess a source file
+src/gui/widgets/secure_table/PasswordDelegate.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/PasswordDelegate.cpp.i
+.PHONY : src/gui/widgets/secure_table/PasswordDelegate.cpp.i
+
+src/gui/widgets/secure_table/PasswordDelegate.s: src/gui/widgets/secure_table/PasswordDelegate.cpp.s
+.PHONY : src/gui/widgets/secure_table/PasswordDelegate.s
+
+# target to generate assembly for a file
+src/gui/widgets/secure_table/PasswordDelegate.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/PasswordDelegate.cpp.s
+.PHONY : src/gui/widgets/secure_table/PasswordDelegate.cpp.s
+
 src/gui/widgets/secure_table/SearchProxyModel.o: src/gui/widgets/secure_table/SearchProxyModel.cpp.o
 .PHONY : src/gui/widgets/secure_table/SearchProxyModel.o
 
@@ -562,6 +586,9 @@ help:
 	@echo "... src/gui/widgets/password_entry/PasswordEntry.o"
 	@echo "... src/gui/widgets/password_entry/PasswordEntry.i"
 	@echo "... src/gui/widgets/password_entry/PasswordEntry.s"
+	@echo "... src/gui/widgets/secure_table/PasswordDelegate.o"
+	@echo "... src/gui/widgets/secure_table/PasswordDelegate.i"
+	@echo "... src/gui/widgets/secure_table/PasswordDelegate.s"
 	@echo "... src/gui/widgets/secure_table/SearchProxyModel.o"
 	@echo "... src/gui/widgets/secure_table/SearchProxyModel.i"
 	@echo "... src/gui/widgets/secure_table/SearchProxyModel.s"

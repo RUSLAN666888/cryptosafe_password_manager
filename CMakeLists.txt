@@ -124,7 +124,9 @@ set(HEADERS
 
 set(ALL_SOURCES ${SOURCES} ${HEADERS})
 
-add_executable(${TARGET_NAME} ${ALL_SOURCES})
+add_executable(${TARGET_NAME} ${ALL_SOURCES}
+    src/gui/widgets/secure_table/PasswordDelegate.h
+    src/gui/widgets/secure_table/PasswordDelegate.cpp)
 
 # ============================================================
 # ПОДКЛЮЧЕНИЕ ЗАГОЛОВОЧНЫХ ФАЙЛОВ

@@ -10,12 +10,13 @@
 #include <QTimer>
 #include "../src/core/vault/plaintext_entry.h"
 
-    class EntryDialog : public QDialog
+class EntryDialog : public QDialog
 {
     Q_OBJECT
 
 public:
     explicit EntryDialog(QWidget* parent = nullptr);
+    explicit EntryDialog(const PlaintextEntry& entry, QWidget* parent = nullptr);
 
     PlaintextEntry getEntry() const;
 
@@ -30,6 +31,7 @@ private:
     void setupConnections();
     QString generateSecurePassword(int length = 16);
     void updateStrengthDisplay(int score, const QString& message, const QColor& color);
+    void loadEntry(const PlaintextEntry& entry);
 
     QLineEdit* m_titleEdit;
     QLineEdit* m_usernameEdit;
