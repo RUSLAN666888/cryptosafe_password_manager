@@ -87,6 +87,7 @@ set(SOURCES
     src/gui/dialogs/settings_dialog/SettingsDialog.cpp
     src/gui/dialogs/login_dialog/LoginDialog.cpp
     src/gui/dialogs/password_change/password_change.cpp
+    src/gui/dialogs/entry_dialog/entry_dialog.cpp
 
     # GUI Widgets
     src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp
@@ -113,11 +114,12 @@ set(HEADERS
 # СОЗДАНИЕ ИСПОЛНЯЕМОГО ФАЙЛА
 # ============================================================
 
-# Включаем только исходники программы, НЕ тесты!
 set(ALL_SOURCES ${SOURCES} ${HEADERS})
 
 add_executable(${TARGET_NAME} ${ALL_SOURCES}
-    src/core/vault/VaultManager.cpp)
+    src/core/vault/VaultManager.cpp
+    src/gui/dialogs/entry_dialog/entry_dialog.h
+    src/gui/dialogs/entry_dialog/entry_dialog.cpp)
 
 # ============================================================
 # ПОДКЛЮЧЕНИЕ ЗАГОЛОВОЧНЫХ ФАЙЛОВ
@@ -136,6 +138,7 @@ target_include_directories(${TARGET_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/settings_dialog
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/login_dialog
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/password_change
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/entry_dialog
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets/audit_log_viewer
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets/password_entry

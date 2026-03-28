@@ -3,7 +3,10 @@
 #include <iostream>
 #include "src/core/config_handler.h"
 #include "src/database/DB_helper/db_helper.h"
+#include "../src/core/vault/VaultManager.h"
 #include "src/gui/MainWindow.h"
+#include "../src/core/key_manager.h"
+#include "../src/core/crypto/AES256.h"
 
 int main(int argc, char *argv[])
 {
@@ -33,8 +36,11 @@ int main(int argc, char *argv[])
             return 1;
         }
 
+        static AES256GCM crypto;
+        static VaultManager m(db, crypto, KeyManager::getInstance());
+
         // Создаем главное окно
-        MainWindow mainWindow(config, db);
+        MainWindow mainWindow(config, db, m);
         mainWindow.show();
 
         return app.exec();

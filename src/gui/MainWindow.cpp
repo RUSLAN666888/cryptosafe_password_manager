@@ -4,14 +4,16 @@
 #include "../src/gui/dialogs/password_change/password_change.h"
 #include "../src/gui/dialogs/settings_dialog/SettingsDialog.h"
 #include "../src/core/state_manager.h"
+#include "../src/gui/dialogs/entry_dialog/entry_dialog.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QDebug>
 
-MainWindow::MainWindow(ConfigHander &cfg, Database &database)
+MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaultManager)
     : QMainWindow(nullptr)
     , config(cfg)
     , db(database)
+    , m_vaultManager(vaultManager)
     , isLoggedIn(false)
 {
     setWindowTitle("CryptoSafe Manager");
@@ -176,9 +178,21 @@ void MainWindow::unlockApplication()
 
         StateManager::getInstance().login();
 
-        if (passwordTable->rowCount() == 0)
+
+        // Обновляем таблицу
+        auto metadata = m_vaultManager.getAllEntryMetadata();
+        passwordTable->clearAll();
+        for (const auto& meta : metadata)
         {
-            passwordTable->addSampleData();
+            VaultEntry vaultEntry;
+            vaultEntry.id = meta.id;
+            vaultEntry.title = meta.title;
+            vaultEntry.username = meta.username;
+            vaultEntry.url = meta.url;
+            vaultEntry.tags = meta.tags;
+            vaultEntry.created_at = meta.created_at;
+            vaultEntry.updated_at = meta.updated_at;
+            passwordTable->addEntry(vaultEntry);
         }
 
         resetInactivityTimer();
@@ -261,7 +275,44 @@ void MainWindow::onAddEntry()
         return;
     }
     resetInactivityTimer();
-    QMessageBox::information(this, "Info", "Add Entry - will be implemented in Sprint 3");
+
+    if (!isLoggedIn)
+    {
+        showLoginDialog();
+        return;
+    }
+    resetInactivityTimer();
+
+    EntryDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        PlaintextEntry entry = dialog.getEntry();
+        try {
+            int id = m_vaultManager.createEntry(entry);
+            if (id != -1) {
+                // Обновляем таблицу
+                auto metadata = m_vaultManager.getAllEntryMetadata();
+                passwordTable->clearAll();
+                for (const auto& meta : metadata) {
+                    VaultEntry vaultEntry;
+                    vaultEntry.id = meta.id;
+                    vaultEntry.title = meta.title;
+                    vaultEntry.username = meta.username;
+                    vaultEntry.url = meta.url;
+                    vaultEntry.tags = meta.tags;
+                    vaultEntry.created_at = meta.created_at;
+                    vaultEntry.updated_at = meta.updated_at;
+                    passwordTable->addEntry(vaultEntry);
+                }
+                statusBar->showMessage("Запись успешно добавлена", 3000);
+            } else {
+                QMessageBox::warning(this, "Ошибка", "Не удалось добавить запись");
+            }
+        } catch (const std::exception& e) {
+            QMessageBox::critical(this, "Ошибка",
+                                  QString("Ошибка при добавлении записи: %1").arg(e.what()));
+        }
+    }
 }
 
 void MainWindow::onEditEntry()

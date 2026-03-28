@@ -1,8 +1,12 @@
 /home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/MXUWEOXILK/moc_MainWindow.cpp: /home/master666/development/cryptosafe_password_manager/src/gui/MainWindow.h \
   /home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/moc_predefs.h \
   /home/master666/development/cryptosafe_password_manager/src/core/config_handler.h \
+  /home/master666/development/cryptosafe_password_manager/src/core/crypto/AES256.h \
+  /home/master666/development/cryptosafe_password_manager/src/core/crypto/abstract.h \
   /home/master666/development/cryptosafe_password_manager/src/core/events.h \
   /home/master666/development/cryptosafe_password_manager/src/core/key_manager.h \
+  /home/master666/development/cryptosafe_password_manager/src/core/vault/VaultManager.h \
+  /home/master666/development/cryptosafe_password_manager/src/core/vault/plaintext_entry.h \
   /home/master666/development/cryptosafe_password_manager/src/database/DBSchema.h \
   /home/master666/development/cryptosafe_password_manager/src/database/DB_helper/db_helper.h \
   /home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SecureTable.h \
@@ -38,6 +42,7 @@
   /usr/include/c++/13/bits/cpp_type_traits.h \
   /usr/include/c++/13/bits/cxxabi_forced.h \
   /usr/include/c++/13/bits/cxxabi_init_exception.h \
+  /usr/include/c++/13/bits/deque.tcc \
   /usr/include/c++/13/bits/enable_special_members.h \
   /usr/include/c++/13/bits/erase_if.h \
   /usr/include/c++/13/bits/exception.h \
@@ -105,6 +110,7 @@
   /usr/include/c++/13/bits/stl_algobase.h \
   /usr/include/c++/13/bits/stl_bvector.h \
   /usr/include/c++/13/bits/stl_construct.h \
+  /usr/include/c++/13/bits/stl_deque.h \
   /usr/include/c++/13/bits/stl_function.h \
   /usr/include/c++/13/bits/stl_heap.h \
   /usr/include/c++/13/bits/stl_iterator.h \
@@ -115,6 +121,7 @@
   /usr/include/c++/13/bits/stl_multimap.h \
   /usr/include/c++/13/bits/stl_numeric.h \
   /usr/include/c++/13/bits/stl_pair.h \
+  /usr/include/c++/13/bits/stl_queue.h \
   /usr/include/c++/13/bits/stl_raw_storage_iter.h \
   /usr/include/c++/13/bits/stl_relops.h \
   /usr/include/c++/13/bits/stl_tempbuf.h \
@@ -156,6 +163,7 @@
   /usr/include/c++/13/cwctype \
   /usr/include/c++/13/debug/assertions.h \
   /usr/include/c++/13/debug/debug.h \
+  /usr/include/c++/13/deque \
   /usr/include/c++/13/exception \
   /usr/include/c++/13/ext/aligned_buffer.h \
   /usr/include/c++/13/ext/alloc_traits.h \
@@ -190,6 +198,7 @@
   /usr/include/c++/13/pstl/glue_algorithm_defs.h \
   /usr/include/c++/13/pstl/glue_memory_defs.h \
   /usr/include/c++/13/pstl/glue_numeric_defs.h \
+  /usr/include/c++/13/queue \
   /usr/include/c++/13/ranges \
   /usr/include/c++/13/ratio \
   /usr/include/c++/13/span \
@@ -274,6 +283,34 @@
   /usr/include/nlohmann/ordered_map.hpp \
   /usr/include/nlohmann/thirdparty/hedley/hedley.hpp \
   /usr/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
+  /usr/include/openssl/asn1.h \
+  /usr/include/openssl/asn1err.h \
+  /usr/include/openssl/bio.h \
+  /usr/include/openssl/bioerr.h \
+  /usr/include/openssl/bn.h \
+  /usr/include/openssl/bnerr.h \
+  /usr/include/openssl/core.h \
+  /usr/include/openssl/core_dispatch.h \
+  /usr/include/openssl/crypto.h \
+  /usr/include/openssl/cryptoerr.h \
+  /usr/include/openssl/cryptoerr_legacy.h \
+  /usr/include/openssl/e_os2.h \
+  /usr/include/openssl/err.h \
+  /usr/include/openssl/evp.h \
+  /usr/include/openssl/evperr.h \
+  /usr/include/openssl/lhash.h \
+  /usr/include/openssl/macros.h \
+  /usr/include/openssl/obj_mac.h \
+  /usr/include/openssl/objects.h \
+  /usr/include/openssl/objectserr.h \
+  /usr/include/openssl/opensslv.h \
+  /usr/include/openssl/params.h \
+  /usr/include/openssl/rand.h \
+  /usr/include/openssl/randerr.h \
+  /usr/include/openssl/safestack.h \
+  /usr/include/openssl/stack.h \
+  /usr/include/openssl/symhacks.h \
+  /usr/include/openssl/types.h \
   /usr/include/pthread.h \
   /usr/include/sched.h \
   /usr/include/sqlite3.h \
@@ -380,6 +417,8 @@
   /usr/include/x86_64-linux-gnu/c++/13/bits/time_members.h \
   /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
   /usr/include/x86_64-linux-gnu/gnu/stubs.h \
+  /usr/include/x86_64-linux-gnu/openssl/configuration.h \
+  /usr/include/x86_64-linux-gnu/openssl/opensslconf.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qabstractitemmodel.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qalgorithms.h \

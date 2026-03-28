@@ -12,6 +12,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.o.d"
   "CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o"
   "CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o.d"
+  "CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.o"
+  "CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.o.d"
   "CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o"
   "CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o.d"
   "CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.o"

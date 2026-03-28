@@ -13,6 +13,7 @@
 #include "../src/core/key_manager.h"
 #include "../src/database/DB_helper/db_helper.h"
 #include "../src/gui/widgets/secure_table/SecureTable.h"
+#include "../src/core/vault/VaultManager.h"
 
 class MainWindow : public QMainWindow
 {
@@ -21,6 +22,8 @@ class MainWindow : public QMainWindow
 private:
     ConfigHander &config;
     Database &db;
+    VaultManager& m_vaultManager;
+
     bool isLoggedIn;
 
     // Элементы UI
@@ -72,7 +75,7 @@ private slots:
     void onChangePassword();
 
 public:
-    MainWindow(ConfigHander &cfg, Database &database);
+    MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaultManager);
     ~MainWindow();
 
     void loadSampleData();

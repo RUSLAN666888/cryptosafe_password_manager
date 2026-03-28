@@ -1,6 +1,5 @@
 cryptosafe_autogen/timestamp: \
 	/home/master666/development/cryptosafe_password_manager/CMakeLists.txt \
-	/home/master666/development/cryptosafe_password_manager/build/.qtc/package-manager/auto-setup.cmake \
 	/home/master666/development/cryptosafe_password_manager/build/CMakeFiles/3.28.3/CMakeCCompiler.cmake \
 	/home/master666/development/cryptosafe_password_manager/build/CMakeFiles/3.28.3/CMakeCXXCompiler.cmake \
 	/home/master666/development/cryptosafe_password_manager/build/CMakeFiles/3.28.3/CMakeSystem.cmake \
@@ -8,17 +7,22 @@ cryptosafe_autogen/timestamp: \
 	/home/master666/development/cryptosafe_password_manager/main.cpp \
 	/home/master666/development/cryptosafe_password_manager/src/core/audit_logger.h \
 	/home/master666/development/cryptosafe_password_manager/src/core/config_handler.h \
-	/home/master666/development/cryptosafe_password_manager/src/core/crypto/AES256Placeholder.h \
+	/home/master666/development/cryptosafe_password_manager/src/core/crypto/AES256.h \
 	/home/master666/development/cryptosafe_password_manager/src/core/crypto/abstract.h \
 	/home/master666/development/cryptosafe_password_manager/src/core/crypto/authentication.h \
 	/home/master666/development/cryptosafe_password_manager/src/core/crypto/key_derivation.h \
 	/home/master666/development/cryptosafe_password_manager/src/core/events.h \
 	/home/master666/development/cryptosafe_password_manager/src/core/key_manager.h \
+	/home/master666/development/cryptosafe_password_manager/src/core/vault/VaultManager.cpp \
+	/home/master666/development/cryptosafe_password_manager/src/core/vault/VaultManager.h \
+	/home/master666/development/cryptosafe_password_manager/src/core/vault/plaintext_entry.h \
 	/home/master666/development/cryptosafe_password_manager/src/database/DBSchema.h \
 	/home/master666/development/cryptosafe_password_manager/src/database/DB_helper/db_helper.cpp \
 	/home/master666/development/cryptosafe_password_manager/src/database/DB_helper/db_helper.h \
 	/home/master666/development/cryptosafe_password_manager/src/gui/MainWindow.cpp \
 	/home/master666/development/cryptosafe_password_manager/src/gui/MainWindow.h \
+	/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/entry_dialog/entry_dialog.cpp \
+	/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/entry_dialog/entry_dialog.h \
 	/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp \
 	/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/first_run_wizard/FirstRunWizard.h \
 	/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/login_dialog/LoginDialog.cpp \
@@ -66,6 +70,7 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/c++/13/bits/cpp_type_traits.h \
 	/usr/include/c++/13/bits/cxxabi_forced.h \
 	/usr/include/c++/13/bits/cxxabi_init_exception.h \
+	/usr/include/c++/13/bits/deque.tcc \
 	/usr/include/c++/13/bits/enable_special_members.h \
 	/usr/include/c++/13/bits/erase_if.h \
 	/usr/include/c++/13/bits/exception.h \
@@ -133,6 +138,7 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/c++/13/bits/stl_algobase.h \
 	/usr/include/c++/13/bits/stl_bvector.h \
 	/usr/include/c++/13/bits/stl_construct.h \
+	/usr/include/c++/13/bits/stl_deque.h \
 	/usr/include/c++/13/bits/stl_function.h \
 	/usr/include/c++/13/bits/stl_heap.h \
 	/usr/include/c++/13/bits/stl_iterator.h \
@@ -143,6 +149,7 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/c++/13/bits/stl_multimap.h \
 	/usr/include/c++/13/bits/stl_numeric.h \
 	/usr/include/c++/13/bits/stl_pair.h \
+	/usr/include/c++/13/bits/stl_queue.h \
 	/usr/include/c++/13/bits/stl_raw_storage_iter.h \
 	/usr/include/c++/13/bits/stl_relops.h \
 	/usr/include/c++/13/bits/stl_tempbuf.h \
@@ -184,6 +191,7 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/c++/13/cwctype \
 	/usr/include/c++/13/debug/assertions.h \
 	/usr/include/c++/13/debug/debug.h \
+	/usr/include/c++/13/deque \
 	/usr/include/c++/13/exception \
 	/usr/include/c++/13/ext/aligned_buffer.h \
 	/usr/include/c++/13/ext/alloc_traits.h \
@@ -218,6 +226,7 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/c++/13/pstl/glue_algorithm_defs.h \
 	/usr/include/c++/13/pstl/glue_memory_defs.h \
 	/usr/include/c++/13/pstl/glue_numeric_defs.h \
+	/usr/include/c++/13/queue \
 	/usr/include/c++/13/ranges \
 	/usr/include/c++/13/ratio \
 	/usr/include/c++/13/span \
@@ -314,14 +323,18 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/openssl/cryptoerr.h \
 	/usr/include/openssl/cryptoerr_legacy.h \
 	/usr/include/openssl/e_os2.h \
+	/usr/include/openssl/err.h \
 	/usr/include/openssl/evp.h \
 	/usr/include/openssl/evperr.h \
+	/usr/include/openssl/lhash.h \
 	/usr/include/openssl/macros.h \
 	/usr/include/openssl/obj_mac.h \
 	/usr/include/openssl/objects.h \
 	/usr/include/openssl/objectserr.h \
 	/usr/include/openssl/opensslv.h \
 	/usr/include/openssl/params.h \
+	/usr/include/openssl/rand.h \
+	/usr/include/openssl/randerr.h \
 	/usr/include/openssl/safestack.h \
 	/usr/include/openssl/stack.h \
 	/usr/include/openssl/symhacks.h \
@@ -558,6 +571,7 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qtcore-config.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qtimer.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qtypeinfo.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtCore/qurl.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qvariant.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qvarlengtharray.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h \
@@ -582,6 +596,7 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qrgb.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qrgba64.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qtextcursor.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtGui/qtextdocument.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qtextformat.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qtextoption.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qtgui-config.h \
@@ -603,6 +618,7 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStatusBar \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTabWidget \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTableWidget \
+	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTextEdit \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QToolBar \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QVBoxLayout \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget \
@@ -642,6 +658,7 @@ cryptosafe_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtableview.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtablewidget.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtabwidget.h \
+	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtextedit.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtoolbar.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtwidgets-config.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtwidgetsglobal.h \

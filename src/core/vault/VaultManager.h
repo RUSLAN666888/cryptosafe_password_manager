@@ -40,6 +40,18 @@ public:
     bool deleteEntry(int entry_id);
 
     bool changeMasterPassword(const std::string& old_key);
+
+    struct EntryMetadata {
+        long id;
+        std::string title;
+        std::string username;
+        std::string url;
+        std::string tags;
+        std::string created_at;
+        std::string updated_at;
+    };
+
+    std::vector<EntryMetadata> getAllEntryMetadata();
 };
 
 #endif // VAULTMANAGER_H

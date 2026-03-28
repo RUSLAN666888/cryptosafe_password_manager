@@ -275,6 +275,30 @@ src/gui/MainWindow.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.s
 .PHONY : src/gui/MainWindow.cpp.s
 
+src/gui/dialogs/entry_dialog/entry_dialog.o: src/gui/dialogs/entry_dialog/entry_dialog.cpp.o
+.PHONY : src/gui/dialogs/entry_dialog/entry_dialog.o
+
+# target to build an object file
+src/gui/dialogs/entry_dialog/entry_dialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.o
+.PHONY : src/gui/dialogs/entry_dialog/entry_dialog.cpp.o
+
+src/gui/dialogs/entry_dialog/entry_dialog.i: src/gui/dialogs/entry_dialog/entry_dialog.cpp.i
+.PHONY : src/gui/dialogs/entry_dialog/entry_dialog.i
+
+# target to preprocess a source file
+src/gui/dialogs/entry_dialog/entry_dialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.i
+.PHONY : src/gui/dialogs/entry_dialog/entry_dialog.cpp.i
+
+src/gui/dialogs/entry_dialog/entry_dialog.s: src/gui/dialogs/entry_dialog/entry_dialog.cpp.s
+.PHONY : src/gui/dialogs/entry_dialog/entry_dialog.s
+
+# target to generate assembly for a file
+src/gui/dialogs/entry_dialog/entry_dialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.s
+.PHONY : src/gui/dialogs/entry_dialog/entry_dialog.cpp.s
+
 src/gui/dialogs/first_run_wizard/FirstRunWizard.o: src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
 .PHONY : src/gui/dialogs/first_run_wizard/FirstRunWizard.o
 
@@ -469,6 +493,9 @@ help:
 	@echo "... src/gui/MainWindow.o"
 	@echo "... src/gui/MainWindow.i"
 	@echo "... src/gui/MainWindow.s"
+	@echo "... src/gui/dialogs/entry_dialog/entry_dialog.o"
+	@echo "... src/gui/dialogs/entry_dialog/entry_dialog.i"
+	@echo "... src/gui/dialogs/entry_dialog/entry_dialog.s"
 	@echo "... src/gui/dialogs/first_run_wizard/FirstRunWizard.o"
 	@echo "... src/gui/dialogs/first_run_wizard/FirstRunWizard.i"
 	@echo "... src/gui/dialogs/first_run_wizard/FirstRunWizard.s"

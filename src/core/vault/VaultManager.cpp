@@ -32,8 +32,8 @@ int VaultManager::createEntry(const PlaintextEntry& entry) {
 
     sqlite3_stmt *stmt;
     const char *sql = R"(
-        INSERT INTO vault_entries (encrypted_data, title, username, tags)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO vault_entries (encrypted_data, title, username, tags, url)
+        VALUES (?, ?, ?, ?, ?)
     )";
 
     rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
@@ -63,6 +63,7 @@ int VaultManager::createEntry(const PlaintextEntry& entry) {
     sqlite3_bind_text(stmt, 2, entry.title.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, entry.username.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, entry.tags.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 5, entry.url.c_str(), -1, SQLITE_STATIC);
 
     rc = sqlite3_step(stmt);
     if (rc == SQLITE_DONE) {
@@ -99,7 +100,7 @@ std::unique_ptr<PlaintextEntry> VaultManager::getEntry(int entry_id) {
 
     sqlite3_stmt *stmt;
     const char *sql = R"(
-        SELECT encrypted_data, title, username, tags, created_at, updated_at
+        SELECT encrypted_data, title, username, tags, url, created_at, updated_at
         FROM vault_entries
         WHERE rowid = ?
     )";
@@ -134,7 +135,15 @@ std::unique_ptr<PlaintextEntry> VaultManager::getEntry(int entry_id) {
             decrypted_entry.title = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
             decrypted_entry.username = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
             const char* tags_col = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
-            if (tags_col) decrypted_entry.tags = tags_col;
+
+            if (tags_col)
+                decrypted_entry.tags = tags_col;
+
+            decrypted_entry.url = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+            const char* created_at = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+
+            if (created_at)
+                decrypted_entry.creation_timestamp = created_at;
 
             result = std::make_unique<PlaintextEntry>(decrypted_entry);
         } catch (const std::exception& e) {
@@ -179,7 +188,7 @@ std::vector<PlaintextEntry> VaultManager::getAllEntries()
 
     sqlite3_stmt* stmt;
     const char* sql = R"(
-        SELECT encrypted_data, title, username, tags, created_at, updated_at
+        SELECT encrypted_data, title, username, tags, url, created_at, updated_at
         FROM vault_entries
         ORDER BY title
     )";
@@ -222,10 +231,12 @@ std::vector<PlaintextEntry> VaultManager::getAllEntries()
             const char* tags = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
             if (tags) entry.tags = tags;
 
-            const char* created_at = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+            const char* url = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+            entry.url = url;
+
+            const char* created_at = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
             if (created_at) entry.creation_timestamp = created_at;
 
-            // updated_at (колонка 5) можно добавить в структуру при необходимости
 
             entries.push_back(std::move(entry));
         }
@@ -286,7 +297,8 @@ bool VaultManager::updateEntry(int entry_id, const PlaintextEntry& entry)
         SET encrypted_data = ?,
             title = ?,
             username = ?,
-            tags = ?
+            tags = ?,
+            url = ?
         WHERE rowid = ?
     )";
 
@@ -305,7 +317,8 @@ bool VaultManager::updateEntry(int entry_id, const PlaintextEntry& entry)
     sqlite3_bind_text(stmt, 2, entry.title.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, entry.username.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, entry.tags.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 5, entry_id);
+    sqlite3_bind_text(stmt, 5, entry.url.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 6, entry_id);
 
     rc = sqlite3_step(stmt);
     if (rc == SQLITE_DONE)
@@ -404,4 +417,72 @@ bool VaultManager::deleteEntry(int entry_id)
     sqlite3_finalize(stmt);
     db.releaseConnection(conn);
     return success;
+}
+
+
+std::vector<VaultManager::EntryMetadata> VaultManager::getAllEntryMetadata()
+{
+    std::vector<EntryMetadata> result;
+
+    sqlite3* conn = db.getConnection();
+    if (!conn) {
+        std::cerr << "Failed to get database connection" << std::endl;
+        return result;
+    }
+
+    sqlite3_stmt* stmt;
+    const char* sql = R"(
+        SELECT rowid, title, username, url, tags, created_at, updated_at
+        FROM vault_entries
+        ORDER BY title
+    )";
+
+    int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+        db.releaseConnection(conn);
+        return result;
+    }
+
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        EntryMetadata meta;
+
+        // rowid (всегда есть)
+        meta.id = sqlite3_column_int64(stmt, 0);
+
+        // title (NOT NULL)
+        const char* title = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        meta.title = title ? title : "";
+
+        // username (NOT NULL)
+        const char* username = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+        meta.username = username ? username : "";
+
+        // url (может быть NULL)
+        const char* url = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+        meta.url = url ? url : "";
+
+        // tags (может быть NULL)
+        const char* tags = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+        meta.tags = tags ? tags : "";
+
+        // created_at
+        const char* created_at = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+        meta.created_at = created_at ? created_at : "";
+
+        // updated_at
+        const char* updated_at = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
+        meta.updated_at = updated_at ? updated_at : "";
+
+        result.push_back(std::move(meta));
+    }
+
+    if (rc != SQLITE_DONE) {
+        std::cerr << "Step failed: " << sqlite3_errmsg(conn) << std::endl;
+    }
+
+    sqlite3_finalize(stmt);
+    db.releaseConnection(conn);
+
+    return result;
 }

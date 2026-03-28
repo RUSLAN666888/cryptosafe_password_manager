@@ -169,3 +169,5 @@ secrets/
 # Local configuration
 local_settings.h
 local_config.h
+
+CMakeLists.txt.user

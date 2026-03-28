@@ -114,14 +114,16 @@ const std::string CREATE_TABLES_V2 = R"(
                 title TEXT NOT NULL,
                 username TEXT NOT NULL,
                 tags TEXT,
+                url TEXT,
 
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 format_version INTEGER DEFAULT 1
             );
 
-            -- Индексы для быстрого поиска (требование DB-1)
+            -- Индексы для быстрого поиска
             CREATE INDEX IF NOT EXISTS idx_vault_title ON vault_entries(title);
+            CREATE INDEX IF NOT EXISTS idx_vault_url ON vault_entries(url);
             CREATE INDEX IF NOT EXISTS idx_vault_username ON vault_entries(username);
             CREATE INDEX IF NOT EXISTS idx_vault_created ON vault_entries(created_at);
             CREATE INDEX IF NOT EXISTS idx_vault_updated ON vault_entries(updated_at);
@@ -133,7 +135,7 @@ const std::string CREATE_TABLES_V2 = R"(
             BEGIN
                 UPDATE vault_entries
                 SET updated_at = CURRENT_TIMESTAMP
-                WHERE id = NEW.id;
+                WHERE rowid = NEW.rowid;
             END;
 
             -- =====================================================
