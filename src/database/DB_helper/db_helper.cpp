@@ -201,14 +201,37 @@ bool Database::initialize()
   // Существующая БД - проверяем миграции
   checkMigration();
 
-  setSetting("password_length", "16");
-  setSetting("password_use_uppercase", "true");
-  setSetting("password_use_lowercase", "true");
-  setSetting("password_use_digits", "true");
-  setSetting("password_use_symbols", "true");
-  setSetting("password_exclude_ambiguous", "true");
+  initDefaultSettings();
 
   return true;
+}
+
+void Database::initDefaultSettings()
+{
+    // Проверяем каждую настройку отдельно
+    if (getSetting("password_length", "").empty()) {
+        setSetting("password_length", "16");
+    }
+
+    if (getSetting("password_use_uppercase", "").empty()) {
+        setSetting("password_use_uppercase", "true");
+    }
+
+    if (getSetting("password_use_lowercase", "").empty()) {
+        setSetting("password_use_lowercase", "true");
+    }
+
+    if (getSetting("password_use_digits", "").empty()) {
+        setSetting("password_use_digits", "true");
+    }
+
+    if (getSetting("password_use_symbols", "").empty()) {
+        setSetting("password_use_symbols", "true");
+    }
+
+    if (getSetting("password_exclude_ambiguous", "").empty()) {
+        setSetting("password_exclude_ambiguous", "true");
+    }
 }
 
 // Создание таблиц

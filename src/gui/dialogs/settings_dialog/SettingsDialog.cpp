@@ -9,9 +9,10 @@
 #include <QApplication>
 #include <QScreen>
 
-SettingsDialog::SettingsDialog(QWidget *parent, ConfigHander &cfg)
+SettingsDialog::SettingsDialog(Database& db, QWidget *parent, ConfigHander &cfg)
     : QDialog(parent)
     , config(cfg)
+    , m_db(db)
 {
     setWindowTitle("Settings");
     setMinimumSize(500, 400);
@@ -26,6 +27,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, ConfigHander &cfg)
     createGeneralTab();
     createSecurityTab();
     createAdvancedTab();
+    createPasswordGeneratorTab();
 
     mainLayout->addWidget(tabWidget);
 
@@ -82,13 +84,11 @@ void SettingsDialog::createGeneralTab()
     formLayout->setSpacing(10);
     formLayout->setContentsMargins(15, 15, 15, 15);
 
-    // Database path (отображаем, но не редактируем в Sprint 1)
     QLabel *dbPathLabel = new QLabel(QString::fromStdString(config.getDatabasePath()), settingsGroup);
     dbPathLabel->setWordWrap(true);
     dbPathLabel->setStyleSheet("color: #666;");
     formLayout->addRow("Database Path:", dbPathLabel);
 
-    // Startup behavior
     QCheckBox *startMinimized = new QCheckBox("Start minimized to tray", settingsGroup);
     startMinimized->setChecked(false);
     startMinimized->setEnabled(false); // Заглушка
@@ -107,6 +107,85 @@ void SettingsDialog::createGeneralTab()
 
     panel->setLayout(layout);
     tabWidget->addTab(panel, "General");
+}
+
+void SettingsDialog::createPasswordGeneratorTab()
+{
+    QWidget *panel = new QWidget();
+    QVBoxLayout *layout = new QVBoxLayout(panel);
+
+    // Заголовок
+    QLabel *title = new QLabel("Настройки генератора паролей", panel);
+    QFont titleFont = title->font();
+    titleFont.setPointSize(12);
+    titleFont.setBold(true);
+    title->setFont(titleFont);
+    layout->addWidget(title);
+
+    layout->addSpacing(10);
+
+    // Группа настроек генератора
+    QGroupBox *settingsGroup = new QGroupBox("Параметры генерации", panel);
+    QFormLayout *formLayout = new QFormLayout(settingsGroup);
+    formLayout->setSpacing(10);
+    formLayout->setContentsMargins(15, 15, 15, 15);
+
+    // Длина пароля
+    m_passwordLengthSpin = new QSpinBox(settingsGroup);
+    m_passwordLengthSpin->setRange(8, 64);
+    m_passwordLengthSpin->setSuffix(" символов");
+    m_passwordLengthSpin->setValue(16);
+    formLayout->addRow("Длина пароля:", m_passwordLengthSpin);
+
+    // Наборы символов
+    m_useUppercaseCheck = new QCheckBox("Заглавные буквы (A-Z)", settingsGroup);
+    m_useUppercaseCheck->setChecked(true);
+    formLayout->addRow("", m_useUppercaseCheck);
+
+    m_useLowercaseCheck = new QCheckBox("Строчные буквы (a-z)", settingsGroup);
+    m_useLowercaseCheck->setChecked(true);
+    formLayout->addRow("", m_useLowercaseCheck);
+
+    m_useDigitsCheck = new QCheckBox("Цифры (0-9)", settingsGroup);
+    m_useDigitsCheck->setChecked(true);
+    formLayout->addRow("", m_useDigitsCheck);
+
+    m_useSymbolsCheck = new QCheckBox("Символы (!@#$%^&*)", settingsGroup);
+    m_useSymbolsCheck->setChecked(true);
+    formLayout->addRow("", m_useSymbolsCheck);
+
+    // Исключение неоднозначных символов
+    m_excludeAmbiguousCheck = new QCheckBox("Исключить неоднозначные символы (l, I, 1, 0, O)", settingsGroup);
+    m_excludeAmbiguousCheck->setChecked(true);
+    formLayout->addRow("", m_excludeAmbiguousCheck);
+
+    settingsGroup->setLayout(formLayout);
+    layout->addWidget(settingsGroup);
+
+    // Пояснение
+    QLabel *infoLabel = new QLabel(
+        "Эти настройки будут использоваться при генерации паролей в диалоге добавления/редактирования записей.",
+        panel);
+    infoLabel->setWordWrap(true);
+    infoLabel->setStyleSheet("color: #666; font-size: 10px; margin-top: 10px;");
+    layout->addWidget(infoLabel);
+
+    layout->addStretch();
+
+    panel->setLayout(layout);
+    tabWidget->addTab(panel, "Генератор паролей");
+
+    // Загружаем настройки из БД
+    loadPasswordSettings();
+
+    // Подключаем сигналы (для сохранения, без предварительного просмотра)
+    connect(m_passwordLengthSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &SettingsDialog::onPasswordLengthChanged);
+    connect(m_useUppercaseCheck, &QCheckBox::stateChanged, this, &SettingsDialog::onUseUppercaseChanged);
+    connect(m_useLowercaseCheck, &QCheckBox::stateChanged, this, &SettingsDialog::onUseLowercaseChanged);
+    connect(m_useDigitsCheck, &QCheckBox::stateChanged, this, &SettingsDialog::onUseDigitsChanged);
+    connect(m_useSymbolsCheck, &QCheckBox::stateChanged, this, &SettingsDialog::onUseSymbolsChanged);
+    connect(m_excludeAmbiguousCheck, &QCheckBox::stateChanged, this, &SettingsDialog::onExcludeAmbiguousChanged);
 }
 
 void SettingsDialog::createSecurityTab()
@@ -260,13 +339,12 @@ void SettingsDialog::createAdvancedTab()
 
 void SettingsDialog::onOk()
 {
+    // Сохраняем настройки генератора паролей
+    savePasswordSettings();
+
     QMessageBox::information(this, "CryptoSafe Manager",
-                             "Settings dialog is a placeholder for Sprint 2.\n\n"
-                             "Real settings will be implemented in future sprints:\n"
-                             "• Security settings - Sprint 4\n"
-                             "• Import/Export - Sprint 6\n"
-                             "• Backup - Sprint 8\n"
-                             "• Theme/Language - future",
+                             "Settings saved successfully.\n\n"
+                             "Password generator settings will take effect immediately.",
                              QMessageBox::Ok);
 
     accept();
@@ -275,4 +353,69 @@ void SettingsDialog::onOk()
 void SettingsDialog::onCancel()
 {
     reject();
+}
+
+void SettingsDialog::loadPasswordSettings()
+{
+    // Загружаем настройки из БД
+    try {
+        std::string lenStr = m_db.getSetting("password_length", "16");
+        m_passwordLengthSpin->setValue(std::stoi(lenStr));
+
+        m_useUppercaseCheck->setChecked(m_db.getSetting("password_use_uppercase", "true") == "true");
+        m_useLowercaseCheck->setChecked(m_db.getSetting("password_use_lowercase", "true") == "true");
+        m_useDigitsCheck->setChecked(m_db.getSetting("password_use_digits", "true") == "true");
+        m_useSymbolsCheck->setChecked(m_db.getSetting("password_use_symbols", "true") == "true");
+        m_excludeAmbiguousCheck->setChecked(m_db.getSetting("password_exclude_ambiguous", "true") == "true");
+    } catch (const std::exception& e) {
+        // Если ошибка, используем значения по умолчанию
+        m_passwordLengthSpin->setValue(16);
+        m_useUppercaseCheck->setChecked(true);
+        m_useLowercaseCheck->setChecked(true);
+        m_useDigitsCheck->setChecked(true);
+        m_useSymbolsCheck->setChecked(true);
+        m_excludeAmbiguousCheck->setChecked(true);
+    }
+}
+
+void SettingsDialog::savePasswordSettings()
+{
+    std::cout << "LENGTH" << std::to_string(m_passwordLengthSpin->value()) << std::endl;
+    m_db.setSetting("password_length", std::to_string(m_passwordLengthSpin->value()));
+    m_db.setSetting("password_use_uppercase", m_useUppercaseCheck->isChecked() ? "true" : "false");
+    m_db.setSetting("password_use_lowercase", m_useLowercaseCheck->isChecked() ? "true" : "false");
+    m_db.setSetting("password_use_digits", m_useDigitsCheck->isChecked() ? "true" : "false");
+    m_db.setSetting("password_use_symbols", m_useSymbolsCheck->isChecked() ? "true" : "false");
+    m_db.setSetting("password_exclude_ambiguous", m_excludeAmbiguousCheck->isChecked() ? "true" : "false");
+}
+
+void SettingsDialog::onPasswordLengthChanged(int value)
+{
+    Q_UNUSED(value);
+    // Изменения будут сохранены при нажатии OK
+}
+
+void SettingsDialog::onUseUppercaseChanged(int state)
+{
+    Q_UNUSED(state);
+}
+
+void SettingsDialog::onUseLowercaseChanged(int state)
+{
+    Q_UNUSED(state);
+}
+
+void SettingsDialog::onUseDigitsChanged(int state)
+{
+    Q_UNUSED(state);
+}
+
+void SettingsDialog::onUseSymbolsChanged(int state)
+{
+    Q_UNUSED(state);
+}
+
+void SettingsDialog::onExcludeAmbiguousChanged(int state)
+{
+    Q_UNUSED(state);
 }

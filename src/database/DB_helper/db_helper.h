@@ -139,6 +139,8 @@ public:
 
   // Получить соль для PBKDF2
   bool getEncSalt(std::vector<uint8_t> &salt);
+
+  void initDefaultSettings();
 };
 
 #endif

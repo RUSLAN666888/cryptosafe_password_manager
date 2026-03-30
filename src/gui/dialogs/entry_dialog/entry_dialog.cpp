@@ -264,7 +264,7 @@ void EntryDialog::onGeneratePassword()
 QString EntryDialog::generateSecurePassword(int length)
 {
     // Используем настройки из конфига
-    int actualLength = (length > 0) ? length : m_genConfig.length;
+    int actualLength = m_genConfig.length;
     actualLength = std::clamp(actualLength, 8, 64);
 
     // Формируем наборы символов с учетом настроек
@@ -306,7 +306,7 @@ QString EntryDialog::generateSecurePassword(int length)
     // Создаем пароль
     QString password;
 
-    // Добавляем обязательные символы из выбранных наборов (GEN-3)
+    // Добавляем обязательные символы из выбранных наборов
     if (m_genConfig.useUppercase && !uppercase.isEmpty()) {
         password += uppercase[getRandomInt(uppercase.length())];
     }

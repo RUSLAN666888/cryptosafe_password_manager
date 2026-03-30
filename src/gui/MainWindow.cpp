@@ -475,7 +475,7 @@ void MainWindow::onViewLogs()
 
 void MainWindow::onSettings()
 {
-    SettingsDialog dialog(this, config);
+    SettingsDialog dialog(db, this, config);
     dialog.exec();
 }
 
