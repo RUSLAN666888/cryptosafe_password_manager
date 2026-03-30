@@ -10,6 +10,7 @@
 #include <QTimer>
 #include "../src/core/vault/plaintext_entry.h"
 #include "../src/database/DB_helper/db_helper.h"
+#include "../src/gui/widgets/password_entry/PasswordEntry.h"
 
 class EntryDialog : public QDialog
 {
@@ -23,7 +24,6 @@ public:
 
 private slots:
     void onGeneratePassword();
-    void onTogglePasswordVisibility();
     void validateForm();
     void onStrengthTimer();
 
@@ -49,13 +49,12 @@ private:
 
     QLineEdit* m_titleEdit;
     QLineEdit* m_usernameEdit;
-    QLineEdit* m_passwordEdit;
+    PasswordEntry* m_passwordEntry;
     QLineEdit* m_urlEdit;
     QTextEdit* m_notesEdit;
     QLineEdit* m_categoryEdit;
     QLineEdit* m_tagsEdit;
     QPushButton* m_generatePasswordBtn;
-    QPushButton* m_togglePasswordBtn;
     QPushButton* m_okBtn;
     QPushButton* m_cancelBtn;
     QProgressBar* m_strengthGauge;

@@ -30,7 +30,7 @@ void EntryDialog::loadEntry(const PlaintextEntry& entry)
 {
     m_titleEdit->setText(QString::fromStdString(entry.title));
     m_usernameEdit->setText(QString::fromStdString(entry.username));
-    m_passwordEdit->setText(QString::fromStdString(entry.password));
+    m_passwordEntry->setValue(QString::fromStdString(entry.password));
     m_urlEdit->setText(QString::fromStdString(entry.url));
     m_notesEdit->setPlainText(QString::fromStdString(entry.notes));
     m_categoryEdit->setText(QString::fromStdString(entry.category));
@@ -74,17 +74,15 @@ void EntryDialog::setupUI()
 
     // Пароль с генератором
     QHBoxLayout* passwordLayout = new QHBoxLayout();
-    m_passwordEdit = new QLineEdit(this);
-    m_passwordEdit->setEchoMode(QLineEdit::Password);
-    m_passwordEdit->setPlaceholderText("Введите пароль или сгенерируйте");
-    passwordLayout->addWidget(m_passwordEdit);
+
+    // Используем готовый виджет PasswordEntry
+    m_passwordEntry = new PasswordEntry(this, "", QSize(300, -1));
+    m_passwordEntry->setPlaceholderText("Введите пароль или сгенерируйте");
+    passwordLayout->addWidget(m_passwordEntry, 1);
 
     m_generatePasswordBtn = new QPushButton("Сгенерировать", this);
-    m_togglePasswordBtn = new QPushButton("👁", this);
-    m_togglePasswordBtn->setFixedWidth(30);
-    m_togglePasswordBtn->setToolTip("Показать/скрыть пароль");
     passwordLayout->addWidget(m_generatePasswordBtn);
-    passwordLayout->addWidget(m_togglePasswordBtn);
+
     formLayout->addRow("Пароль *:", passwordLayout);
 
     // Индикатор силы пароля
@@ -147,15 +145,14 @@ void EntryDialog::setupConnections()
     connect(m_okBtn, &QPushButton::clicked, this, &QDialog::accept);
     connect(m_cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
     connect(m_generatePasswordBtn, &QPushButton::clicked, this, &EntryDialog::onGeneratePassword);
-    connect(m_togglePasswordBtn, &QPushButton::clicked, this, &EntryDialog::onTogglePasswordVisibility);
     connect(m_titleEdit, &QLineEdit::textChanged, this, &EntryDialog::validateForm);
-    connect(m_passwordEdit, &QLineEdit::textChanged, this, &EntryDialog::validateForm);
+    connect(m_passwordEntry, &PasswordEntry::textChanged, this, &EntryDialog::validateForm);
 }
 
 void EntryDialog::validateForm()
 {
     bool titleOk = !m_titleEdit->text().isEmpty();
-    bool passwordOk = m_passwordEdit->text().length() >= MIN_PASSWORD_LENGTH;
+    bool passwordOk = m_passwordEntry->getValue().length() >= MIN_PASSWORD_LENGTH;
 
     m_okBtn->setEnabled(titleOk && passwordOk);
 
@@ -176,7 +173,7 @@ void EntryDialog::onStrengthTimer()
         return;
     }
 
-    QString password = m_passwordEdit->text();
+    QString password = m_passwordEntry->getValue();
 
     if (password.isEmpty())
     {
@@ -231,7 +228,7 @@ PlaintextEntry EntryDialog::getEntry() const
     PlaintextEntry entry;
     entry.title = m_titleEdit->text().toStdString();
     entry.username = m_usernameEdit->text().toStdString();
-    entry.password = m_passwordEdit->text().toStdString();
+    entry.password = m_passwordEntry->getValue().toStdString();
     entry.url = m_urlEdit->text().toStdString();
     entry.notes = m_notesEdit->toPlainText().toStdString();
     entry.category = m_categoryEdit->text().toStdString();
@@ -252,10 +249,10 @@ PlaintextEntry EntryDialog::getEntry() const
 void EntryDialog::onGeneratePassword()
 {
     QString password = generateSecurePassword();
-    m_passwordEdit->setText(password);
-    m_isGenerated = true;  // Устанавливаем флаг, что пароль сгенерирован
+    m_passwordEntry->setValue(password);
+    m_isGenerated = true;
 
-    // Очищаем индикатор силы пароля (не показываем для сгенерированного)
+    // Очищаем индикатор силы пароля
     m_strengthGauge->setValue(0);
     m_strengthText->setText("Пароль сгенерирован");
     QPalette pal = m_strengthText->palette();
@@ -331,11 +328,4 @@ QString EntryDialog::generateSecurePassword(int length)
     }
 
     return password;
-}
-
-void EntryDialog::onTogglePasswordVisibility()
-{
-    m_passwordVisible = !m_passwordVisible;
-    m_passwordEdit->setEchoMode(m_passwordVisible ? QLineEdit::Normal : QLineEdit::Password);
-    m_togglePasswordBtn->setText(m_passwordVisible ? "👁‍🗨" : "👁");
 }
