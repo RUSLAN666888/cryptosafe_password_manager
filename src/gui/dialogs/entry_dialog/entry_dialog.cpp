@@ -1,4 +1,5 @@
 #include "../src/gui/dialogs/entry_dialog/entry_dialog.h"
+#include "../src/core/crypto/authentication.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFormLayout>
@@ -39,12 +40,10 @@ void EntryDialog::loadEntry(const PlaintextEntry& entry)
 void EntryDialog::loadGeneratorSettings()
 {
     try {
-        // Загружаем длину пароля
         std::string lenStr = m_db.getSetting("password_length", "16");
         m_genConfig.length = std::stoi(lenStr);
         m_genConfig.length = std::clamp(m_genConfig.length, 8, 64);
 
-        // Загружаем настройки наборов символов
         m_genConfig.useUppercase = m_db.getSetting("password_use_uppercase", "true") == "true";
         m_genConfig.useLowercase = m_db.getSetting("password_use_lowercase", "true") == "true";
         m_genConfig.useDigits = m_db.getSetting("password_use_digits", "true") == "true";
@@ -88,7 +87,7 @@ void EntryDialog::setupUI()
     passwordLayout->addWidget(m_togglePasswordBtn);
     formLayout->addRow("Пароль *:", passwordLayout);
 
-    // Индикатор силы пароля (как в FirstRunWizard)
+    // Индикатор силы пароля
     m_strengthGauge = new QProgressBar(this);
     m_strengthGauge->setRange(0, 4);
     m_strengthGauge->setValue(0);
@@ -136,7 +135,6 @@ void EntryDialog::setupUI()
     buttonLayout->addWidget(m_cancelBtn);
     mainLayout->addLayout(buttonLayout);
 
-    // Создаем таймер для задержки проверки (как в FirstRunWizard)
     m_strengthTimer = new QTimer(this);
     m_strengthTimer->setSingleShot(true);
     connect(m_strengthTimer, &QTimer::timeout, this, &EntryDialog::onStrengthTimer);
@@ -161,13 +159,23 @@ void EntryDialog::validateForm()
 
     m_okBtn->setEnabled(titleOk && passwordOk);
 
-    // Перезапускаем таймер при каждом изменении текста (как в FirstRunWizard)
+    // Если пароль был сгенерирован, не запускаем проверку надежности
+    if (m_isGenerated) {
+        return;
+    }
+
+    // Перезапускаем таймер при каждом изменении текста
     m_strengthTimer->stop();
     m_strengthTimer->start(500);
 }
 
 void EntryDialog::onStrengthTimer()
 {
+    // Если пароль был сгенерирован, не показываем проверку
+    if (m_isGenerated) {
+        return;
+    }
+
     QString password = m_passwordEdit->text();
 
     if (password.isEmpty())
@@ -180,19 +188,11 @@ void EntryDialog::onStrengthTimer()
         return;
     }
 
-    // Оценка сложности пароля (как в FirstRunWizard)
-    int strength = 0;
+    std::string pwdStr = password.toStdString();
+    int strength = check_password_strength(pwdStr);  // 0-4
 
-    if (password.length() >= 12) strength++;
-    if (password.contains(QRegularExpression("[A-Z]"))) strength++;
-    if (password.contains(QRegularExpression("[a-z]"))) strength++;
-    if (password.contains(QRegularExpression("[0-9]"))) strength++;
-    if (password.contains(QRegularExpression("[!@#$%^&*]"))) strength++;
-
-    // Обновляем индикатор
     m_strengthGauge->setValue(strength);
 
-    // Обновляем текст и цвет в зависимости от оценки
     QColor color;
     QString message;
 
@@ -218,9 +218,6 @@ void EntryDialog::onStrengthTimer()
         color = QColor(0, 200, 0);
         message = "Очень сильный";
         break;
-    default:
-        color = QColor(100, 100, 100);
-        message = "Неизвестно";
     }
 
     m_strengthText->setText(message);
@@ -240,11 +237,9 @@ PlaintextEntry EntryDialog::getEntry() const
     entry.category = m_categoryEdit->text().toStdString();
     entry.tags = m_tagsEdit->text().toStdString();
 
-    // Устанавливаем текущую дату и время для новой записи
     auto now = std::chrono::system_clock::now();
     auto now_time_t = std::chrono::system_clock::to_time_t(now);
     std::string timestamp = std::ctime(&now_time_t);
-    // Убираем символ новой строки в конце
     if (!timestamp.empty() && timestamp.back() == '\n') {
         timestamp.pop_back();
     }
@@ -258,22 +253,28 @@ void EntryDialog::onGeneratePassword()
 {
     QString password = generateSecurePassword();
     m_passwordEdit->setText(password);
+    m_isGenerated = true;  // Устанавливаем флаг, что пароль сгенерирован
+
+    // Очищаем индикатор силы пароля (не показываем для сгенерированного)
+    m_strengthGauge->setValue(0);
+    m_strengthText->setText("Пароль сгенерирован");
+    QPalette pal = m_strengthText->palette();
+    pal.setColor(QPalette::WindowText, QColor(0, 150, 0));
+    m_strengthText->setPalette(pal);
+
     validateForm();
 }
 
 QString EntryDialog::generateSecurePassword(int length)
 {
-    // Используем настройки из конфига
     int actualLength = m_genConfig.length;
     actualLength = std::clamp(actualLength, 8, 64);
 
-    // Формируем наборы символов с учетом настроек
     QString uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     QString lowercase = "abcdefghijklmnopqrstuvwxyz";
     QString digits = "0123456789";
     QString symbols = "!@#$%^&*";
 
-    // Исключаем неоднозначные символы, если нужно
     if (m_genConfig.excludeAmbiguous) {
         uppercase.remove('I');
         uppercase.remove('O');
@@ -282,7 +283,6 @@ QString EntryDialog::generateSecurePassword(int length)
         digits.remove('1');
     }
 
-    // Собираем выбранные наборы
     QString allChars;
     if (m_genConfig.useUppercase) allChars += uppercase;
     if (m_genConfig.useLowercase) allChars += lowercase;
@@ -290,11 +290,9 @@ QString EntryDialog::generateSecurePassword(int length)
     if (m_genConfig.useSymbols) allChars += symbols;
 
     if (allChars.isEmpty()) {
-        // Если ничего не выбрано, используем lowercase по умолчанию
         allChars = lowercase;
     }
 
-    // Криптостойкий генератор
     auto getRandomInt = [](int max) -> int {
         unsigned int value;
         if (RAND_bytes(reinterpret_cast<unsigned char*>(&value), sizeof(value)) != 1) {
@@ -303,10 +301,8 @@ QString EntryDialog::generateSecurePassword(int length)
         return value % max;
     };
 
-    // Создаем пароль
     QString password;
 
-    // Добавляем обязательные символы из выбранных наборов
     if (m_genConfig.useUppercase && !uppercase.isEmpty()) {
         password += uppercase[getRandomInt(uppercase.length())];
     }
@@ -320,13 +316,11 @@ QString EntryDialog::generateSecurePassword(int length)
         password += symbols[getRandomInt(symbols.length())];
     }
 
-    // Добавляем остальные символы
     int remaining = actualLength - password.length();
     for (int i = 0; i < remaining; ++i) {
         password += allChars[getRandomInt(allChars.length())];
     }
 
-    // Перемешиваем
     for (int i = password.length() - 1; i > 0; --i) {
         int j = getRandomInt(i + 1);
         if (i != j) {

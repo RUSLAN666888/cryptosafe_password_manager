@@ -63,6 +63,7 @@ private:
     QTimer* m_strengthTimer;
 
     bool m_passwordVisible = false;
+    bool m_isGenerated = false;
 
     static constexpr int MIN_PASSWORD_LENGTH = 8;
 };
