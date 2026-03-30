@@ -17,6 +17,7 @@
 #include "../src/gui/widgets/secure_table/VaultTableModel.h"
 #include "../src/gui/widgets/secure_table/SearchProxyModel.h"
 #include "../src/core/vault/VaultManager.h"
+#include "../src/core/crypto/AES256.h"
 
 class MainWindow : public QMainWindow
 {
@@ -26,6 +27,8 @@ private:
     ConfigHander &config;
     Database &db;
     VaultManager& m_vaultManager;
+
+    AES256GCM m_crypto;
 
     bool isLoggedIn;
 
@@ -87,6 +90,10 @@ private slots:
     void showContextMenu(const QPoint& pos);
     void onCopyUsername();
     void onCopyPassword();
+
+    void runEncryptionTest();
+    void runCrudTest();
+    void runPasswordGeneratorTest();
 
 public:
     MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaultManager);
