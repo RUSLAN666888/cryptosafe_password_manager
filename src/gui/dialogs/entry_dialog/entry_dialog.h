@@ -9,14 +9,15 @@
 #include <QProgressBar>
 #include <QTimer>
 #include "../src/core/vault/plaintext_entry.h"
+#include "../src/database/DB_helper/db_helper.h"
 
 class EntryDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit EntryDialog(QWidget* parent = nullptr);
-    explicit EntryDialog(const PlaintextEntry& entry, QWidget* parent = nullptr);
+    explicit EntryDialog(Database& db, QWidget* parent);
+    explicit EntryDialog(Database& db, const PlaintextEntry& entry, QWidget* parent);
 
     PlaintextEntry getEntry() const;
 
@@ -30,8 +31,21 @@ private:
     void setupUI();
     void setupConnections();
     QString generateSecurePassword(int length = 16);
+    void loadGeneratorSettings();
     void updateStrengthDisplay(int score, const QString& message, const QColor& color);
     void loadEntry(const PlaintextEntry& entry);
+
+    struct GeneratorConfig {
+        int length = 16;
+        bool useUppercase = true;
+        bool useLowercase = true;
+        bool useDigits = true;
+        bool useSymbols = true;
+        bool excludeAmbiguous = true;
+    };
+    GeneratorConfig m_genConfig;
+    Database& m_db;
+
 
     QLineEdit* m_titleEdit;
     QLineEdit* m_usernameEdit;

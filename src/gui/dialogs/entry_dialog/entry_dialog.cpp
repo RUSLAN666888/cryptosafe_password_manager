@@ -4,20 +4,23 @@
 #include <QFormLayout>
 #include <QMessageBox>
 #include <QRegularExpression>
-#include <random>
 #include <chrono>
+#include <openssl/rand.h>
+#include <algorithm>
 
-EntryDialog::EntryDialog(QWidget* parent) : QDialog(parent)
+EntryDialog::EntryDialog(Database& db, QWidget* parent) : QDialog(parent), m_db(db)
 {
     setupUI();
     setupConnections();
+    loadGeneratorSettings();
     setWindowTitle("Добавление записи");
 }
 
-EntryDialog::EntryDialog(const PlaintextEntry& entry, QWidget* parent) : QDialog(parent)
+EntryDialog::EntryDialog(Database& db, const PlaintextEntry& entry, QWidget* parent) : QDialog(parent), m_db(db)
 {
     setupUI();
     setupConnections();
+    loadGeneratorSettings();
     loadEntry(entry);
     setWindowTitle("Редактирование записи");
 }
@@ -31,6 +34,26 @@ void EntryDialog::loadEntry(const PlaintextEntry& entry)
     m_notesEdit->setPlainText(QString::fromStdString(entry.notes));
     m_categoryEdit->setText(QString::fromStdString(entry.category));
     m_tagsEdit->setText(QString::fromStdString(entry.tags));
+}
+
+void EntryDialog::loadGeneratorSettings()
+{
+    try {
+        // Загружаем длину пароля
+        std::string lenStr = m_db.getSetting("password_length", "16");
+        m_genConfig.length = std::stoi(lenStr);
+        m_genConfig.length = std::clamp(m_genConfig.length, 8, 64);
+
+        // Загружаем настройки наборов символов
+        m_genConfig.useUppercase = m_db.getSetting("password_use_uppercase", "true") == "true";
+        m_genConfig.useLowercase = m_db.getSetting("password_use_lowercase", "true") == "true";
+        m_genConfig.useDigits = m_db.getSetting("password_use_digits", "true") == "true";
+        m_genConfig.useSymbols = m_db.getSetting("password_use_symbols", "true") == "true";
+        m_genConfig.excludeAmbiguous = m_db.getSetting("password_exclude_ambiguous", "true") == "true";
+
+    } catch (const std::exception& e) {
+        m_genConfig = GeneratorConfig();
+    }
 }
 
 void EntryDialog::setupUI()
@@ -240,9 +263,80 @@ void EntryDialog::onGeneratePassword()
 
 QString EntryDialog::generateSecurePassword(int length)
 {
+    // Используем настройки из конфига
+    int actualLength = (length > 0) ? length : m_genConfig.length;
+    actualLength = std::clamp(actualLength, 8, 64);
 
+    // Формируем наборы символов с учетом настроек
+    QString uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    QString lowercase = "abcdefghijklmnopqrstuvwxyz";
+    QString digits = "0123456789";
+    QString symbols = "!@#$%^&*";
 
-    return "stub";
+    // Исключаем неоднозначные символы, если нужно
+    if (m_genConfig.excludeAmbiguous) {
+        uppercase.remove('I');
+        uppercase.remove('O');
+        lowercase.remove('l');
+        digits.remove('0');
+        digits.remove('1');
+    }
+
+    // Собираем выбранные наборы
+    QString allChars;
+    if (m_genConfig.useUppercase) allChars += uppercase;
+    if (m_genConfig.useLowercase) allChars += lowercase;
+    if (m_genConfig.useDigits) allChars += digits;
+    if (m_genConfig.useSymbols) allChars += symbols;
+
+    if (allChars.isEmpty()) {
+        // Если ничего не выбрано, используем lowercase по умолчанию
+        allChars = lowercase;
+    }
+
+    // Криптостойкий генератор
+    auto getRandomInt = [](int max) -> int {
+        unsigned int value;
+        if (RAND_bytes(reinterpret_cast<unsigned char*>(&value), sizeof(value)) != 1) {
+            throw std::runtime_error("Failed to generate random number");
+        }
+        return value % max;
+    };
+
+    // Создаем пароль
+    QString password;
+
+    // Добавляем обязательные символы из выбранных наборов (GEN-3)
+    if (m_genConfig.useUppercase && !uppercase.isEmpty()) {
+        password += uppercase[getRandomInt(uppercase.length())];
+    }
+    if (m_genConfig.useLowercase && !lowercase.isEmpty()) {
+        password += lowercase[getRandomInt(lowercase.length())];
+    }
+    if (m_genConfig.useDigits && !digits.isEmpty()) {
+        password += digits[getRandomInt(digits.length())];
+    }
+    if (m_genConfig.useSymbols && !symbols.isEmpty()) {
+        password += symbols[getRandomInt(symbols.length())];
+    }
+
+    // Добавляем остальные символы
+    int remaining = actualLength - password.length();
+    for (int i = 0; i < remaining; ++i) {
+        password += allChars[getRandomInt(allChars.length())];
+    }
+
+    // Перемешиваем
+    for (int i = password.length() - 1; i > 0; --i) {
+        int j = getRandomInt(i + 1);
+        if (i != j) {
+            QChar temp = password[i];
+            password[i] = password[j];
+            password[j] = temp;
+        }
+    }
+
+    return password;
 }
 
 void EntryDialog::onTogglePasswordVisibility()

@@ -84,6 +84,10 @@ private slots:
     void onFirstRunWizard();
     void onChangePassword();
 
+    void showContextMenu(const QPoint& pos);
+    void onCopyUsername();
+    void onCopyPassword();
+
 public:
     MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaultManager);
     ~MainWindow();

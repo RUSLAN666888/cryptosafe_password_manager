@@ -13,6 +13,7 @@
 #include <QDebug>
 #include <QHeaderView>
 #include <QShortcut>
+#include <QClipboard>
 
 MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaultManager)
     : QMainWindow(nullptr)
@@ -196,6 +197,10 @@ void MainWindow::createCentralWidget()
         m_proxyModel->setSearchText(text);
     });
 
+    // Подключаем контекстное меню
+    m_tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_tableView, &QTableView::customContextMenuRequested,
+            this, &MainWindow::showContextMenu);
 }
 
 void MainWindow::createStatusBar()
@@ -340,7 +345,7 @@ void MainWindow::onAddEntry()
     }
     resetInactivityTimer();
 
-    EntryDialog dialog(this);
+    EntryDialog dialog(db, this);
     if (dialog.exec() == QDialog::Accepted)
     {
         PlaintextEntry entry = dialog.getEntry();
@@ -376,7 +381,7 @@ void MainWindow::onEditEntry()
     }
 
     // Открываем диалог с данными записи
-    EntryDialog dialog(*entry, this);  // конструктор для редактирования
+    EntryDialog dialog(db, *entry, this);  // конструктор для редактирования
     if (dialog.exec() == QDialog::Accepted)
     {
         PlaintextEntry updatedEntry = dialog.getEntry();
@@ -546,4 +551,81 @@ void MainWindow::onLock()
 void MainWindow::refreshTable()
 {
     m_tableModel->refresh();
+}
+
+// ============== КОНТЕКСТНОЕ МЕНЮ ==============
+
+void MainWindow::showContextMenu(const QPoint& pos)
+{
+    QModelIndex index = m_tableView->indexAt(pos);
+    if (!index.isValid()) return;
+
+    // Выделяем строку, если она не выделена
+    if (!m_tableView->selectionModel()->isSelected(index)) {
+        m_tableView->selectionModel()->clear();
+        m_tableView->selectionModel()->select(index,
+                                              QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    }
+
+    QModelIndexList selected = m_tableView->selectionModel()->selectedRows();
+    bool singleSelected = (selected.size() == 1);
+    bool multiSelected = (selected.size() > 1);
+
+    QMenu menu(this);
+
+    if (singleSelected) {
+        // Действия для одной записи
+        menu.addAction("Редактировать", this, &MainWindow::onEditEntry);
+        menu.addSeparator();
+        menu.addAction("Копировать логин", this, &MainWindow::onCopyUsername);
+        menu.addAction("Копировать пароль", this, &MainWindow::onCopyPassword);
+        menu.addSeparator();
+        menu.addAction("Удалить", this, &MainWindow::onDeleteEntry);
+    } else if (multiSelected) {
+        // Действия для нескольких записей
+        menu.addAction(QString("Удалить (%1 записей)").arg(selected.size()),
+                       this, &MainWindow::onDeleteEntry);
+    }
+
+    menu.exec(m_tableView->viewport()->mapToGlobal(pos));
+}
+
+void MainWindow::onCopyUsername()
+{
+    QModelIndexList selected = m_tableView->selectionModel()->selectedRows();
+    if (selected.isEmpty()) return;
+
+    QModelIndex sourceIdx = m_proxyModel->mapToSource(selected.first());
+    long id = m_tableModel->getId(sourceIdx.row());
+
+    try {
+        auto entry = m_vaultManager.getEntry(static_cast<int>(id));
+        if (entry) {
+            QApplication::clipboard()->setText(QString::fromStdString(entry->username));
+            statusBar->showMessage("Логин скопирован", 2000);
+        }
+    } catch (const std::exception& e) {
+        statusBar->showMessage("Ошибка при копировании", 2000);
+    }
+}
+
+void MainWindow::onCopyPassword()
+{
+    QModelIndexList selected = m_tableView->selectionModel()->selectedRows();
+    if (selected.isEmpty()) return;
+
+    QModelIndex sourceIdx = m_proxyModel->mapToSource(selected.first());
+    long id = m_tableModel->getId(sourceIdx.row());
+
+    try {
+        auto entry = m_vaultManager.getEntry(static_cast<int>(id));
+        if (entry) {
+            QApplication::clipboard()->setText(QString::fromStdString(entry->password));
+            statusBar->showMessage("Пароль скопирован", 2000);
+
+            // TODO: Запланировать очистку буфера через 30 секунд (Sprint 4)
+        }
+    } catch (const std::exception& e) {
+        statusBar->showMessage("Ошибка при копировании", 2000);
+    }
 }

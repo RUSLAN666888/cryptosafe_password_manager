@@ -201,6 +201,13 @@ bool Database::initialize()
   // Существующая БД - проверяем миграции
   checkMigration();
 
+  setSetting("password_length", "16");
+  setSetting("password_use_uppercase", "true");
+  setSetting("password_use_lowercase", "true");
+  setSetting("password_use_digits", "true");
+  setSetting("password_use_symbols", "true");
+  setSetting("password_exclude_ambiguous", "true");
+
   return true;
 }
 
