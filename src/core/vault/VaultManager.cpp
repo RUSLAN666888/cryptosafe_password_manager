@@ -83,7 +83,7 @@ int VaultManager::createEntry(const PlaintextEntry& entry) {
     return entry_id;
 }
 
-std::unique_ptr<PlaintextEntry> VaultManager::getEntry(int entry_id) {
+std::unique_ptr<PlaintextEntry> VaultManager::getEntry(int entry_id, bool isKeyRotation) {
     sqlite3 *conn = db.getConnection();
     if (!conn) return nullptr;
 
@@ -128,7 +128,11 @@ std::unique_ptr<PlaintextEntry> VaultManager::getEntry(int entry_id) {
 
         try {
             KeyManager::KeyData d;
-            key_manager.get_key(d);
+            if (isKeyRotation)
+                key_manager.get_old_key(d);
+            else
+                key_manager.get_key(d);
+
             PlaintextEntry decrypted_entry = crypto.decrypt(encrypted_data, d);
 
             // Заполняем дополнительные поля из БД
@@ -169,7 +173,7 @@ std::unique_ptr<PlaintextEntry> VaultManager::getEntry(int entry_id) {
     return result;
 }
 
-std::vector<PlaintextEntry> VaultManager::getAllEntries()
+std::vector<PlaintextEntry> VaultManager::getAllEntries(bool rotate)
 {
     std::vector<PlaintextEntry> entries;
     sqlite3* conn = db.getConnection();
@@ -203,7 +207,10 @@ std::vector<PlaintextEntry> VaultManager::getAllEntries()
     }
 
     KeyManager::KeyData d;
-    key_manager.get_key(d);
+    if (rotate)
+        key_manager.get_old_key(d);
+    else
+        key_manager.get_key(d);
 
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
@@ -485,4 +492,131 @@ std::vector<VaultManager::EntryMetadata> VaultManager::getAllEntryMetadata()
     db.releaseConnection(conn);
 
     return result;
+}
+
+int VaultManager::getTotalEntriesCount() {
+    sqlite3* conn = db.getConnection();
+    if (!conn) return -1;
+
+    sqlite3_stmt* stmt;
+    int count = 0;
+
+    const char* sql = "SELECT COUNT(*) FROM vault_entries";
+
+    if (sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            count = sqlite3_column_int(stmt, 0);
+        }
+        sqlite3_finalize(stmt);
+    }
+
+    db.releaseConnection(conn);
+    return count;
+}
+
+bool VaultManager::rotate()
+{
+    sqlite3* conn = db.getConnection();
+    if (!conn) return false;
+
+    // Получаем старый и новый ключи
+    KeyManager::KeyData old_key, new_key;
+    key_manager.get_key(new_key);
+    key_manager.get_old_key(old_key);
+
+    // Получаем все rowid
+    std::vector<int> all_ids;
+    sqlite3_stmt* id_stmt;
+    const char* id_sql = "SELECT rowid FROM vault_entries";
+
+    if (sqlite3_prepare_v2(conn, id_sql, -1, &id_stmt, nullptr) != SQLITE_OK) {
+        db.releaseConnection(conn);
+        return false;
+    }
+
+    while (sqlite3_step(id_stmt) == SQLITE_ROW) {
+        all_ids.push_back(sqlite3_column_int(id_stmt, 0));
+    }
+    sqlite3_finalize(id_stmt);
+
+    int total = all_ids.size();
+    if (total == 0) {
+        db.releaseConnection(conn);
+        return true;
+    }
+
+    // Начинаем одну большую транзакцию
+    sqlite3_exec(conn, "BEGIN IMMEDIATE;", nullptr, nullptr, nullptr);
+
+    sqlite3_stmt* select_stmt;
+    sqlite3_stmt* update_stmt;
+
+    const char* select_sql = "SELECT encrypted_data FROM vault_entries WHERE rowid = ?";
+    const char* update_sql = "UPDATE vault_entries SET encrypted_data = ?, updated_at = CURRENT_TIMESTAMP WHERE rowid = ?";
+
+    sqlite3_prepare_v2(conn, select_sql, -1, &select_stmt, nullptr);
+    sqlite3_prepare_v2(conn, update_sql, -1, &update_stmt, nullptr);
+
+    bool success = true;
+    int processed = 0;
+
+    for (int i = 0; i < all_ids.size(); i++)
+    {
+        // Читаем зашифрованные данные
+        sqlite3_bind_int(select_stmt, 1, all_ids[i]);
+
+        if (sqlite3_step(select_stmt) != SQLITE_ROW) {
+            std::cerr << "Failed to read entry " << all_ids[i] << std::endl;
+            success = false;
+            break;
+        }
+
+        const void* encrypted_blob = sqlite3_column_blob(select_stmt, 0);
+        int encrypted_size = sqlite3_column_bytes(select_stmt, 0);
+
+        std::vector<uint8_t> encrypted_data(
+            static_cast<const uint8_t*>(encrypted_blob),
+            static_cast<const uint8_t*>(encrypted_blob) + encrypted_size
+            );
+
+        sqlite3_reset(select_stmt);
+
+        try {
+            // Расшифровываем старым ключом
+            PlaintextEntry entry = crypto.decrypt(encrypted_data, old_key);
+
+            // Шифруем новым ключом
+            std::vector<uint8_t> new_encrypted = crypto.encrypt(new_key, entry);
+
+            // Обновляем в БД
+            sqlite3_bind_blob(update_stmt, 1, new_encrypted.data(), new_encrypted.size(), SQLITE_STATIC);
+            sqlite3_bind_int(update_stmt, 2, all_ids[i]);
+
+            if (sqlite3_step(update_stmt) != SQLITE_DONE) {
+                throw std::runtime_error("Update failed");
+            }
+
+            sqlite3_reset(update_stmt);
+            processed++;
+
+        } catch (const std::exception& e) {
+            std::cerr << "Error processing entry " << all_ids[i] << ": " << e.what() << std::endl;
+            success = false;
+            break;
+        }
+    }
+
+    // Финализируем запросы
+    sqlite3_finalize(select_stmt);
+    sqlite3_finalize(update_stmt);
+
+    if (success) {
+        sqlite3_exec(conn, "COMMIT;", nullptr, nullptr, nullptr);
+        key_manager.getInstance().zero_keyData(old_key);
+    } else {
+        sqlite3_exec(conn, "ROLLBACK;", nullptr, nullptr, nullptr);
+    }
+
+    db.releaseConnection(conn);
+    return success;
 }

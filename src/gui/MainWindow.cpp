@@ -660,6 +660,8 @@ void MainWindow::onChangePassword()
             QMetaObject::invokeMethod(this, &MainWindow::close, Qt::QueuedConnection);
             return;
         }
+
+
     }
 }
 

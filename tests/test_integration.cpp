@@ -7,7 +7,6 @@
 #include <thread>
 #include <wx/evtloop.h>
 #include <wx/wx.h>
-
 // Тестовое приложение
 class TestApp : public wxApp
 {

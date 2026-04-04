@@ -117,6 +117,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named cryptosafe_lib
+
+# Build rule for target.
+cryptosafe_lib: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 cryptosafe_lib
+.PHONY : cryptosafe_lib
+
+# fast build rule for target.
+cryptosafe_lib/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/build
+.PHONY : cryptosafe_lib/fast
+
+#=============================================================================
 # Target rules for targets named cryptosafe
 
 # Build rule for target.
@@ -128,6 +141,45 @@ cryptosafe: cmake_check_build_system
 cryptosafe/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/build
 .PHONY : cryptosafe/fast
+
+#=============================================================================
+# Target rules for targets named run_tests
+
+# Build rule for target.
+run_tests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_tests
+.PHONY : run_tests
+
+# fast build rule for target.
+run_tests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/build
+.PHONY : run_tests/fast
+
+#=============================================================================
+# Target rules for targets named cryptosafe_lib_autogen_timestamp_deps
+
+# Build rule for target.
+cryptosafe_lib_autogen_timestamp_deps: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 cryptosafe_lib_autogen_timestamp_deps
+.PHONY : cryptosafe_lib_autogen_timestamp_deps
+
+# fast build rule for target.
+cryptosafe_lib_autogen_timestamp_deps/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib_autogen_timestamp_deps.dir/build.make CMakeFiles/cryptosafe_lib_autogen_timestamp_deps.dir/build
+.PHONY : cryptosafe_lib_autogen_timestamp_deps/fast
+
+#=============================================================================
+# Target rules for targets named cryptosafe_lib_autogen
+
+# Build rule for target.
+cryptosafe_lib_autogen: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 cryptosafe_lib_autogen
+.PHONY : cryptosafe_lib_autogen
+
+# fast build rule for target.
+cryptosafe_lib_autogen/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib_autogen.dir/build.make CMakeFiles/cryptosafe_lib_autogen.dir/build
+.PHONY : cryptosafe_lib_autogen/fast
 
 #=============================================================================
 # Target rules for targets named cryptosafe_autogen_timestamp_deps
@@ -155,6 +207,32 @@ cryptosafe_autogen/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_autogen.dir/build.make CMakeFiles/cryptosafe_autogen.dir/build
 .PHONY : cryptosafe_autogen/fast
 
+#=============================================================================
+# Target rules for targets named run_tests_autogen_timestamp_deps
+
+# Build rule for target.
+run_tests_autogen_timestamp_deps: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_tests_autogen_timestamp_deps
+.PHONY : run_tests_autogen_timestamp_deps
+
+# fast build rule for target.
+run_tests_autogen_timestamp_deps/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests_autogen_timestamp_deps.dir/build.make CMakeFiles/run_tests_autogen_timestamp_deps.dir/build
+.PHONY : run_tests_autogen_timestamp_deps/fast
+
+#=============================================================================
+# Target rules for targets named run_tests_autogen
+
+# Build rule for target.
+run_tests_autogen: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_tests_autogen
+.PHONY : run_tests_autogen
+
+# fast build rule for target.
+run_tests_autogen/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests_autogen.dir/build.make CMakeFiles/run_tests_autogen.dir/build
+.PHONY : run_tests_autogen/fast
+
 cryptosafe_autogen/mocs_compilation.o: cryptosafe_autogen/mocs_compilation.cpp.o
 .PHONY : cryptosafe_autogen/mocs_compilation.o
 
@@ -178,6 +256,30 @@ cryptosafe_autogen/mocs_compilation.s: cryptosafe_autogen/mocs_compilation.cpp.s
 cryptosafe_autogen/mocs_compilation.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/cryptosafe_autogen/mocs_compilation.cpp.s
 .PHONY : cryptosafe_autogen/mocs_compilation.cpp.s
+
+cryptosafe_lib_autogen/mocs_compilation.o: cryptosafe_lib_autogen/mocs_compilation.cpp.o
+.PHONY : cryptosafe_lib_autogen/mocs_compilation.o
+
+# target to build an object file
+cryptosafe_lib_autogen/mocs_compilation.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/cryptosafe_lib_autogen/mocs_compilation.cpp.o
+.PHONY : cryptosafe_lib_autogen/mocs_compilation.cpp.o
+
+cryptosafe_lib_autogen/mocs_compilation.i: cryptosafe_lib_autogen/mocs_compilation.cpp.i
+.PHONY : cryptosafe_lib_autogen/mocs_compilation.i
+
+# target to preprocess a source file
+cryptosafe_lib_autogen/mocs_compilation.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/cryptosafe_lib_autogen/mocs_compilation.cpp.i
+.PHONY : cryptosafe_lib_autogen/mocs_compilation.cpp.i
+
+cryptosafe_lib_autogen/mocs_compilation.s: cryptosafe_lib_autogen/mocs_compilation.cpp.s
+.PHONY : cryptosafe_lib_autogen/mocs_compilation.s
+
+# target to generate assembly for a file
+cryptosafe_lib_autogen/mocs_compilation.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/cryptosafe_lib_autogen/mocs_compilation.cpp.s
+.PHONY : cryptosafe_lib_autogen/mocs_compilation.cpp.s
 
 main.o: main.cpp.o
 .PHONY : main.o
@@ -203,12 +305,36 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+run_tests_autogen/mocs_compilation.o: run_tests_autogen/mocs_compilation.cpp.o
+.PHONY : run_tests_autogen/mocs_compilation.o
+
+# target to build an object file
+run_tests_autogen/mocs_compilation.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/run_tests_autogen/mocs_compilation.cpp.o
+.PHONY : run_tests_autogen/mocs_compilation.cpp.o
+
+run_tests_autogen/mocs_compilation.i: run_tests_autogen/mocs_compilation.cpp.i
+.PHONY : run_tests_autogen/mocs_compilation.i
+
+# target to preprocess a source file
+run_tests_autogen/mocs_compilation.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/run_tests_autogen/mocs_compilation.cpp.i
+.PHONY : run_tests_autogen/mocs_compilation.cpp.i
+
+run_tests_autogen/mocs_compilation.s: run_tests_autogen/mocs_compilation.cpp.s
+.PHONY : run_tests_autogen/mocs_compilation.s
+
+# target to generate assembly for a file
+run_tests_autogen/mocs_compilation.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/run_tests_autogen/mocs_compilation.cpp.s
+.PHONY : run_tests_autogen/mocs_compilation.cpp.s
+
 src/core/vault/VaultManager.o: src/core/vault/VaultManager.cpp.o
 .PHONY : src/core/vault/VaultManager.o
 
 # target to build an object file
 src/core/vault/VaultManager.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/vault/VaultManager.cpp.o
 .PHONY : src/core/vault/VaultManager.cpp.o
 
 src/core/vault/VaultManager.i: src/core/vault/VaultManager.cpp.i
@@ -216,7 +342,7 @@ src/core/vault/VaultManager.i: src/core/vault/VaultManager.cpp.i
 
 # target to preprocess a source file
 src/core/vault/VaultManager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/vault/VaultManager.cpp.i
 .PHONY : src/core/vault/VaultManager.cpp.i
 
 src/core/vault/VaultManager.s: src/core/vault/VaultManager.cpp.s
@@ -224,7 +350,7 @@ src/core/vault/VaultManager.s: src/core/vault/VaultManager.cpp.s
 
 # target to generate assembly for a file
 src/core/vault/VaultManager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/vault/VaultManager.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/vault/VaultManager.cpp.s
 .PHONY : src/core/vault/VaultManager.cpp.s
 
 src/database/DB_helper/db_helper.o: src/database/DB_helper/db_helper.cpp.o
@@ -232,7 +358,7 @@ src/database/DB_helper/db_helper.o: src/database/DB_helper/db_helper.cpp.o
 
 # target to build an object file
 src/database/DB_helper/db_helper.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/database/DB_helper/db_helper.cpp.o
 .PHONY : src/database/DB_helper/db_helper.cpp.o
 
 src/database/DB_helper/db_helper.i: src/database/DB_helper/db_helper.cpp.i
@@ -240,7 +366,7 @@ src/database/DB_helper/db_helper.i: src/database/DB_helper/db_helper.cpp.i
 
 # target to preprocess a source file
 src/database/DB_helper/db_helper.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/database/DB_helper/db_helper.cpp.i
 .PHONY : src/database/DB_helper/db_helper.cpp.i
 
 src/database/DB_helper/db_helper.s: src/database/DB_helper/db_helper.cpp.s
@@ -248,7 +374,7 @@ src/database/DB_helper/db_helper.s: src/database/DB_helper/db_helper.cpp.s
 
 # target to generate assembly for a file
 src/database/DB_helper/db_helper.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/database/DB_helper/db_helper.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/database/DB_helper/db_helper.cpp.s
 .PHONY : src/database/DB_helper/db_helper.cpp.s
 
 src/gui/MainWindow.o: src/gui/MainWindow.cpp.o
@@ -256,7 +382,7 @@ src/gui/MainWindow.o: src/gui/MainWindow.cpp.o
 
 # target to build an object file
 src/gui/MainWindow.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/MainWindow.cpp.o
 .PHONY : src/gui/MainWindow.cpp.o
 
 src/gui/MainWindow.i: src/gui/MainWindow.cpp.i
@@ -264,7 +390,7 @@ src/gui/MainWindow.i: src/gui/MainWindow.cpp.i
 
 # target to preprocess a source file
 src/gui/MainWindow.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/MainWindow.cpp.i
 .PHONY : src/gui/MainWindow.cpp.i
 
 src/gui/MainWindow.s: src/gui/MainWindow.cpp.s
@@ -272,7 +398,7 @@ src/gui/MainWindow.s: src/gui/MainWindow.cpp.s
 
 # target to generate assembly for a file
 src/gui/MainWindow.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/MainWindow.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/MainWindow.cpp.s
 .PHONY : src/gui/MainWindow.cpp.s
 
 src/gui/dialogs/entry_dialog/entry_dialog.o: src/gui/dialogs/entry_dialog/entry_dialog.cpp.o
@@ -280,7 +406,7 @@ src/gui/dialogs/entry_dialog/entry_dialog.o: src/gui/dialogs/entry_dialog/entry_
 
 # target to build an object file
 src/gui/dialogs/entry_dialog/entry_dialog.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.o
 .PHONY : src/gui/dialogs/entry_dialog/entry_dialog.cpp.o
 
 src/gui/dialogs/entry_dialog/entry_dialog.i: src/gui/dialogs/entry_dialog/entry_dialog.cpp.i
@@ -288,7 +414,7 @@ src/gui/dialogs/entry_dialog/entry_dialog.i: src/gui/dialogs/entry_dialog/entry_
 
 # target to preprocess a source file
 src/gui/dialogs/entry_dialog/entry_dialog.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.i
 .PHONY : src/gui/dialogs/entry_dialog/entry_dialog.cpp.i
 
 src/gui/dialogs/entry_dialog/entry_dialog.s: src/gui/dialogs/entry_dialog/entry_dialog.cpp.s
@@ -296,7 +422,7 @@ src/gui/dialogs/entry_dialog/entry_dialog.s: src/gui/dialogs/entry_dialog/entry_
 
 # target to generate assembly for a file
 src/gui/dialogs/entry_dialog/entry_dialog.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.s
 .PHONY : src/gui/dialogs/entry_dialog/entry_dialog.cpp.s
 
 src/gui/dialogs/first_run_wizard/FirstRunWizard.o: src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
@@ -304,7 +430,7 @@ src/gui/dialogs/first_run_wizard/FirstRunWizard.o: src/gui/dialogs/first_run_wiz
 
 # target to build an object file
 src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
 .PHONY : src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
 
 src/gui/dialogs/first_run_wizard/FirstRunWizard.i: src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.i
@@ -312,7 +438,7 @@ src/gui/dialogs/first_run_wizard/FirstRunWizard.i: src/gui/dialogs/first_run_wiz
 
 # target to preprocess a source file
 src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.i
 .PHONY : src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.i
 
 src/gui/dialogs/first_run_wizard/FirstRunWizard.s: src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.s
@@ -320,7 +446,7 @@ src/gui/dialogs/first_run_wizard/FirstRunWizard.s: src/gui/dialogs/first_run_wiz
 
 # target to generate assembly for a file
 src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.s
 .PHONY : src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.s
 
 src/gui/dialogs/login_dialog/LoginDialog.o: src/gui/dialogs/login_dialog/LoginDialog.cpp.o
@@ -328,7 +454,7 @@ src/gui/dialogs/login_dialog/LoginDialog.o: src/gui/dialogs/login_dialog/LoginDi
 
 # target to build an object file
 src/gui/dialogs/login_dialog/LoginDialog.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.o
 .PHONY : src/gui/dialogs/login_dialog/LoginDialog.cpp.o
 
 src/gui/dialogs/login_dialog/LoginDialog.i: src/gui/dialogs/login_dialog/LoginDialog.cpp.i
@@ -336,7 +462,7 @@ src/gui/dialogs/login_dialog/LoginDialog.i: src/gui/dialogs/login_dialog/LoginDi
 
 # target to preprocess a source file
 src/gui/dialogs/login_dialog/LoginDialog.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.i
 .PHONY : src/gui/dialogs/login_dialog/LoginDialog.cpp.i
 
 src/gui/dialogs/login_dialog/LoginDialog.s: src/gui/dialogs/login_dialog/LoginDialog.cpp.s
@@ -344,7 +470,7 @@ src/gui/dialogs/login_dialog/LoginDialog.s: src/gui/dialogs/login_dialog/LoginDi
 
 # target to generate assembly for a file
 src/gui/dialogs/login_dialog/LoginDialog.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/login_dialog/LoginDialog.cpp.s
 .PHONY : src/gui/dialogs/login_dialog/LoginDialog.cpp.s
 
 src/gui/dialogs/password_change/password_change.o: src/gui/dialogs/password_change/password_change.cpp.o
@@ -352,7 +478,7 @@ src/gui/dialogs/password_change/password_change.o: src/gui/dialogs/password_chan
 
 # target to build an object file
 src/gui/dialogs/password_change/password_change.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/password_change/password_change.cpp.o
 .PHONY : src/gui/dialogs/password_change/password_change.cpp.o
 
 src/gui/dialogs/password_change/password_change.i: src/gui/dialogs/password_change/password_change.cpp.i
@@ -360,7 +486,7 @@ src/gui/dialogs/password_change/password_change.i: src/gui/dialogs/password_chan
 
 # target to preprocess a source file
 src/gui/dialogs/password_change/password_change.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/password_change/password_change.cpp.i
 .PHONY : src/gui/dialogs/password_change/password_change.cpp.i
 
 src/gui/dialogs/password_change/password_change.s: src/gui/dialogs/password_change/password_change.cpp.s
@@ -368,7 +494,7 @@ src/gui/dialogs/password_change/password_change.s: src/gui/dialogs/password_chan
 
 # target to generate assembly for a file
 src/gui/dialogs/password_change/password_change.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/password_change/password_change.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/password_change/password_change.cpp.s
 .PHONY : src/gui/dialogs/password_change/password_change.cpp.s
 
 src/gui/dialogs/settings_dialog/SettingsDialog.o: src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o
@@ -376,7 +502,7 @@ src/gui/dialogs/settings_dialog/SettingsDialog.o: src/gui/dialogs/settings_dialo
 
 # target to build an object file
 src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o
 .PHONY : src/gui/dialogs/settings_dialog/SettingsDialog.cpp.o
 
 src/gui/dialogs/settings_dialog/SettingsDialog.i: src/gui/dialogs/settings_dialog/SettingsDialog.cpp.i
@@ -384,7 +510,7 @@ src/gui/dialogs/settings_dialog/SettingsDialog.i: src/gui/dialogs/settings_dialo
 
 # target to preprocess a source file
 src/gui/dialogs/settings_dialog/SettingsDialog.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.i
 .PHONY : src/gui/dialogs/settings_dialog/SettingsDialog.cpp.i
 
 src/gui/dialogs/settings_dialog/SettingsDialog.s: src/gui/dialogs/settings_dialog/SettingsDialog.cpp.s
@@ -392,7 +518,7 @@ src/gui/dialogs/settings_dialog/SettingsDialog.s: src/gui/dialogs/settings_dialo
 
 # target to generate assembly for a file
 src/gui/dialogs/settings_dialog/SettingsDialog.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.s
 .PHONY : src/gui/dialogs/settings_dialog/SettingsDialog.cpp.s
 
 src/gui/widgets/audit_log_viewer/AuditLogViewer.o: src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o
@@ -400,7 +526,7 @@ src/gui/widgets/audit_log_viewer/AuditLogViewer.o: src/gui/widgets/audit_log_vie
 
 # target to build an object file
 src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o
 .PHONY : src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.o
 
 src/gui/widgets/audit_log_viewer/AuditLogViewer.i: src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.i
@@ -408,7 +534,7 @@ src/gui/widgets/audit_log_viewer/AuditLogViewer.i: src/gui/widgets/audit_log_vie
 
 # target to preprocess a source file
 src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.i
 .PHONY : src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.i
 
 src/gui/widgets/audit_log_viewer/AuditLogViewer.s: src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.s
@@ -416,7 +542,7 @@ src/gui/widgets/audit_log_viewer/AuditLogViewer.s: src/gui/widgets/audit_log_vie
 
 # target to generate assembly for a file
 src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.s
 .PHONY : src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp.s
 
 src/gui/widgets/password_entry/PasswordEntry.o: src/gui/widgets/password_entry/PasswordEntry.cpp.o
@@ -424,7 +550,7 @@ src/gui/widgets/password_entry/PasswordEntry.o: src/gui/widgets/password_entry/P
 
 # target to build an object file
 src/gui/widgets/password_entry/PasswordEntry.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.o
 .PHONY : src/gui/widgets/password_entry/PasswordEntry.cpp.o
 
 src/gui/widgets/password_entry/PasswordEntry.i: src/gui/widgets/password_entry/PasswordEntry.cpp.i
@@ -432,7 +558,7 @@ src/gui/widgets/password_entry/PasswordEntry.i: src/gui/widgets/password_entry/P
 
 # target to preprocess a source file
 src/gui/widgets/password_entry/PasswordEntry.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.i
 .PHONY : src/gui/widgets/password_entry/PasswordEntry.cpp.i
 
 src/gui/widgets/password_entry/PasswordEntry.s: src/gui/widgets/password_entry/PasswordEntry.cpp.s
@@ -440,7 +566,7 @@ src/gui/widgets/password_entry/PasswordEntry.s: src/gui/widgets/password_entry/P
 
 # target to generate assembly for a file
 src/gui/widgets/password_entry/PasswordEntry.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/password_entry/PasswordEntry.cpp.s
 .PHONY : src/gui/widgets/password_entry/PasswordEntry.cpp.s
 
 src/gui/widgets/secure_table/PasswordDelegate.o: src/gui/widgets/secure_table/PasswordDelegate.cpp.o
@@ -448,7 +574,7 @@ src/gui/widgets/secure_table/PasswordDelegate.o: src/gui/widgets/secure_table/Pa
 
 # target to build an object file
 src/gui/widgets/secure_table/PasswordDelegate.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/PasswordDelegate.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/secure_table/PasswordDelegate.cpp.o
 .PHONY : src/gui/widgets/secure_table/PasswordDelegate.cpp.o
 
 src/gui/widgets/secure_table/PasswordDelegate.i: src/gui/widgets/secure_table/PasswordDelegate.cpp.i
@@ -456,7 +582,7 @@ src/gui/widgets/secure_table/PasswordDelegate.i: src/gui/widgets/secure_table/Pa
 
 # target to preprocess a source file
 src/gui/widgets/secure_table/PasswordDelegate.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/PasswordDelegate.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/secure_table/PasswordDelegate.cpp.i
 .PHONY : src/gui/widgets/secure_table/PasswordDelegate.cpp.i
 
 src/gui/widgets/secure_table/PasswordDelegate.s: src/gui/widgets/secure_table/PasswordDelegate.cpp.s
@@ -464,7 +590,7 @@ src/gui/widgets/secure_table/PasswordDelegate.s: src/gui/widgets/secure_table/Pa
 
 # target to generate assembly for a file
 src/gui/widgets/secure_table/PasswordDelegate.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/PasswordDelegate.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/secure_table/PasswordDelegate.cpp.s
 .PHONY : src/gui/widgets/secure_table/PasswordDelegate.cpp.s
 
 src/gui/widgets/secure_table/SearchProxyModel.o: src/gui/widgets/secure_table/SearchProxyModel.cpp.o
@@ -472,7 +598,7 @@ src/gui/widgets/secure_table/SearchProxyModel.o: src/gui/widgets/secure_table/Se
 
 # target to build an object file
 src/gui/widgets/secure_table/SearchProxyModel.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.o
 .PHONY : src/gui/widgets/secure_table/SearchProxyModel.cpp.o
 
 src/gui/widgets/secure_table/SearchProxyModel.i: src/gui/widgets/secure_table/SearchProxyModel.cpp.i
@@ -480,7 +606,7 @@ src/gui/widgets/secure_table/SearchProxyModel.i: src/gui/widgets/secure_table/Se
 
 # target to preprocess a source file
 src/gui/widgets/secure_table/SearchProxyModel.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.i
 .PHONY : src/gui/widgets/secure_table/SearchProxyModel.cpp.i
 
 src/gui/widgets/secure_table/SearchProxyModel.s: src/gui/widgets/secure_table/SearchProxyModel.cpp.s
@@ -488,7 +614,7 @@ src/gui/widgets/secure_table/SearchProxyModel.s: src/gui/widgets/secure_table/Se
 
 # target to generate assembly for a file
 src/gui/widgets/secure_table/SearchProxyModel.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/secure_table/SearchProxyModel.cpp.s
 .PHONY : src/gui/widgets/secure_table/SearchProxyModel.cpp.s
 
 src/gui/widgets/secure_table/SecureTable.o: src/gui/widgets/secure_table/SecureTable.cpp.o
@@ -496,7 +622,7 @@ src/gui/widgets/secure_table/SecureTable.o: src/gui/widgets/secure_table/SecureT
 
 # target to build an object file
 src/gui/widgets/secure_table/SecureTable.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/secure_table/SecureTable.cpp.o
 .PHONY : src/gui/widgets/secure_table/SecureTable.cpp.o
 
 src/gui/widgets/secure_table/SecureTable.i: src/gui/widgets/secure_table/SecureTable.cpp.i
@@ -504,7 +630,7 @@ src/gui/widgets/secure_table/SecureTable.i: src/gui/widgets/secure_table/SecureT
 
 # target to preprocess a source file
 src/gui/widgets/secure_table/SecureTable.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/secure_table/SecureTable.cpp.i
 .PHONY : src/gui/widgets/secure_table/SecureTable.cpp.i
 
 src/gui/widgets/secure_table/SecureTable.s: src/gui/widgets/secure_table/SecureTable.cpp.s
@@ -512,7 +638,7 @@ src/gui/widgets/secure_table/SecureTable.s: src/gui/widgets/secure_table/SecureT
 
 # target to generate assembly for a file
 src/gui/widgets/secure_table/SecureTable.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/SecureTable.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/secure_table/SecureTable.cpp.s
 .PHONY : src/gui/widgets/secure_table/SecureTable.cpp.s
 
 src/gui/widgets/secure_table/VaultTableModel.o: src/gui/widgets/secure_table/VaultTableModel.cpp.o
@@ -520,7 +646,7 @@ src/gui/widgets/secure_table/VaultTableModel.o: src/gui/widgets/secure_table/Vau
 
 # target to build an object file
 src/gui/widgets/secure_table/VaultTableModel.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.o
 .PHONY : src/gui/widgets/secure_table/VaultTableModel.cpp.o
 
 src/gui/widgets/secure_table/VaultTableModel.i: src/gui/widgets/secure_table/VaultTableModel.cpp.i
@@ -528,7 +654,7 @@ src/gui/widgets/secure_table/VaultTableModel.i: src/gui/widgets/secure_table/Vau
 
 # target to preprocess a source file
 src/gui/widgets/secure_table/VaultTableModel.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.i
 .PHONY : src/gui/widgets/secure_table/VaultTableModel.cpp.i
 
 src/gui/widgets/secure_table/VaultTableModel.s: src/gui/widgets/secure_table/VaultTableModel.cpp.s
@@ -536,8 +662,32 @@ src/gui/widgets/secure_table/VaultTableModel.s: src/gui/widgets/secure_table/Vau
 
 # target to generate assembly for a file
 src/gui/widgets/secure_table/VaultTableModel.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.s
 .PHONY : src/gui/widgets/secure_table/VaultTableModel.cpp.s
+
+tests/test_key_rotation.o: tests/test_key_rotation.cpp.o
+.PHONY : tests/test_key_rotation.o
+
+# target to build an object file
+tests/test_key_rotation.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_key_rotation.cpp.o
+.PHONY : tests/test_key_rotation.cpp.o
+
+tests/test_key_rotation.i: tests/test_key_rotation.cpp.i
+.PHONY : tests/test_key_rotation.i
+
+# target to preprocess a source file
+tests/test_key_rotation.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_key_rotation.cpp.i
+.PHONY : tests/test_key_rotation.cpp.i
+
+tests/test_key_rotation.s: tests/test_key_rotation.cpp.s
+.PHONY : tests/test_key_rotation.s
+
+# target to generate assembly for a file
+tests/test_key_rotation.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_key_rotation.cpp.s
+.PHONY : tests/test_key_rotation.cpp.s
 
 # Help Target
 help:
@@ -549,13 +699,25 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... cryptosafe_autogen"
 	@echo "... cryptosafe_autogen_timestamp_deps"
+	@echo "... cryptosafe_lib_autogen"
+	@echo "... cryptosafe_lib_autogen_timestamp_deps"
+	@echo "... run_tests_autogen"
+	@echo "... run_tests_autogen_timestamp_deps"
 	@echo "... cryptosafe"
+	@echo "... cryptosafe_lib"
+	@echo "... run_tests"
 	@echo "... cryptosafe_autogen/mocs_compilation.o"
 	@echo "... cryptosafe_autogen/mocs_compilation.i"
 	@echo "... cryptosafe_autogen/mocs_compilation.s"
+	@echo "... cryptosafe_lib_autogen/mocs_compilation.o"
+	@echo "... cryptosafe_lib_autogen/mocs_compilation.i"
+	@echo "... cryptosafe_lib_autogen/mocs_compilation.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... run_tests_autogen/mocs_compilation.o"
+	@echo "... run_tests_autogen/mocs_compilation.i"
+	@echo "... run_tests_autogen/mocs_compilation.s"
 	@echo "... src/core/vault/VaultManager.o"
 	@echo "... src/core/vault/VaultManager.i"
 	@echo "... src/core/vault/VaultManager.s"
@@ -598,6 +760,9 @@ help:
 	@echo "... src/gui/widgets/secure_table/VaultTableModel.o"
 	@echo "... src/gui/widgets/secure_table/VaultTableModel.i"
 	@echo "... src/gui/widgets/secure_table/VaultTableModel.s"
+	@echo "... tests/test_key_rotation.o"
+	@echo "... tests/test_key_rotation.i"
+	@echo "... tests/test_key_rotation.s"
 .PHONY : help
 
 

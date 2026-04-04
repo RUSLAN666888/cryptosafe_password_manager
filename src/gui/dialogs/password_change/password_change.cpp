@@ -338,6 +338,12 @@ void ChangePasswordDialog::onChange()
                              "Password changed successfully!\n\n"
                              "You will need to log in again with your new password.");
 
+    KeyManager::KeyData d;
+    KeyManager::getInstance().get_key(d);
+    std::vector<uint8_t> key_vector(d.data, d.data + d.size);
+    KeyManager::getInstance().store_old_key(key_vector);
+    KeyManager::getInstance().zero_keyData(d);
+
     // Выходим из системы
     KeyManager::getInstance().logout();
 

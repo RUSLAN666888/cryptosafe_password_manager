@@ -88,140 +88,28 @@
 		"/usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake",
 		"/usr/share/cmake-3.28/Modules/FindPackageMessage.cmake",
 		"/usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake",
-		"/usr/share/cmake-3.28/Modules/FindPackageMessage.cmake"
+		"/usr/share/cmake-3.28/Modules/FindPackageMessage.cmake",
+		"/usr/share/cmake-3.28/Modules/FindGTest.cmake",
+		"/usr/share/cmake-3.28/Modules/GoogleTest.cmake",
+		"/usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake",
+		"/usr/share/cmake-3.28/Modules/FindPackageMessage.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/GTest/GTestConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/GTest/GTestConfig.cmake",
+		"/usr/share/cmake-3.28/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/share/cmake-3.28/Modules/FindThreads.cmake",
+		"/usr/share/cmake-3.28/Modules/CheckLibraryExists.cmake",
+		"/usr/share/cmake-3.28/Modules/CheckIncludeFile.cmake",
+		"/usr/share/cmake-3.28/Modules/CheckCSourceCompiles.cmake",
+		"/usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake",
+		"/usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake",
+		"/usr/share/cmake-3.28/Modules/FindPackageMessage.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/GTest/GTestTargets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/GTest/GTestTargets-none.cmake"
 	],
 	"CMAKE_SOURCE_DIR" : "/home/master666/development/cryptosafe_password_manager",
 	"DEP_FILE" : "/home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/deps",
 	"DEP_FILE_RULE_NAME" : "cryptosafe_autogen/timestamp",
-	"HEADERS" : 
-	[
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/audit_logger.h",
-			"MU",
-			"PRMOGMWJPH/moc_audit_logger.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/config_handler.h",
-			"MU",
-			"PRMOGMWJPH/moc_config_handler.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/crypto/AES256.h",
-			"MU",
-			"PCXAAPSLAK/moc_AES256.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/crypto/abstract.h",
-			"MU",
-			"PCXAAPSLAK/moc_abstract.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/crypto/authentication.h",
-			"MU",
-			"PCXAAPSLAK/moc_authentication.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/events.h",
-			"MU",
-			"PRMOGMWJPH/moc_events.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/key_manager.h",
-			"MU",
-			"PRMOGMWJPH/moc_key_manager.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/vault/VaultManager.h",
-			"MU",
-			"VUUXSGIETZ/moc_VaultManager.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/database/DB_helper/db_helper.h",
-			"MU",
-			"CCQUAKE3I7/moc_db_helper.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/MainWindow.h",
-			"MU",
-			"MXUWEOXILK/moc_MainWindow.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/entry_dialog/entry_dialog.h",
-			"MU",
-			"EHAB3BHSPE/moc_entry_dialog.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/first_run_wizard/FirstRunWizard.h",
-			"MU",
-			"OHO74YENVQ/moc_FirstRunWizard.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/login_dialog/LoginDialog.h",
-			"MU",
-			"TPSZBY2XT2/moc_LoginDialog.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/password_change/password_change.h",
-			"MU",
-			"LQHRZBTKAE/moc_password_change.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/settings_dialog/SettingsDialog.h",
-			"MU",
-			"O6SXBNBWUU/moc_SettingsDialog.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/audit_log_viewer/AuditLogViewer.h",
-			"MU",
-			"TJ42LMF5M5/moc_AuditLogViewer.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/password_entry/PasswordEntry.h",
-			"MU",
-			"BVW642W5BV/moc_PasswordEntry.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/PasswordDelegate.h",
-			"MU",
-			"KKM4S4MZM7/moc_PasswordDelegate.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SearchProxyModel.h",
-			"MU",
-			"KKM4S4MZM7/moc_SearchProxyModel.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SecureTable.h",
-			"MU",
-			"KKM4S4MZM7/moc_SecureTable.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/VaultTableModel.h",
-			"MU",
-			"KKM4S4MZM7/moc_VaultTableModel.cpp",
-			null
-		]
-	],
+	"HEADERS" : [],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
 	"INCLUDE_DIR" : "/home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/include",
 	"MOC_COMPILATION_FILE" : "/home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/mocs_compilation.cpp",
@@ -243,14 +131,7 @@
 		"/home/master666/development/cryptosafe_password_manager/src/database/DB_helper",
 		"/home/master666/development/cryptosafe_password_manager/src/gui",
 		"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs",
-		"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/first_run_wizard",
-		"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/settings_dialog",
-		"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/login_dialog",
-		"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/password_change",
-		"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/entry_dialog",
 		"/home/master666/development/cryptosafe_password_manager/src/gui/widgets",
-		"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/audit_log_viewer",
-		"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/password_entry",
 		"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table",
 		"/usr/include/x86_64-linux-gnu/qt5",
 		"/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
@@ -271,7 +152,7 @@
 	"MOC_PREDEFS_CMD" : 
 	[
 		"/usr/bin/g++",
-		"-std=gnu++17",
+		"-std=gnu++20",
 		"-dM",
 		"-E",
 		"-c",
@@ -279,7 +160,10 @@
 	],
 	"MOC_PREDEFS_FILE" : "/home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/moc_predefs.h",
 	"MOC_RELAXED_MODE" : false,
-	"MOC_SKIP" : [],
+	"MOC_SKIP" : 
+	[
+		"/home/master666/development/cryptosafe_password_manager/build/cryptosafe_lib_autogen/mocs_compilation.cpp"
+	],
 	"MULTI_CONFIG" : false,
 	"PARALLEL" : 8,
 	"PARSE_CACHE_FILE" : "/home/master666/development/cryptosafe_password_manager/build/CMakeFiles/cryptosafe_autogen.dir/ParseCache.txt",
@@ -294,81 +178,14 @@
 			"/home/master666/development/cryptosafe_password_manager/main.cpp",
 			"MU",
 			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/vault/VaultManager.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/database/DB_helper/db_helper.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/MainWindow.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/entry_dialog/entry_dialog.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/login_dialog/LoginDialog.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/password_change/password_change.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/settings_dialog/SettingsDialog.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/password_entry/PasswordEntry.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/PasswordDelegate.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SearchProxyModel.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/SecureTable.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/VaultTableModel.cpp",
-			"MU",
-			null
 		]
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],
-	"UIC_SKIP" : [],
+	"UIC_SKIP" : 
+	[
+		"/home/master666/development/cryptosafe_password_manager/build/cryptosafe_lib_autogen/mocs_compilation.cpp"
+	],
 	"UIC_UI_FILES" : [],
 	"VERBOSITY" : 0
 }
