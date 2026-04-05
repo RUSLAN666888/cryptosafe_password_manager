@@ -16,6 +16,7 @@
 #include <QClipboard>
 //#include <random>
 #include <unordered_set>
+#include <QProgressDialog>
 
 MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaultManager)
     : QMainWindow(nullptr)
@@ -499,7 +500,7 @@ void MainWindow::onAddEntry()
         try {
             int id = m_vaultManager.createEntry(entry);
             if (id != -1) {
-                refreshTable();  // обновляем таблицу
+                //refreshTable();  // обновляем таблицу
                 statusBar->showMessage("Запись успешно добавлена", 3000);
             } else {
                 QMessageBox::warning(this, "Ошибка", "Не удалось добавить запись");
@@ -509,6 +510,14 @@ void MainWindow::onAddEntry()
                                   QString("Ошибка при добавлении записи: %1").arg(e.what()));
         }
     }
+}
+
+void MainWindow::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_F5) {
+        refreshTable();
+    }
+    QMainWindow::keyPressEvent(event);
 }
 
 void MainWindow::onEditEntry()
@@ -654,14 +663,31 @@ void MainWindow::onChangePassword()
     if (dialog.exec() == QDialog::Accepted)
     {
         lockApplication();
+
+        QProgressDialog progressDialog("Идёт перешифровка базы данных...\nПожалуйста, подождите.",
+                                       nullptr, 0, 0, this);
+        progressDialog.setWindowModality(Qt::WindowModal);
+        progressDialog.setMinimumDuration(0);
+        progressDialog.setCancelButton(nullptr);
+        progressDialog.show();
+
         KeyManager::getInstance().logout();
-        if (!showLoginDialog())
-        {
+
+        if (!showLoginDialog()) {
             QMetaObject::invokeMethod(this, &MainWindow::close, Qt::QueuedConnection);
-            return;
         }
 
+        // Синхронный вызов
+        bool success = m_vaultManager.rotate();
 
+        progressDialog.close();
+        setEnabled(true);
+
+        if (success) {
+            QMessageBox::information(this, "Успех", "База данных успешно перешифрована");
+        } else {
+            QMessageBox::critical(this, "Ошибка", "Не удалось перешифровать базу данных");
+        }
     }
 }
 

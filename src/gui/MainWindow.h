@@ -68,6 +68,7 @@ private:
     void onUserLoggedOut(const Event& event);
 
     void refreshTable();
+    void keyPressEvent(QKeyEvent* event) override;
 
 private slots:
     void onInactivityTimeout();

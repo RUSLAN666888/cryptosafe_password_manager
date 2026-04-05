@@ -8,7 +8,7 @@
 #include <map>
 #include <iostream>
 #include <stdexcept>
-
+#include <QApplication>
 
 
 VaultManager::VaultManager(Database& database, AES256GCM& crypto, KeyManager& key_mgr) :
@@ -524,6 +524,20 @@ bool VaultManager::rotate()
     key_manager.get_key(new_key);
     key_manager.get_old_key(old_key);
 
+    std::cout << "NEW KEY size: " << new_key.size << std::endl;
+    std::cout << "NEW KEY data: ";
+    for (size_t i = 0; i < new_key.size; i++) {
+        std::cout << std::hex << (int)new_key.data[i] << " ";
+    }
+    std::cout << std::dec << std::endl;
+
+    std::cout << "OLD KEY size: " << old_key.size << std::endl;
+    std::cout << "OLD KEY data: ";
+    for (size_t i = 0; i < old_key.size; i++) {
+        std::cout << std::hex << (int)old_key.data[i] << " ";
+    }
+    std::cout << std::dec << std::endl;
+
     // Получаем все rowid
     std::vector<int> all_ids;
     sqlite3_stmt* id_stmt;
@@ -603,6 +617,10 @@ bool VaultManager::rotate()
             std::cerr << "Error processing entry " << all_ids[i] << ": " << e.what() << std::endl;
             success = false;
             break;
+        }
+
+        if (i % 10 == 0) {
+            QCoreApplication::processEvents();
         }
     }
 
