@@ -145,7 +145,9 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${Qt5Core_INCLUDE_DIRS}
 )
 
-add_executable(${TARGET_NAME} ${MAIN_SOURCES})
+add_executable(${TARGET_NAME} ${MAIN_SOURCES}
+    src/core/clipboard_service/clipboard_service.h
+    src/core/clipboard_service/clipboard_service.cpp)
 
 
 

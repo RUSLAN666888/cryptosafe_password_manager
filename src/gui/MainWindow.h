@@ -70,6 +70,12 @@ private:
     void refreshTable();
     void keyPressEvent(QKeyEvent* event) override;
 
+    void showTemporaryMessage(const QString& msg, int timeoutMs = 3000);
+    void updatePermanentStatus();
+
+    QTimer* m_clipboardTimer;
+    int m_clipboardSeconds;
+
 private slots:
     void onInactivityTimeout();
     void onLock();

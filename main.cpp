@@ -7,6 +7,7 @@
 #include "src/gui/MainWindow.h"
 #include "../src/core/key_manager.h"
 #include "../src/core/crypto/AES256.h"
+#include "../src/core/clipboard_service/clipboard_service.h"
 
 int main(int argc, char *argv[])
 {
@@ -35,6 +36,9 @@ int main(int argc, char *argv[])
                                   "Please check permissions and try again.");
             return 1;
         }
+
+        // Инициализация ClipboardService
+        ClipboardService::getInstance().init(&db);
 
         static AES256GCM crypto;
         static VaultManager m(db, crypto, KeyManager::getInstance());

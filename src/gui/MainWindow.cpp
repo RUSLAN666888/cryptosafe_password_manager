@@ -8,6 +8,7 @@
 #include "../src/gui/widgets/secure_table/VaultTableModel.h"
 #include "../src/gui/widgets/secure_table/PasswordDelegate.h"
 #include "../src/core/vault/VaultManager.h"
+#include "../src/core/clipboard_service/clipboard_service.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QDebug>
@@ -38,6 +39,9 @@ MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaul
     inactivityTimer->setSingleShot(true);
     connect(inactivityTimer, &QTimer::timeout, this, &MainWindow::onInactivityTimeout);
 
+    m_clipboardTimer = new QTimer(this);
+    m_clipboardTimer->setSingleShot(true);
+    m_clipboardSeconds = 30;
 
     // Регистрируем обработчики событий
     registerEventHandlers();
@@ -61,7 +65,7 @@ MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaul
         }
     }
 
-    updateStatusBar();
+    updatePermanentStatus();
 
     // ПРОВЕРКА НА ПРОИЗОДИТЕЛЬНОСТЬ (ПРОСТО ДОБАВЛЯЕМ ЗАПИСИ В БД)
     // int count = 1000;
@@ -364,6 +368,23 @@ void MainWindow::updateStatusBar()
     statusBar->showMessage(loginStatus);
 }
 
+void MainWindow::showTemporaryMessage(const QString& msg, int timeoutMs)
+{
+    statusBar->showMessage(msg, timeoutMs);
+    QTimer::singleShot(timeoutMs, this, &MainWindow::updatePermanentStatus);
+}
+
+void MainWindow::updatePermanentStatus()
+{
+    QString msg = isLoggedIn ? "Logged in" : "Not logged in";
+
+    if (m_clipboardTimer && m_clipboardTimer->isActive()) {
+        msg += QString(" | Clipboard: %1 sec").arg(m_clipboardSeconds);
+    }
+
+    statusBar->showMessage(msg);
+}
+
 bool MainWindow::showFirstRunWizard()
 {
     FirstRunWizard wizard(this, config);
@@ -401,7 +422,7 @@ void MainWindow::unlockApplication()
         m_tableView->show();
 
 
-        updateStatusBar();
+        updatePermanentStatus();
 
         StateManager::getInstance().login();
 
@@ -501,7 +522,7 @@ void MainWindow::onAddEntry()
             int id = m_vaultManager.createEntry(entry);
             if (id != -1) {
                 //refreshTable();  // обновляем таблицу
-                statusBar->showMessage("Запись успешно добавлена", 3000);
+                showTemporaryMessage("Запись успешно добавлена", 3000);
             } else {
                 QMessageBox::warning(this, "Ошибка", "Не удалось добавить запись");
             }
@@ -548,7 +569,7 @@ void MainWindow::onEditEntry()
         // Обновляем в БД
         if (m_vaultManager.updateEntry(static_cast<int>(entryId), updatedEntry)) {
             // Обновляем модель (таблицу)
-            m_tableModel->refresh();
+            //m_tableModel->refresh();
 
             // Если пароль был в кэше - обновляем его
             m_tableModel->updatePasswordInCache(entryId, updatedEntry.password);
@@ -613,13 +634,13 @@ void MainWindow::onDeleteEntry()
 
         if (allSuccess) {
             // Обновляем таблицу
-            m_tableModel->refresh();
+            //m_tableModel->refresh();
             statusBar->showMessage(QString("Удалено %1 записей").arg(deletedCount), 3000);
         } else {
             QMessageBox::warning(this, "Ошибка",
                                  QString("Удалено %1 из %2 записей. Некоторые записи не удалось удалить.")
                                      .arg(deletedCount).arg(ids.size()));
-            m_tableModel->refresh();  // все равно обновляем, чтобы показать актуальное состояние
+            //m_tableModel->refresh();  // все равно обновляем, чтобы показать актуальное состояние
         }
     }
 }
@@ -795,10 +816,15 @@ void MainWindow::onCopyPassword()
     try {
         auto entry = m_vaultManager.getEntry(static_cast<int>(id));
         if (entry) {
-            QApplication::clipboard()->setText(QString::fromStdString(entry->password));
-            statusBar->showMessage("Пароль скопирован", 2000);
+            ClipboardService::getInstance().copyText(
+                QString::fromStdString(entry->password),
+                QString::fromStdString(entry->title),
+                "password"
+                );
 
-            // TODO: Запланировать очистку буфера через 30 секунд (Sprint 4)
+            // Показываем уведомление с оставшимся временем
+            int timeout = ClipboardService::getInstance().getAutoClearTimeout();
+            showTemporaryMessage(QString("Пароль скопирован. Очистится через %1 сек").arg(timeout), 2000);
         }
     } catch (const std::exception& e) {
         statusBar->showMessage("Ошибка при копировании", 2000);
