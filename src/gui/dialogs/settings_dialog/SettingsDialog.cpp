@@ -205,32 +205,65 @@ void SettingsDialog::createClipboardTab()
 
     layout->addSpacing(10);
 
+    // === Уровень безопасности ===
+    QGroupBox* securityGroup = new QGroupBox("Пресеты безопасности", panel);
+    QVBoxLayout* securityLayout = new QVBoxLayout(securityGroup);
+
+    m_securityLevel = new QComboBox(securityGroup);
+    m_securityLevel->addItem("Пользовательские настройки");
+    m_securityLevel->addItem("Basic (30 сек, уведомления выключены)");
+    m_securityLevel->addItem("Advanced (15 сек, уведомления включены)");
+    m_securityLevel->addItem("Paranoid (5 сек, уведомления включены)");
+
+    securityLayout->addWidget(m_securityLevel);
+    securityGroup->setLayout(securityLayout);
+    layout->addWidget(securityGroup);
+
+    layout->addSpacing(10);
+
+    // === Настройки авто очистки ===
     QGroupBox* settingsGroup = new QGroupBox("Настройки авто очистки", panel);
     QFormLayout* formLayout = new QFormLayout(settingsGroup);
 
-    // SpinBox для таймера
     m_clipboardTimeoutSpin = new QSpinBox(settingsGroup);
     m_clipboardTimeoutSpin->setRange(5, 300);
     m_clipboardTimeoutSpin->setSuffix(" seconds");
     m_clipboardTimeoutSpin->setValue(30);
-    formLayout->addRow("Clear clipboard after:", m_clipboardTimeoutSpin);
+    formLayout->addRow("Очищать буфер через:", m_clipboardTimeoutSpin);
 
-    // Чекбокс "Never auto-clear"
-    m_clipboardNeverClear = new QCheckBox("Не очищать буфер автоматичски (не рекомендуется)", settingsGroup);
+    m_clipboardNeverClear = new QCheckBox("Не очищать буфер автоматически (не рекомендуется)", settingsGroup);
     formLayout->addRow("", m_clipboardNeverClear);
 
-    // Если чекбокс отмечен, отключаем SpinBox
     connect(m_clipboardNeverClear, &QCheckBox::toggled, m_clipboardTimeoutSpin, &QSpinBox::setDisabled);
 
     settingsGroup->setLayout(formLayout);
     layout->addWidget(settingsGroup);
 
+    layout->addSpacing(10);
+
+    // === Настройки уведомлений ===
+    QGroupBox* notificationGroup = new QGroupBox("Уведомления", panel);
+    QVBoxLayout* notificationLayout = new QVBoxLayout(notificationGroup);
+
+    m_notifyOnCopy = new QCheckBox("Показывать уведомление при копировании", notificationGroup);
+    m_notifyOnWarning = new QCheckBox("Показывать предупреждение за 5 секунд до очистки", notificationGroup);
+    m_notifyOnClear = new QCheckBox("Показывать уведомление при очистке", notificationGroup);
+
+    notificationLayout->addWidget(m_notifyOnCopy);
+    notificationLayout->addWidget(m_notifyOnWarning);
+    notificationLayout->addWidget(m_notifyOnClear);
+
+    notificationGroup->setLayout(notificationLayout);
+    layout->addWidget(notificationGroup);
+
     layout->addStretch();
 
     // Пояснение
     QLabel* info = new QLabel(
-        "Если авто очистка включена, пароли будут автоматически удалены из буфера через указанное время.\n"
-        "Это помогает предотвратить нелегальный доступ к чувствительным данным.",
+        "Basic: минимальная защита, без уведомлений.\n"
+        "Advanced: стандартная защита с уведомлениями.\n"
+        "Paranoid: максимальная защита, быстрая очистка.\n"
+        "Пользовательские настройки: используйте свои значения.",
         panel);
     info->setWordWrap(true);
     info->setStyleSheet("color: #666; font-size: 10px;");
@@ -238,6 +271,10 @@ void SettingsDialog::createClipboardTab()
 
     panel->setLayout(layout);
     tabWidget->addTab(panel, "Clipboard");
+
+    // Подключаем сигнал изменения пресета
+    connect(m_securityLevel, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &SettingsDialog::onSecurityLevelChanged);
 }
 
 void SettingsDialog::createAdvancedTab()
@@ -320,7 +357,7 @@ void SettingsDialog::onOk()
     // Сохраняем настройки
     savePasswordSettings();
     saveClipboardSettings();
-    ClipboardService::getInstance().loadSettings();
+    //ClipboardService::getInstance().loadSettings();
 
     QMessageBox::information(this, "CryptoSafe Manager",
                              "Настройки успешно сохранены.",
@@ -399,32 +436,89 @@ void SettingsDialog::onExcludeAmbiguousChanged(int state)
     Q_UNUSED(state);
 }
 
+void SettingsDialog::onSecurityLevelChanged(int index)
+{
+    // Индекс 0 = Пользовательские настройки (не меняем)
+    if (index == 0) return;
+
+    // Basic
+    if (index == 1) {
+        m_clipboardTimeoutSpin->setValue(30);
+        m_clipboardNeverClear->setChecked(false);
+        m_notifyOnCopy->setChecked(false);
+        m_notifyOnWarning->setChecked(false);
+        m_notifyOnClear->setChecked(false);
+    }
+    // Advanced
+    else if (index == 2) {
+        m_clipboardTimeoutSpin->setValue(15);
+        m_clipboardNeverClear->setChecked(false);
+        m_notifyOnCopy->setChecked(true);
+        m_notifyOnWarning->setChecked(true);
+        m_notifyOnClear->setChecked(true);
+    }
+    // Paranoid
+    else if (index == 3) {
+        m_clipboardTimeoutSpin->setValue(5);
+        m_clipboardNeverClear->setChecked(false);
+        m_notifyOnCopy->setChecked(true);
+        m_notifyOnWarning->setChecked(true);
+        m_notifyOnClear->setChecked(true);
+    }
+}
+
 void SettingsDialog::loadClipboardSettings()
 {
     try {
-        std::string value = m_db.getSetting("clipboard_timeout", "30");
-        int timeout = std::stoi(value);
+        // Загружаем таймер
+        std::string timeoutStr = m_db.getSetting("clipboard_timeout", "30");
+        int timeout = std::stoi(timeoutStr);
 
         if (timeout == 0) {
             m_clipboardNeverClear->setChecked(true);
-            m_clipboardTimeoutSpin->setEnabled(false);
         } else {
             m_clipboardNeverClear->setChecked(false);
             m_clipboardTimeoutSpin->setValue(timeout);
         }
+
+        // Загружаем уведомления
+        m_notifyOnCopy->setChecked(m_db.getSetting("clipboard_notify_copy", "true") == "true");
+        m_notifyOnWarning->setChecked(m_db.getSetting("clipboard_notify_warning", "true") == "true");
+        m_notifyOnClear->setChecked(m_db.getSetting("clipboard_notify_clear", "true") == "true");
+
+        // Загружаем пресет (всегда пользовательский при загрузке)
+        m_securityLevel->setCurrentIndex(0);
+
     } catch (const std::exception& e) {
         m_clipboardNeverClear->setChecked(false);
         m_clipboardTimeoutSpin->setValue(30);
+        m_notifyOnCopy->setChecked(true);
+        m_notifyOnWarning->setChecked(true);
+        m_notifyOnClear->setChecked(true);
+        m_securityLevel->setCurrentIndex(0);
     }
 }
 
 void SettingsDialog::saveClipboardSettings()
 {
+    // Сохраняем таймер
     int timeout;
     if (m_clipboardNeverClear->isChecked()) {
-        timeout = 0;  // 0 означает "never auto-clear"
+        timeout = 0;
     } else {
         timeout = m_clipboardTimeoutSpin->value();
     }
     m_db.setSetting("clipboard_timeout", std::to_string(timeout));
+
+    // Сохраняем уведомления
+    m_db.setSetting("clipboard_notify_copy", m_notifyOnCopy->isChecked() ? "true" : "false");
+    m_db.setSetting("clipboard_notify_warning", m_notifyOnWarning->isChecked() ? "true" : "false");
+    m_db.setSetting("clipboard_notify_clear", m_notifyOnClear->isChecked() ? "true" : "false");
+
+    // Сохраняем выбранный пресет (пользовательский = 0)
+    m_db.setSetting("clipboard_security_level", std::to_string(m_securityLevel->currentIndex()));
+
+    // Применяем к ClipboardService
+    ClipboardService::getInstance().loadSettings();
+    ClipboardService::getInstance().loadNotificationSettings();
 }

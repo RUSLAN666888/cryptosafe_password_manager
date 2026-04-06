@@ -50,7 +50,9 @@ void ClipboardService::copyText(const QString& text, const QString& source, cons
     // Запускаем таймер
     startAutoClearTimer();
 
-    eventBus.publish(EventType::ClipboardCopied, source.toStdString(), type.toStdString());
+    if (m_notifyOnCopy) {
+        eventBus.publish(EventType::ClipboardCopied, source.toStdString(), type.toStdString());
+    }
 }
 
 // CLIP-4: Очистка
@@ -105,6 +107,10 @@ int ClipboardService::getRemainingSeconds() const
 void ClipboardService::onTimerTimeout()
 {
     clear();
+
+    if (m_notifyOnClear) {
+        eventBus.publish(EventType::ClipboardCleared, "", "");
+    }
 }
 
 // Обнаружение внешних изменений
@@ -140,8 +146,9 @@ void ClipboardService::showClearWarning()
 {
     if (m_timer->isActive() && !m_warningShown) {
         m_warningShown = true;
-        // Публикуем через EventBus
-        eventBus.publish(EventType::ClipboardWillClear, 5, "ClipboardService");
+        if (m_notifyOnWarning) {
+            eventBus.publish(EventType::ClipboardWillClear, 5, "ClipboardService");
+        }
     }
 }
 
@@ -234,3 +241,21 @@ void ClipboardService::resetTimer()
         m_db->setSetting("clipboard_remaining_seconds", "0");
     }
 }
+
+void ClipboardService::loadNotificationSettings()
+{
+
+    try {
+        m_notifyOnCopy = m_db->getSetting("clipboard_notify_copy", "true") == "true";
+        m_notifyOnWarning = m_db->getSetting("clipboard_notify_warning", "true") == "true";
+        m_notifyOnClear = m_db->getSetting("clipboard_notify_clear", "true") == "true";
+    } catch (...) {
+        m_notifyOnCopy = true;
+        m_notifyOnWarning = true;
+        m_notifyOnClear = true;
+    }
+}
+
+bool ClipboardService::isNotifyOnCopy() const { return m_notifyOnCopy; }
+bool ClipboardService::isNotifyOnWarning() const { return m_notifyOnWarning; }
+bool ClipboardService::isNotifyOnClear() const { return m_notifyOnClear; }

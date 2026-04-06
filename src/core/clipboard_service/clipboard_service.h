@@ -36,6 +36,10 @@ public:
     }
 
     void loadSettings();
+    bool isNotifyOnCopy() const;
+    bool isNotifyOnWarning() const;
+    bool isNotifyOnClear() const;
+    void loadNotificationSettings();
 
     // void saveRemainingTime();
     // void restoreRemainingTime();
@@ -73,6 +77,10 @@ private:
     QDateTime m_lastCopyTime;
 
     QTimer* m_updateTimer;
+
+    bool m_notifyOnCopy = true;
+    bool m_notifyOnWarning = true;
+    bool m_notifyOnClear = true;
 };
 
 #endif // CLIPBOARD_SERVICE_H

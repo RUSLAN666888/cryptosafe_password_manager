@@ -9,6 +9,7 @@
 #include <QCheckBox>
 #include <QLabel>
 #include <QPushButton>
+#include <QComboBox>
 #include "../src/core/config_handler.h"
 #include "../src/database/DB_helper/db_helper.h"
 
@@ -29,6 +30,11 @@ private:
     QCheckBox *m_useDigitsCheck;
     QCheckBox *m_useSymbolsCheck;
     QCheckBox *m_excludeAmbiguousCheck;
+
+    QCheckBox* m_notifyOnCopy;
+    QCheckBox* m_notifyOnWarning;
+    QCheckBox* m_notifyOnClear;
+    QComboBox* m_securityLevel;
 
     void createGeneralTab();
     void createAdvancedTab();
@@ -52,6 +58,7 @@ private slots:
     void onUseDigitsChanged(int state);
     void onUseSymbolsChanged(int state);
     void onExcludeAmbiguousChanged(int state);
+    void onSecurityLevelChanged(int index);
 
 public:
     SettingsDialog(Database& db, QWidget *parent, ConfigHander &cfg);
