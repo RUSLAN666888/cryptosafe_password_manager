@@ -7,6 +7,19 @@
 #include <iostream>
 #include <QThread>
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
+
+#ifdef Q_OS_LINUX
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#endif
+
+#ifdef Q_OS_MAC
+#include <objc/objc-runtime.h>
+#endif
+
 ClipboardService::ClipboardService()
     : QObject(nullptr)
     , m_timer(new QTimer(this))
@@ -60,13 +73,30 @@ void ClipboardService::clear()
 {
     std::cout << "=== CLEAR ===" << std::endl;
 
-#ifdef Q_OS_LINUX
-    system("echo -n '' | xclip -selection clipboard");
-    system("echo -n '' | xclip -selection primary");
-#elif defined(Q_OS_WIN)
-    // Windows PowerShell
-    system("powershell -command \"Set-Clipboard -Value ''\"");
+#ifdef Q_OS_WIN
+    // Windows: используем Win32 API
+    if (OpenClipboard(nullptr)) {
+        EmptyClipboard();
+        CloseClipboard();
+    }
+#elif defined(Q_OS_LINUX)
+    // Linux: используем X11 API
+    Display* dpy = XOpenDisplay(nullptr);
+    if (dpy) {
+        // Очищаем CLIPBOARD
+        Atom clipboard = XInternAtom(dpy, "CLIPBOARD", False);
+        XSetSelectionOwner(dpy, clipboard, None, CurrentTime);
+
+        // Очищаем PRIMARY
+        Atom primary = XInternAtom(dpy, "PRIMARY", False);
+        XSetSelectionOwner(dpy, primary, None, CurrentTime);
+
+        XFlush(dpy);
+        XCloseDisplay(dpy);
+    }
 #elif defined(Q_OS_MAC)
+    // macOS: используем NSPasteboard через Objective-C
+    // fallback через system
     system("echo -n '' | pbcopy");
 #endif
 
@@ -154,7 +184,7 @@ void ClipboardService::showClearWarning()
 
 
 void ClipboardService::loadSettings()
-{    
+{
     try {
         std::string timeoutStr = m_db->getSetting("clipboard_timeout", "30");
         std::cout << "timer " << timeoutStr << std::endl;

@@ -66,12 +66,12 @@ include CMakeFiles/cryptosafe_autogen_timestamp_deps.dir/compiler_depend.make
 # Include the progress variables for this target.
 include CMakeFiles/cryptosafe_autogen_timestamp_deps.dir/progress.make
 
+CMakeFiles/cryptosafe_autogen_timestamp_deps: /usr/lib/x86_64-linux-gnu/libssl.so
 CMakeFiles/cryptosafe_autogen_timestamp_deps: /usr/lib/x86_64-linux-gnu/libcrypto.so
 CMakeFiles/cryptosafe_autogen_timestamp_deps: /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.15.13
+CMakeFiles/cryptosafe_autogen_timestamp_deps: /usr/lib/qt5/bin/uic
 CMakeFiles/cryptosafe_autogen_timestamp_deps: /usr/lib/x86_64-linux-gnu/libQt5Core.so.5.15.13
 CMakeFiles/cryptosafe_autogen_timestamp_deps: /usr/lib/qt5/bin/moc
-CMakeFiles/cryptosafe_autogen_timestamp_deps: /usr/lib/qt5/bin/uic
-CMakeFiles/cryptosafe_autogen_timestamp_deps: /usr/lib/x86_64-linux-gnu/libssl.so
 CMakeFiles/cryptosafe_autogen_timestamp_deps: libcryptosafe_lib.a
 
 cryptosafe_autogen_timestamp_deps: CMakeFiles/cryptosafe_autogen_timestamp_deps

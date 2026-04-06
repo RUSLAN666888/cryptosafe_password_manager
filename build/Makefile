@@ -689,6 +689,150 @@ src/gui/widgets/secure_table/VaultTableModel.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.s
 .PHONY : src/gui/widgets/secure_table/VaultTableModel.cpp.s
 
+tests/test_config.o: tests/test_config.cpp.o
+.PHONY : tests/test_config.o
+
+# target to build an object file
+tests/test_config.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_config.cpp.o
+.PHONY : tests/test_config.cpp.o
+
+tests/test_config.i: tests/test_config.cpp.i
+.PHONY : tests/test_config.i
+
+# target to preprocess a source file
+tests/test_config.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_config.cpp.i
+.PHONY : tests/test_config.cpp.i
+
+tests/test_config.s: tests/test_config.cpp.s
+.PHONY : tests/test_config.s
+
+# target to generate assembly for a file
+tests/test_config.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_config.cpp.s
+.PHONY : tests/test_config.cpp.s
+
+tests/test_crud.o: tests/test_crud.cpp.o
+.PHONY : tests/test_crud.o
+
+# target to build an object file
+tests/test_crud.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_crud.cpp.o
+.PHONY : tests/test_crud.cpp.o
+
+tests/test_crud.i: tests/test_crud.cpp.i
+.PHONY : tests/test_crud.i
+
+# target to preprocess a source file
+tests/test_crud.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_crud.cpp.i
+.PHONY : tests/test_crud.cpp.i
+
+tests/test_crud.s: tests/test_crud.cpp.s
+.PHONY : tests/test_crud.s
+
+# target to generate assembly for a file
+tests/test_crud.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_crud.cpp.s
+.PHONY : tests/test_crud.cpp.s
+
+tests/test_database.o: tests/test_database.cpp.o
+.PHONY : tests/test_database.o
+
+# target to build an object file
+tests/test_database.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_database.cpp.o
+.PHONY : tests/test_database.cpp.o
+
+tests/test_database.i: tests/test_database.cpp.i
+.PHONY : tests/test_database.i
+
+# target to preprocess a source file
+tests/test_database.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_database.cpp.i
+.PHONY : tests/test_database.cpp.i
+
+tests/test_database.s: tests/test_database.cpp.s
+.PHONY : tests/test_database.s
+
+# target to generate assembly for a file
+tests/test_database.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_database.cpp.s
+.PHONY : tests/test_database.cpp.s
+
+tests/test_database_auth_data.o: tests/test_database_auth_data.cpp.o
+.PHONY : tests/test_database_auth_data.o
+
+# target to build an object file
+tests/test_database_auth_data.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_database_auth_data.cpp.o
+.PHONY : tests/test_database_auth_data.cpp.o
+
+tests/test_database_auth_data.i: tests/test_database_auth_data.cpp.i
+.PHONY : tests/test_database_auth_data.i
+
+# target to preprocess a source file
+tests/test_database_auth_data.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_database_auth_data.cpp.i
+.PHONY : tests/test_database_auth_data.cpp.i
+
+tests/test_database_auth_data.s: tests/test_database_auth_data.cpp.s
+.PHONY : tests/test_database_auth_data.s
+
+# target to generate assembly for a file
+tests/test_database_auth_data.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_database_auth_data.cpp.s
+.PHONY : tests/test_database_auth_data.cpp.s
+
+tests/test_encryption.o: tests/test_encryption.cpp.o
+.PHONY : tests/test_encryption.o
+
+# target to build an object file
+tests/test_encryption.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_encryption.cpp.o
+.PHONY : tests/test_encryption.cpp.o
+
+tests/test_encryption.i: tests/test_encryption.cpp.i
+.PHONY : tests/test_encryption.i
+
+# target to preprocess a source file
+tests/test_encryption.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_encryption.cpp.i
+.PHONY : tests/test_encryption.cpp.i
+
+tests/test_encryption.s: tests/test_encryption.cpp.s
+.PHONY : tests/test_encryption.s
+
+# target to generate assembly for a file
+tests/test_encryption.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_encryption.cpp.s
+.PHONY : tests/test_encryption.cpp.s
+
+tests/test_events.o: tests/test_events.cpp.o
+.PHONY : tests/test_events.o
+
+# target to build an object file
+tests/test_events.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_events.cpp.o
+.PHONY : tests/test_events.cpp.o
+
+tests/test_events.i: tests/test_events.cpp.i
+.PHONY : tests/test_events.i
+
+# target to preprocess a source file
+tests/test_events.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_events.cpp.i
+.PHONY : tests/test_events.cpp.i
+
+tests/test_events.s: tests/test_events.cpp.s
+.PHONY : tests/test_events.s
+
+# target to generate assembly for a file
+tests/test_events.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_events.cpp.s
+.PHONY : tests/test_events.cpp.s
+
 tests/test_key_rotation.o: tests/test_key_rotation.cpp.o
 .PHONY : tests/test_key_rotation.o
 
@@ -787,6 +931,24 @@ help:
 	@echo "... src/gui/widgets/secure_table/VaultTableModel.o"
 	@echo "... src/gui/widgets/secure_table/VaultTableModel.i"
 	@echo "... src/gui/widgets/secure_table/VaultTableModel.s"
+	@echo "... tests/test_config.o"
+	@echo "... tests/test_config.i"
+	@echo "... tests/test_config.s"
+	@echo "... tests/test_crud.o"
+	@echo "... tests/test_crud.i"
+	@echo "... tests/test_crud.s"
+	@echo "... tests/test_database.o"
+	@echo "... tests/test_database.i"
+	@echo "... tests/test_database.s"
+	@echo "... tests/test_database_auth_data.o"
+	@echo "... tests/test_database_auth_data.i"
+	@echo "... tests/test_database_auth_data.s"
+	@echo "... tests/test_encryption.o"
+	@echo "... tests/test_encryption.i"
+	@echo "... tests/test_encryption.s"
+	@echo "... tests/test_events.o"
+	@echo "... tests/test_events.i"
+	@echo "... tests/test_events.s"
 	@echo "... tests/test_key_rotation.o"
 	@echo "... tests/test_key_rotation.i"
 	@echo "... tests/test_key_rotation.s"

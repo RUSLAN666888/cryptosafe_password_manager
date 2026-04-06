@@ -147,7 +147,8 @@ target_include_directories(cryptosafe_lib PUBLIC
 
 add_executable(${TARGET_NAME} ${MAIN_SOURCES}
     src/core/clipboard_service/clipboard_service.h
-    src/core/clipboard_service/clipboard_service.cpp)
+    src/core/clipboard_service/clipboard_service.cpp
+)
 
 
 
@@ -173,6 +174,7 @@ target_link_libraries(${TARGET_NAME} PRIVATE
     OpenSSL::Crypto
     ${ZXCVB_LIB}
     ${LIBSODIUM_LIB}
+    X11
 )
 
 
@@ -183,7 +185,15 @@ target_compile_definitions(${TARGET_NAME} PRIVATE
 )
 
 
-add_executable(run_tests tests/test_key_rotation.cpp)
+add_executable(run_tests
+    tests/test_key_rotation.cpp
+    tests/test_encryption.cpp
+    tests/test_crud.cpp
+    tests/test_database.cpp
+    tests/test_database_auth_data.cpp
+    tests/test_config.cpp
+    tests/test_events.cpp
+)
 
 target_link_libraries(run_tests PRIVATE
     cryptosafe_lib
