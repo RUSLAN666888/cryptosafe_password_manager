@@ -25,6 +25,7 @@ MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaul
     , db(database)
     , m_vaultManager(vaultManager)
     , isLoggedIn(false)
+    , m_temporaryMessage("")
 {
     setWindowTitle("CryptoSafe Manager");
     resize(900, 600);
@@ -65,7 +66,7 @@ MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaul
         }
     }
 
-    updatePermanentStatus();
+    updateStatusBar();
 
     // ПРОВЕРКА НА ПРОИЗОДИТЕЛЬНОСТЬ (ПРОСТО ДОБАВЛЯЕМ ЗАПИСИ В БД)
     // int count = 1000;
@@ -204,6 +205,8 @@ MainWindow::~MainWindow()
 {
     if (isLoggedIn)
     {
+        //ClipboardService::getInstance().saveRemainingTime();
+        ClipboardService::getInstance().resetTimer();
         KeyManager::getInstance().logout();
     }
 }
@@ -215,6 +218,22 @@ void MainWindow::registerEventHandlers()
 
     eventBus.subscribe(EventType::UserLoggedOut,
                        [this](const Event& event) { this->onUserLoggedOut(event); });
+
+    eventBus.subscribe(EventType::ClipboardWillClear,
+                       [this](const Event& event) {
+                           showTemporaryMessage("ВНИМАНИЕ! Буфер обмена очистится через 5 секунд!", 3000);
+                       });
+
+    eventBus.subscribe(EventType::ClipboardCleared,
+                       [this](const Event& event) {
+                           showTemporaryMessage("Буфер обмена очищен", 3000);
+                       });
+
+    eventBus.subscribe(EventType::ClipboardCopied,
+                       [this](const Event& event) {
+                           int timeout = ClipboardService::getInstance().getAutoClearTimeout();
+                           showTemporaryMessage(QString("Пароль скопирован. Очистится через %1 сек").arg(timeout), 3000);
+                       });
 }
 
 void MainWindow::createMenuBar()
@@ -362,28 +381,55 @@ void MainWindow::createStatusBar()
     statusBar->showMessage("Not logged in");
 }
 
+
+
 void MainWindow::updateStatusBar()
 {
-    QString loginStatus = isLoggedIn ? "Logged in" : "Not logged in";
-    statusBar->showMessage(loginStatus);
-}
+    QString msg;
 
-void MainWindow::showTemporaryMessage(const QString& msg, int timeoutMs)
-{
-    statusBar->showMessage(msg, timeoutMs);
-    QTimer::singleShot(timeoutMs, this, &MainWindow::updatePermanentStatus);
-}
+    // Базовый статус
+    if (isLoggedIn) {
+        msg = "Logged in";
+    } else {
+        msg = "Not logged in";
+    }
 
-void MainWindow::updatePermanentStatus()
-{
-    QString msg = isLoggedIn ? "Logged in" : "Not logged in";
+    // // Статус буфера обмена
+    // if (ClipboardService::getInstance().isTimerActive()) {
+    //     int remaining = ClipboardService::getInstance().getRemainingSeconds();
+    //     msg += QString(" | Clipboard: %1 sec").arg(remaining);
+    // }
 
-    if (m_clipboardTimer && m_clipboardTimer->isActive()) {
-        msg += QString(" | Clipboard: %1 sec").arg(m_clipboardSeconds);
+    // Временное сообщение (если есть)
+    if (!m_temporaryMessage.isEmpty()) {
+        msg = m_temporaryMessage + " | " + msg;
     }
 
     statusBar->showMessage(msg);
 }
+
+void MainWindow::showTemporaryMessage(const QString& msg, int timeoutMs)
+{
+    m_temporaryMessage = msg;
+    updateStatusBar();
+
+    // Таймер для очистки временного сообщения
+    QTimer::singleShot(timeoutMs, this, [this]() {
+        m_temporaryMessage.clear();
+        updateStatusBar();
+    });
+}
+
+// void MainWindow::updatePermanentStatus()
+// {
+//     QString msg = isLoggedIn ? "Logged in" : "Not logged in";
+
+//     if (m_clipboardTimer && m_clipboardTimer->isActive()) {
+//         msg += QString(" | Clipboard: %1 sec").arg(m_clipboardSeconds);
+//     }
+
+//     statusBar->showMessage(msg);
+// }
 
 bool MainWindow::showFirstRunWizard()
 {
@@ -422,7 +468,7 @@ void MainWindow::unlockApplication()
         m_tableView->show();
 
 
-        updatePermanentStatus();
+        updateStatusBar();
 
         StateManager::getInstance().login();
 
@@ -434,6 +480,9 @@ void MainWindow::lockApplication()
 {
     if (isLoggedIn)
     {
+        // Принудительно сбрасываем буфер обмена и таймер
+        ClipboardService::getInstance().resetTimer();
+
         isLoggedIn = false;
         m_tableView->hide();
         updateStatusBar();
@@ -756,7 +805,6 @@ void MainWindow::showContextMenu(const QPoint& pos)
     QModelIndex index = m_tableView->indexAt(pos);
     if (!index.isValid()) return;
 
-    // Выделяем строку, если она не выделена
     if (!m_tableView->selectionModel()->isSelected(index)) {
         m_tableView->selectionModel()->clear();
         m_tableView->selectionModel()->select(index,
@@ -770,15 +818,14 @@ void MainWindow::showContextMenu(const QPoint& pos)
     QMenu menu(this);
 
     if (singleSelected) {
-        // Действия для одной записи
         menu.addAction("Редактировать", this, &MainWindow::onEditEntry);
         menu.addSeparator();
         menu.addAction("Копировать логин", this, &MainWindow::onCopyUsername);
         menu.addAction("Копировать пароль", this, &MainWindow::onCopyPassword);
+        menu.addAction("Копировать всё", this, &MainWindow::onCopyAll);  // ← ДОБАВИТЬ
         menu.addSeparator();
         menu.addAction("Удалить", this, &MainWindow::onDeleteEntry);
     } else if (multiSelected) {
-        // Действия для нескольких записей
         menu.addAction(QString("Удалить (%1 записей)").arg(selected.size()),
                        this, &MainWindow::onDeleteEntry);
     }
@@ -797,8 +844,13 @@ void MainWindow::onCopyUsername()
     try {
         auto entry = m_vaultManager.getEntry(static_cast<int>(id));
         if (entry) {
-            QApplication::clipboard()->setText(QString::fromStdString(entry->username));
-            statusBar->showMessage("Логин скопирован", 2000);
+            ClipboardService::getInstance().copyText(
+                QString::fromStdString(entry->username),
+                QString::fromStdString(entry->title),
+                "username"
+                );
+            // Уведомление уже в EventBus, можно убрать или оставить
+            showTemporaryMessage("Логин скопирован", 2000);
         }
     } catch (const std::exception& e) {
         statusBar->showMessage("Ошибка при копировании", 2000);
@@ -821,10 +873,41 @@ void MainWindow::onCopyPassword()
                 QString::fromStdString(entry->title),
                 "password"
                 );
+        }
+    } catch (const std::exception& e) {
+        statusBar->showMessage("Ошибка при копировании", 2000);
+    }
+}
 
-            // Показываем уведомление с оставшимся временем
-            int timeout = ClipboardService::getInstance().getAutoClearTimeout();
-            showTemporaryMessage(QString("Пароль скопирован. Очистится через %1 сек").arg(timeout), 2000);
+void MainWindow::onCopyAll()
+{
+    QModelIndexList selected = m_tableView->selectionModel()->selectedRows();
+    if (selected.isEmpty()) return;
+
+    QModelIndex sourceIdx = m_proxyModel->mapToSource(selected.first());
+    long id = m_tableModel->getId(sourceIdx.row());
+
+    try {
+        auto entry = m_vaultManager.getEntry(static_cast<int>(id));
+        if (entry) {
+            QString allData = QString(
+                                  "Title: %1\n"
+                                  "Username: %2\n"
+                                  "Password: %3\n"
+                                  "URL: %4\n"
+                                  "Notes: %5\n"
+                                  "Category: %6\n"
+                                  "Tags: %7"
+                                  ).arg(QString::fromStdString(entry->title))
+                                  .arg(QString::fromStdString(entry->username))
+                                  .arg(QString::fromStdString(entry->password))
+                                  .arg(QString::fromStdString(entry->url))
+                                  .arg(QString::fromStdString(entry->notes))
+                                  .arg(QString::fromStdString(entry->category))
+                                  .arg(QString::fromStdString(entry->tags));
+
+            ClipboardService::getInstance().copyText(allData, QString::fromStdString(entry->title), "all");
+            showTemporaryMessage("Все данные скопированы", 2000);
         }
     } catch (const std::exception& e) {
         statusBar->showMessage("Ошибка при копировании", 2000);

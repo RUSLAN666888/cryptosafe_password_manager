@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
 
         // Инициализация ClipboardService
         ClipboardService::getInstance().init(&db);
+        //ClipboardService::getInstance().restoreRemainingTime();
 
         static AES256GCM crypto;
         static VaultManager m(db, crypto, KeyManager::getInstance());

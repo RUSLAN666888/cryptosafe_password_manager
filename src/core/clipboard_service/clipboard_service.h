@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include "../database/DB_helper/db_helper.h"
 
+
 class ClipboardService : public QObject
 {
     Q_OBJECT
@@ -34,11 +35,18 @@ public:
         loadSettings();
     }
 
+    void loadSettings();
+
+    // void saveRemainingTime();
+    // void restoreRemainingTime();
+
+    void resetTimer();
+
 signals:
     void clipboardCopied(const QString& dataType, const QString& source);
     void clipboardCleared();
-    void clipboardTimerUpdated(int secondsLeft);
     void clipboardWillClear(int secondsLeft);  // Предупреждение за 5 секунд
+
 
 private slots:
     void onTimerTimeout();
@@ -46,12 +54,9 @@ private slots:
 
 private:
     ClipboardService();
-    ~ClipboardService();
 
     void startAutoClearTimer();
     void stopAutoClearTimer();
-    void saveSettings();
-    void loadSettings();
     void showClearWarning();
 
     QTimer* m_timer;
@@ -64,6 +69,10 @@ private:
     bool m_warningShown;
 
     Database* m_db = nullptr;
+
+    QDateTime m_lastCopyTime;
+
+    QTimer* m_updateTimer;
 };
 
 #endif // CLIPBOARD_SERVICE_H

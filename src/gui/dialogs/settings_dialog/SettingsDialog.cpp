@@ -1,4 +1,5 @@
 #include "SettingsDialog.h"
+#include "../src/core/clipboard_service/clipboard_service.h"
 #include <QMessageBox>
 #include <QGroupBox>
 #include <QFormLayout>
@@ -25,7 +26,7 @@ SettingsDialog::SettingsDialog(Database& db, QWidget *parent, ConfigHander &cfg)
     tabWidget = new QTabWidget(this);
 
     createGeneralTab();
-    createSecurityTab();
+    createClipboardTab();
     createAdvancedTab();
     createPasswordGeneratorTab();
 
@@ -57,6 +58,8 @@ SettingsDialog::SettingsDialog(Database& db, QWidget *parent, ConfigHander &cfg)
     int x = (screenGeometry.width() - width()) / 2;
     int y = (screenGeometry.height() - height()) / 2;
     move(x, y);
+
+    loadClipboardSettings();
 }
 
 SettingsDialog::~SettingsDialog()
@@ -188,13 +191,12 @@ void SettingsDialog::createPasswordGeneratorTab()
     connect(m_excludeAmbiguousCheck, &QCheckBox::stateChanged, this, &SettingsDialog::onExcludeAmbiguousChanged);
 }
 
-void SettingsDialog::createSecurityTab()
+void SettingsDialog::createClipboardTab()
 {
-    QWidget *panel = new QWidget();
-    QVBoxLayout *layout = new QVBoxLayout(panel);
+    QWidget* panel = new QWidget();
+    QVBoxLayout* layout = new QVBoxLayout(panel);
 
-    // Заголовок
-    QLabel *title = new QLabel("Security Settings", panel);
+    QLabel* title = new QLabel("Настройки буфера обмена", panel);
     QFont titleFont = title->font();
     titleFont.setPointSize(12);
     titleFont.setBold(true);
@@ -203,63 +205,39 @@ void SettingsDialog::createSecurityTab()
 
     layout->addSpacing(10);
 
-    // Группа настроек
-    QGroupBox *settingsGroup = new QGroupBox("Auto-Lock Settings", panel);
-    QFormLayout *formLayout = new QFormLayout(settingsGroup);
-    formLayout->setSpacing(10);
-    formLayout->setContentsMargins(15, 15, 15, 15);
+    QGroupBox* settingsGroup = new QGroupBox("Настройки авто очистки", panel);
+    QFormLayout* formLayout = new QFormLayout(settingsGroup);
 
-    QSpinBox *autoLockSpin = new QSpinBox(settingsGroup);
-    autoLockSpin->setRange(1, 60);
-    autoLockSpin->setValue(5);
-    autoLockSpin->setSuffix(" minutes");
-    autoLockSpin->setEnabled(false); // Заглушка
-    formLayout->addRow("Auto-lock after inactivity:", autoLockSpin);
+    // SpinBox для таймера
+    m_clipboardTimeoutSpin = new QSpinBox(settingsGroup);
+    m_clipboardTimeoutSpin->setRange(5, 300);
+    m_clipboardTimeoutSpin->setSuffix(" seconds");
+    m_clipboardTimeoutSpin->setValue(30);
+    formLayout->addRow("Clear clipboard after:", m_clipboardTimeoutSpin);
 
-    QCheckBox *lockOnMinimize = new QCheckBox("Lock when minimized", settingsGroup);
-    lockOnMinimize->setChecked(true);
-    lockOnMinimize->setEnabled(false); // Заглушка
-    formLayout->addRow("", lockOnMinimize);
+    // Чекбокс "Never auto-clear"
+    m_clipboardNeverClear = new QCheckBox("Не очищать буфер автоматичски (не рекомендуется)", settingsGroup);
+    formLayout->addRow("", m_clipboardNeverClear);
 
-    QSpinBox *clipboardSpin = new QSpinBox(settingsGroup);
-    clipboardSpin->setRange(5, 60);
-    clipboardSpin->setValue(10);
-    clipboardSpin->setSuffix(" seconds");
-    clipboardSpin->setEnabled(false); // Заглушка
-    formLayout->addRow("Clear clipboard after:", clipboardSpin);
+    // Если чекбокс отмечен, отключаем SpinBox
+    connect(m_clipboardNeverClear, &QCheckBox::toggled, m_clipboardTimeoutSpin, &QSpinBox::setDisabled);
 
     settingsGroup->setLayout(formLayout);
     layout->addWidget(settingsGroup);
 
-    layout->addSpacing(10);
-
-    // Группа дополнительных настроек
-    QGroupBox *extraGroup = new QGroupBox("Additional Protection", panel);
-    QVBoxLayout *extraLayout = new QVBoxLayout(extraGroup);
-
-    QCheckBox *panicKey = new QCheckBox("Enable panic key (Ctrl+Shift+P)", extraGroup);
-    panicKey->setChecked(false);
-    panicKey->setEnabled(false); // Заглушка
-    extraLayout->addWidget(panicKey);
-
-    QCheckBox *memoryWipe = new QCheckBox("Wipe memory on lock", extraGroup);
-    memoryWipe->setChecked(true);
-    memoryWipe->setEnabled(false); // Заглушка
-    extraLayout->addWidget(memoryWipe);
-
-    extraGroup->setLayout(extraLayout);
-    layout->addWidget(extraGroup);
-
     layout->addStretch();
 
-    // Информация
-    QLabel *info = new QLabel("Security settings will be fully implemented in Sprint 4", panel);
-    info->setStyleSheet("color: #888;");
+    // Пояснение
+    QLabel* info = new QLabel(
+        "Если авто очистка включена, пароли будут автоматически удалены из буфера через указанное время.\n"
+        "Это помогает предотвратить нелегальный доступ к чувствительным данным.",
+        panel);
     info->setWordWrap(true);
+    info->setStyleSheet("color: #666; font-size: 10px;");
     layout->addWidget(info);
 
     panel->setLayout(layout);
-    tabWidget->addTab(panel, "Security");
+    tabWidget->addTab(panel, "Clipboard");
 }
 
 void SettingsDialog::createAdvancedTab()
@@ -339,12 +317,13 @@ void SettingsDialog::createAdvancedTab()
 
 void SettingsDialog::onOk()
 {
-    // Сохраняем настройки генератора паролей
+    // Сохраняем настройки
     savePasswordSettings();
+    saveClipboardSettings();
+    ClipboardService::getInstance().loadSettings();
 
     QMessageBox::information(this, "CryptoSafe Manager",
-                             "Settings saved successfully.\n\n"
-                             "Password generator settings will take effect immediately.",
+                             "Настройки успешно сохранены.",
                              QMessageBox::Ok);
 
     accept();
@@ -418,4 +397,34 @@ void SettingsDialog::onUseSymbolsChanged(int state)
 void SettingsDialog::onExcludeAmbiguousChanged(int state)
 {
     Q_UNUSED(state);
+}
+
+void SettingsDialog::loadClipboardSettings()
+{
+    try {
+        std::string value = m_db.getSetting("clipboard_timeout", "30");
+        int timeout = std::stoi(value);
+
+        if (timeout == 0) {
+            m_clipboardNeverClear->setChecked(true);
+            m_clipboardTimeoutSpin->setEnabled(false);
+        } else {
+            m_clipboardNeverClear->setChecked(false);
+            m_clipboardTimeoutSpin->setValue(timeout);
+        }
+    } catch (const std::exception& e) {
+        m_clipboardNeverClear->setChecked(false);
+        m_clipboardTimeoutSpin->setValue(30);
+    }
+}
+
+void SettingsDialog::saveClipboardSettings()
+{
+    int timeout;
+    if (m_clipboardNeverClear->isChecked()) {
+        timeout = 0;  // 0 означает "never auto-clear"
+    } else {
+        timeout = m_clipboardTimeoutSpin->value();
+    }
+    m_db.setSetting("clipboard_timeout", std::to_string(timeout));
 }

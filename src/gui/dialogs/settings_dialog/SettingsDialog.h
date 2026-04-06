@@ -31,11 +31,17 @@ private:
     QCheckBox *m_excludeAmbiguousCheck;
 
     void createGeneralTab();
-    void createSecurityTab();
     void createAdvancedTab();
     void createPasswordGeneratorTab();
     void loadPasswordSettings();
     void savePasswordSettings();
+
+    void createClipboardTab();
+    void loadClipboardSettings();
+    void saveClipboardSettings();
+
+    QSpinBox* m_clipboardTimeoutSpin;
+    QCheckBox* m_clipboardNeverClear;
 
 private slots:
     void onOk();

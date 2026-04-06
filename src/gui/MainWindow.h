@@ -31,6 +31,10 @@ private:
     AES256GCM m_crypto;
 
     bool isLoggedIn;
+    QString m_temporaryMessage;
+
+    QTimer* m_clipboardUpdateTimer;
+    int m_clipboardSeconds;
 
     // Элементы UI
     QMenuBar *menuBar;
@@ -74,7 +78,6 @@ private:
     void updatePermanentStatus();
 
     QTimer* m_clipboardTimer;
-    int m_clipboardSeconds;
 
 private slots:
     void onInactivityTimeout();
@@ -97,6 +100,7 @@ private slots:
     void showContextMenu(const QPoint& pos);
     void onCopyUsername();
     void onCopyPassword();
+    void onCopyAll();
 
     void runEncryptionTest();
     void runCrudTest();

@@ -14,38 +14,39 @@
 // Типы событий
 enum class EventType
 {
-  // Entry events
-  EntryAdded,
-  EntryUpdated,
-  EntryDeleted,
+    // Entry events
+    EntryAdded,
+    EntryUpdated,
+    EntryDeleted,
 
-  // Auth events
-  UserLoggedIn,
-  UserLoggedOut,
+    // Auth events
+    UserLoggedIn,
+    UserLoggedOut,
 
-  // Clipboard events (Sprint 4)
-  ClipboardCopied,
-  ClipboardCleared
+    // Clipboard events
+    ClipboardCopied,
+    ClipboardCleared,
+    ClipboardWillClear
 };
 
 // Класс события
 class Event
 {
 public:
-  EventType type;
-  std::any data;
-  std::string source;
-  std::chrono::system_clock::time_point timestamp;
+    EventType type;
+    std::any data;
+    std::string source;
+    std::chrono::system_clock::time_point timestamp;
 
-  Event(EventType t, const std::any &d = std::any(), const std::string &s = "")
+    Event(EventType t, const std::any &d = std::any(), const std::string &s = "")
       : type(t), data(d), source(s)
-  {
+    {
     timestamp = std::chrono::system_clock::now();
-  }
+    }
 
-  template <typename T> T getData() const { return std::any_cast<T>(data); }
+    template <typename T> T getData() const { return std::any_cast<T>(data); }
 
-  bool hasData() const { return data.has_value(); }
+    bool hasData() const { return data.has_value(); }
 };
 
 // Тип для callback функции
