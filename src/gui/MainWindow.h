@@ -102,10 +102,6 @@ private slots:
     void onCopyPassword();
     void onCopyAll();
 
-    void runEncryptionTest();
-    void runCrudTest();
-    void runPasswordGeneratorTest();
-
 public:
     MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaultManager);
     ~MainWindow();

@@ -6,8 +6,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/cryptosafe.dir/cryptosafe_autogen/mocs_compilation.cpp.o.d"
   "CMakeFiles/cryptosafe.dir/main.cpp.o"
   "CMakeFiles/cryptosafe.dir/main.cpp.o.d"
-  "CMakeFiles/cryptosafe.dir/src/core/clipboard_service/clipboard_service.cpp.o"
-  "CMakeFiles/cryptosafe.dir/src/core/clipboard_service/clipboard_service.cpp.o.d"
   "cryptosafe"
   "cryptosafe.pdb"
   "cryptosafe_autogen/mocs_compilation.cpp"

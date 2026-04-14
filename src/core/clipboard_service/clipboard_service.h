@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QTimer>
 #include <QDateTime>
-#include "../database/DB_helper/db_helper.h"
 
+#include "../src/database/DB_helper/db_helper.h"
 
 class ClipboardService : public QObject
 {
@@ -14,25 +14,31 @@ class ClipboardService : public QObject
 public:
     static ClipboardService& getInstance();
 
-    // CLIP-1: Поддержка разных типов данных
     void copyText(const QString& text, const QString& source, const QString& type);
     void clear();
 
-    // CLIP-2: Настройка таймера
     void setAutoClearTimeout(int seconds);  // 5-300 секунд
     int getAutoClearTimeout() const;
     bool isTimerActive() const;
     int getRemainingSeconds() const;
 
-    // CLIP-4: Проверка состояния
     bool hasContent() const;
     QString getCurrentContent() const;
     QString getCurrentSource() const;
     QString getCurrentDataType() const;
 
+#ifndef  CLIPBOARD_TEST_MODE
     void init(Database* database) {
         m_db = database;
-        loadSettings();
+        //loadSettings();
+    }
+#endif
+
+    void initForTest() {
+        m_timeoutSeconds = 30;
+        m_notifyOnCopy = true;
+        m_notifyOnWarning = true;
+        m_notifyOnClear = true;
     }
 
     void loadSettings();
@@ -43,8 +49,13 @@ public:
 
     // void saveRemainingTime();
     // void restoreRemainingTime();
+    void checkAndRestoreTimer();  // Проверка и восстановление таймера после краша
 
     void resetTimer();
+
+    void test_setTimeOut(int seconds){
+        m_timeoutSeconds = seconds;
+    }
 
 signals:
     void clipboardCopied(const QString& dataType, const QString& source);
@@ -63,7 +74,10 @@ private:
     void stopAutoClearTimer();
     void showClearWarning();
 
+    void saveCurrentRemainingTime();
+
     QTimer* m_timer;
+    QTimer* m_saveTimer;
     QString m_currentContent;
     QString m_currentSource;
     QString m_currentDataType;

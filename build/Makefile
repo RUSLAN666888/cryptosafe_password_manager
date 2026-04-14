@@ -334,7 +334,7 @@ src/core/clipboard_service/clipboard_service.o: src/core/clipboard_service/clipb
 
 # target to build an object file
 src/core/clipboard_service/clipboard_service.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/clipboard_service/clipboard_service.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/clipboard_service/clipboard_service.cpp.o
 .PHONY : src/core/clipboard_service/clipboard_service.cpp.o
 
 src/core/clipboard_service/clipboard_service.i: src/core/clipboard_service/clipboard_service.cpp.i
@@ -342,7 +342,7 @@ src/core/clipboard_service/clipboard_service.i: src/core/clipboard_service/clipb
 
 # target to preprocess a source file
 src/core/clipboard_service/clipboard_service.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/clipboard_service/clipboard_service.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/clipboard_service/clipboard_service.cpp.i
 .PHONY : src/core/clipboard_service/clipboard_service.cpp.i
 
 src/core/clipboard_service/clipboard_service.s: src/core/clipboard_service/clipboard_service.cpp.s
@@ -350,7 +350,7 @@ src/core/clipboard_service/clipboard_service.s: src/core/clipboard_service/clipb
 
 # target to generate assembly for a file
 src/core/clipboard_service/clipboard_service.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/clipboard_service/clipboard_service.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/clipboard_service/clipboard_service.cpp.s
 .PHONY : src/core/clipboard_service/clipboard_service.cpp.s
 
 src/core/vault/VaultManager.o: src/core/vault/VaultManager.cpp.o

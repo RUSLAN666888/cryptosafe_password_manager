@@ -96,6 +96,8 @@ set(SOURCES
     src/gui/widgets/secure_table/VaultTableModel.cpp
     src/gui/widgets/secure_table/SearchProxyModel.cpp
     src/gui/widgets/secure_table/PasswordDelegate.cpp
+
+    src/core/clipboard_service/clipboard_service.cpp
 )
 
 set(MAIN_SOURCES
@@ -116,6 +118,7 @@ set(HEADERS
     src/gui/widgets/secure_table/VaultTableModel.h
     src/gui/widgets/secure_table/SearchProxyModel.h
     src/gui/widgets/secure_table/PasswordDelegate.h
+    src/core/clipboard_service/clipboard_service.h
 )
 
 
@@ -145,10 +148,7 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${Qt5Core_INCLUDE_DIRS}
 )
 
-add_executable(${TARGET_NAME} ${MAIN_SOURCES}
-    src/core/clipboard_service/clipboard_service.h
-    src/core/clipboard_service/clipboard_service.cpp
-)
+add_executable(${TARGET_NAME} ${MAIN_SOURCES})
 
 
 
@@ -223,3 +223,7 @@ target_include_directories(run_tests PRIVATE
     ${SQLite3_INCLUDE_DIRS}
     ${GTEST_INCLUDE_DIRS}
 )
+
+
+
+

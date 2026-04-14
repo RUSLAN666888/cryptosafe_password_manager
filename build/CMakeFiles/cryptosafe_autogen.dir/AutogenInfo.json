@@ -109,15 +109,7 @@
 	"CMAKE_SOURCE_DIR" : "/home/master666/development/cryptosafe_password_manager",
 	"DEP_FILE" : "/home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/deps",
 	"DEP_FILE_RULE_NAME" : "cryptosafe_autogen/timestamp",
-	"HEADERS" : 
-	[
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/clipboard_service/clipboard_service.h",
-			"MU",
-			"LSINGSMQY2/moc_clipboard_service.cpp",
-			null
-		]
-	],
+	"HEADERS" : [],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
 	"INCLUDE_DIR" : "/home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/include",
 	"MOC_COMPILATION_FILE" : "/home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/mocs_compilation.cpp",
@@ -184,11 +176,6 @@
 	[
 		[
 			"/home/master666/development/cryptosafe_password_manager/main.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/clipboard_service/clipboard_service.cpp",
 			"MU",
 			null
 		]

@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
         // Инициализация ClipboardService
         ClipboardService::getInstance().init(&db);
         ClipboardService::getInstance().loadNotificationSettings();
+        ClipboardService::getInstance().checkAndRestoreTimer();
         //ClipboardService::getInstance().restoreRemainingTime();
 
         static AES256GCM crypto;

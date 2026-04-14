@@ -23,6 +23,7 @@
 ClipboardService::ClipboardService()
     : QObject(nullptr)
     , m_timer(new QTimer(this))
+    , m_saveTimer(new QTimer(this))
     , m_timeoutSeconds(30)
     , m_isOwnChange(false)
     , m_warningShown(false)
@@ -31,12 +32,55 @@ ClipboardService::ClipboardService()
     m_timer->setSingleShot(true);
     connect(m_timer, &QTimer::timeout, this, &ClipboardService::onTimerTimeout);
 
+    // Настройка таймера для сохранения в БД
+            m_saveTimer->setSingleShot(false);  // Циклический
+    m_saveTimer->setInterval(3000);     // Каждые 3 секунды
+    connect(m_saveTimer, &QTimer::timeout, this, &ClipboardService::saveCurrentRemainingTime);
+
     // Мониторинг внешних изменений
     connect(QGuiApplication::clipboard(), &QClipboard::dataChanged,
             this, &ClipboardService::onClipboardChanged);
-
 }
 
+void ClipboardService::saveCurrentRemainingTime()
+{
+    if (!m_db) return;
+
+    int remaining = getRemainingSeconds();
+    if (remaining > 0) {
+        m_db->setSetting("clipboard_remaining_seconds", std::to_string(remaining));
+        std::cout << "Saved remaining time: " << remaining << " seconds" << std::endl;
+    }
+}
+
+void ClipboardService::checkAndRestoreTimer()
+{
+    if (!m_db) return;
+
+    try {
+        std::string remainingStr = m_db->getSetting("clipboard_remaining_seconds", "0");
+        int remaining = std::stoi(remainingStr);
+
+        std::cout << "Check saved timer: " << remaining << " seconds" << std::endl;
+
+        if (remaining > 0 && remaining <= 300) {
+            // Восстанавливаем таймер без копирования в буфер
+            m_timeoutSeconds = remaining;
+            m_copyTime = QDateTime::currentDateTime();
+            m_timer->start(remaining * 1000);
+
+            // Запускаем периодическое сохранение
+            m_saveTimer->start();
+
+            std::cout << "Timer restored: " << remaining << " seconds remaining" << std::endl;
+
+            // Очищаем сохранённое значение в БД (чтобы не восстановить снова)
+            m_db->setSetting("clipboard_remaining_seconds", "0");
+        }
+    } catch (const std::exception& e) {
+        std::cout << "Failed to restore timer: " << e.what() << std::endl;
+    }
+}
 
 ClipboardService& ClipboardService::getInstance()
 {
@@ -44,7 +88,6 @@ ClipboardService& ClipboardService::getInstance()
     return instance;
 }
 
-// CLIP-1: Копирование
 void ClipboardService::copyText(const QString& text, const QString& source, const QString& type)
 {
     m_isOwnChange = true;
@@ -54,53 +97,116 @@ void ClipboardService::copyText(const QString& text, const QString& source, cons
     m_copyTime = QDateTime::currentDateTime();
     m_warningShown = false;
 
-    // Копируем в системный буфер
-    QGuiApplication::clipboard()->setText(text);
+    if (m_timer->isActive()) {
+        m_timer->stop();
+    }
+
+    if (m_saveTimer->isActive()) {
+        m_saveTimer->stop();
+    }
+
+#ifdef Q_OS_WIN
+    if (OpenClipboard(nullptr)) {
+        EmptyClipboard();
+        int size = (text.size() + 1) * sizeof(wchar_t);
+        HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE, size);
+        if (hGlobal) {
+            wchar_t* pData = (wchar_t*)GlobalLock(hGlobal);
+            MultiByteToWideChar(CP_UTF8, 0, text.c_str(), -1, pData, text.size() + 1);
+            GlobalUnlock(hGlobal);
+            SetClipboardData(CF_UNICODETEXT, hGlobal);
+        }
+        CloseClipboard();
+    }
+
+#elif defined(Q_OS_LINUX)
+    std::string utf8Text = text.toStdString();
+    std::string cmd = "echo -n '" + utf8Text + "' | xclip -selection clipboard";
+    int result = system(cmd.c_str());
+    if (result != 0) {
+        std::cerr << "Failed to copy: xclip not available" << std::endl;
+    }
+#elif defined(Q_OS_MAC)
+    // macOS: NSPasteboard через system
+    system(("echo -n '" + text.toStdString() + "' | pbcopy").c_str());
+#endif
 
     m_lastCopyTime = QDateTime::currentDateTime();
     m_isOwnChange = true;
 
-    // Запускаем таймер
     startAutoClearTimer();
+
+    m_saveTimer->start();
 
     if (m_notifyOnCopy) {
         eventBus.publish(EventType::ClipboardCopied, source.toStdString(), type.toStdString());
     }
 }
 
-// CLIP-4: Очистка
 void ClipboardService::clear()
 {
     std::cout << "=== CLEAR ===" << std::endl;
 
+    // Останавливаем таймер сохранения
+    if (m_saveTimer->isActive()) {
+        m_saveTimer->stop();
+    }
+
+    // Сохраняем 0 в БД
+    if (m_db) {
+        m_db->setSetting("clipboard_remaining_seconds", "0");
+    }
+
 #ifdef Q_OS_WIN
-    // Windows: используем Win32 API
     if (OpenClipboard(nullptr)) {
+        // Очищаем
+        EmptyClipboard();
+
+        // Добавляем мусор
+        std::string garbage(12040, 'X');
+        HGLOBAL hGarbage = GlobalAlloc(GMEM_MOVEABLE, garbage.size() + 1);
+        if (hGarbage) {
+            char* pData = (char*)GlobalLock(hGarbage);
+            strcpy(pData, garbage.c_str());
+            GlobalUnlock(hGarbage);
+            SetClipboardData(CF_TEXT, hGarbage);
+        }
+
+        // Снова очищаем
         EmptyClipboard();
         CloseClipboard();
     }
 #elif defined(Q_OS_LINUX)
-    // Linux: используем X11 API
-    Display* dpy = XOpenDisplay(nullptr);
-    if (dpy) {
-        // Очищаем CLIPBOARD
-        Atom clipboard = XInternAtom(dpy, "CLIPBOARD", False);
-        XSetSelectionOwner(dpy, clipboard, None, CurrentTime);
+    // Linux: заполняем мусором через X11
+    // Очищаем оба буфера
+    system("echo -n '' | xclip -selection clipboard");
+    system("echo -n '' | xclip -selection primary");
 
-        // Очищаем PRIMARY
-        Atom primary = XInternAtom(dpy, "PRIMARY", False);
-        XSetSelectionOwner(dpy, primary, None, CurrentTime);
+    // Добавляем мусор
+    std::string garbage(12040, 'X');
+    system(("echo -n '" + garbage + "' | xclip -selection clipboard").c_str());
+    std::string garbage2(12040, 'Y');
+    system(("echo -n '" + garbage2 + "' | xclip -selection primary").c_str());
 
-        XFlush(dpy);
-        XCloseDisplay(dpy);
-    }
+    // Снова очищаем
+    system("echo -n '' | xclip -selection clipboard");
+    system("echo -n '' | xclip -selection primary");
 #elif defined(Q_OS_MAC)
-    // macOS: используем NSPasteboard через Objective-C
-    // fallback через system
+    // macOS: заполняем мусором через pbcopy и pbpaste
+
+    // Очищаем буфер
+    system("echo -n '' | pbcopy");
+
+    // Добавляем мусор
+    std::string garbage(12040, 'X');
+    system(("echo -n '" + garbage + "' | pbcopy").c_str());
+    std::string garbage2(12040, 'Y');
+    system(("echo -n '" + garbage2 + "' | pbcopy").c_str());
+
+    // Снова очищаем
     system("echo -n '' | pbcopy");
 #endif
 
-    QGuiApplication::clipboard()->clear();
 
     // Сбрасываем состояние
     m_currentContent.clear();
@@ -113,7 +219,6 @@ void ClipboardService::clear()
 
     eventBus.publish(EventType::ClipboardCleared, "", "");
 }
-
 
 int ClipboardService::getAutoClearTimeout() const
 {
@@ -185,12 +290,12 @@ void ClipboardService::showClearWarning()
 
 void ClipboardService::loadSettings()
 {
+#ifndef CLIPBOARD_TEST_MODE
     try {
         std::string timeoutStr = m_db->getSetting("clipboard_timeout", "30");
         std::cout << "timer " << timeoutStr << std::endl;
         m_timeoutSeconds = std::stoi(timeoutStr);
 
-        // 0 означает "never auto-clear"
         if (m_timeoutSeconds == 0) {
             m_timeoutSeconds = 0;
         } else if (m_timeoutSeconds < 5) {
@@ -199,8 +304,13 @@ void ClipboardService::loadSettings()
             m_timeoutSeconds = 300;
         }
     } catch (const std::exception& e) {
-        m_timeoutSeconds = 30;
+        m_timeoutSeconds = 10;
     }
+#else
+    // Тестовый режим: используем значения по умолчанию
+    m_timeoutSeconds = 30;
+    std::cout << "Test mode: using default timeout 30 seconds" << std::endl;
+#endif
 }
 
 bool ClipboardService::hasContent() const
@@ -223,30 +333,6 @@ QString ClipboardService::getCurrentDataType() const
     return m_currentDataType;
 }
 
-// void ClipboardService::saveRemainingTime()
-// {
-//     if (!m_db) return;
-
-//     int remaining = getRemainingSeconds();
-//     m_db->setSetting("clipboard_remaining_seconds", std::to_string(remaining));
-// }
-
-// void ClipboardService::restoreRemainingTime()
-// {
-//     if (!m_db) return;
-
-//     try {
-//         std::string timeoutSeconds = m_db->getSetting("clipboard_remaining_seconds", "0");
-//         m_timeoutSeconds = std::stoi(timeoutSeconds);
-
-//         if (m_timeoutSeconds > 0 && m_timeoutSeconds <= 300) {
-//             startAutoClearTimer();
-//         }
-
-//     } catch (const std::exception& e) {
-//         // Игнорируем ошибки
-//     }
-// }
 
 void ClipboardService::resetTimer()
 {
@@ -257,6 +343,10 @@ void ClipboardService::resetTimer()
         m_timer->stop();
     }
 
+    if (m_saveTimer->isActive()) {
+        m_saveTimer->stop();
+    }
+
     // Очищаем буфер
     clear();
 
@@ -265,16 +355,11 @@ void ClipboardService::resetTimer()
     m_currentSource.clear();
     m_currentDataType.clear();
     m_warningShown = false;
-
-    // Удаляем сохранённое время из БД
-    if (m_db) {
-        m_db->setSetting("clipboard_remaining_seconds", "0");
-    }
 }
 
 void ClipboardService::loadNotificationSettings()
 {
-
+#ifndef CLIPBOARD_TEST_MODE
     try {
         m_notifyOnCopy = m_db->getSetting("clipboard_notify_copy", "true") == "true";
         m_notifyOnWarning = m_db->getSetting("clipboard_notify_warning", "true") == "true";
@@ -284,6 +369,13 @@ void ClipboardService::loadNotificationSettings()
         m_notifyOnWarning = true;
         m_notifyOnClear = true;
     }
+#else
+    // Тестовый режим: используем значения по умолчанию
+    m_notifyOnCopy = true;
+    m_notifyOnWarning = true;
+    m_notifyOnClear = true;
+    std::cout << "Test mode: using default notification settings" << std::endl;
+#endif
 }
 
 bool ClipboardService::isNotifyOnCopy() const { return m_notifyOnCopy; }
