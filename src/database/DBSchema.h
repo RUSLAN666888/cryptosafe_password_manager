@@ -139,19 +139,30 @@ const std::string CREATE_TABLES_V2 = R"(
             END;
 
             -- =====================================================
-            -- Таблица: audit_log (Журнал действий)
+            -- Таблица: audit_log
             -- =====================================================
             CREATE TABLE IF NOT EXISTS audit_log (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                action TEXT NOT NULL,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                entry_id INTEGER,
-                details TEXT,
-                signature BLOB
+                sequence_number BIGINT PRIMARY KEY AUTOINCREMENT,
+                previous_hash TEXT,
+                entry_data BLOB,
+                signature TEXT,
+                key_version INTEGER NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                event_type TEXT
             );
 
-            CREATE INDEX IF NOT EXISTS idx_audit_timestamp ON audit_log(timestamp);
-            CREATE INDEX IF NOT EXISTS idx_audit_action ON audit_log(action);
+            CREATE INDEX idx_timestamp ON audit_log (created_at);
+            CREATE INDEX idx_event_type ON audit_log (event_type);
+            CREATE INDEX idx_sequence_number ON audit_log (sequence_number);
+
+            CREATE TABLE IF NOT EXISTS public_keys (
+                id INTEGER PRIMARY KEY,
+                public_key BLOB NOT NULL,
+                key_version INTEGER UNIQUE NOT NULL,
+                valid_from_sequence INTEGER,
+                valid_to_sequence INTEGER
+            );
+
 
             -- =====================================================
             -- Таблица: settings (Настройки приложения)

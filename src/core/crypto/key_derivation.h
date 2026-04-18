@@ -3,6 +3,8 @@
 
 #include <cstdint>
 #include <openssl/evp.h>
+#include <openssl/kdf.h>
+#include <openssl/params.h>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -37,6 +39,82 @@ inline void derive_encryption_key(const std::string &password,
   {
     throw std::runtime_error("Key derivation failed");
   }
+}
+
+inline void derive_log_seed(const std::string &password, std::vector<uint8_t> &key) {
+
+    std::vector<uint8_t> salt = {
+        0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x53, 0x61,
+        0x66, 0x65, 0x5f, 0x41, 0x75, 0x64, 0x69, 0x74
+    };
+
+    const int key_length = 32;
+    key.resize(key_length);
+
+    // Контекст для ключа подписи аудита
+    const std::string info = "audit-signing";
+
+
+    const std::vector<uint8_t>& actual_salt = salt;
+
+    // Загружаем алгоритм HKDF
+    EVP_KDF *kdf = EVP_KDF_fetch(NULL, "HKDF", NULL);
+    if (kdf == NULL) {
+        std::fill(key.begin(), key.end(), 0);
+        return;
+    }
+
+    // Создаём контекст
+    EVP_KDF_CTX *kctx = EVP_KDF_CTX_new(kdf);
+    EVP_KDF_free(kdf); // kctx сохраняет ссылку
+
+    if (kctx == NULL) {
+        std::fill(key.begin(), key.end(), 0);
+        return;
+    }
+
+    // Параметры для HKDF
+    OSSL_PARAM params[6];
+    OSSL_PARAM *p = params;
+
+    // Алгоритм хеширования
+    *p++ = OSSL_PARAM_construct_utf8_string("digest",
+                                            const_cast<char*>("SHA256"),
+                                            (size_t)6);
+
+    // Соль
+    *p++ = OSSL_PARAM_construct_octet_string("salt",
+                                             const_cast<uint8_t*>(actual_salt.data()),
+                                             actual_salt.size());
+
+    // мастер-пароль
+    *p++ = OSSL_PARAM_construct_octet_string("key",
+                                             const_cast<char*>(password.c_str()),
+                                             password.size());
+
+    // Информация (контекст)
+    *p++ = OSSL_PARAM_construct_octet_string("info",
+                                             const_cast<char*>(info.c_str()),
+                                             info.size());
+
+    *p = OSSL_PARAM_construct_end();
+
+    // Устанавливаем параметры
+    if (EVP_KDF_CTX_set_params(kctx, params) <= 0) {
+        EVP_KDF_CTX_free(kctx);
+        std::fill(key.begin(), key.end(), 0);
+        return;
+    }
+
+    // Выполняем derivation
+    if (EVP_KDF_derive(kctx, key.data(), key.size(), NULL) <= 0) {
+        EVP_KDF_CTX_free(kctx);
+        std::fill(key.begin(), key.end(), 0);
+        return;
+    }
+
+    // Очищаем контекст
+    EVP_KDF_CTX_free(kctx);
 }
 
 #endif

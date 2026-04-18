@@ -16,9 +16,11 @@ class KeyManager
 private:
     std::unique_ptr<uint8_t[]> key;
     std::unique_ptr<uint8_t[]> old_key;
+    std::unique_ptr<uint8_t[]> private_sign_key;
 
     size_t key_size;
     size_t old_key_size;
+    size_t private_sign_key_size;
 
     std::chrono::steady_clock::time_point last_activity;
     bool is_unlocked;
@@ -27,6 +29,7 @@ private:
 
     void zero_memory()
     {
+        //ключ для AES-256
         volatile uint8_t *data = key.get();
         for (size_t i = 0; i < key_size; i++)
         {
@@ -34,6 +37,15 @@ private:
         }
         key.reset();
         key_size = 0;
+
+
+        data = private_sign_key.get();
+        for (size_t i = 0; i < private_sign_key_size; i++)
+        {
+            data[i] = 0;
+        }
+        private_sign_key.reset();
+        private_sign_key_size = 0;
     }
 
     KeyManager() : is_unlocked(false), is_active(true) {}
@@ -82,6 +94,28 @@ public:
         eb.publish(EventType::UserLoggedIn, "KeyManager", "store_key");
     }
 
+    void store_private_sign_key(std::vector<uint8_t> &source){
+        std::lock_guard<std::mutex> lock(mutex);
+
+        zero_memory(); // очищаем старый ключ
+
+        // Забираем память у вектора
+        private_sign_key_size = source.size();
+        private_sign_key = std::make_unique<uint8_t[]>(private_sign_key_size);
+        std::copy(source.begin(), source.end(), private_sign_key.get());
+
+        // Зануляем источник
+        volatile uint8_t *src_data = source.data();
+        for (size_t i = 0; i < source.size(); i++)
+        {
+            src_data[i] = 0;
+        }
+        source.clear();
+
+        last_activity = std::chrono::steady_clock::now();
+        is_unlocked = true;
+    }
+
     void store_old_key(std::vector<uint8_t> &source)
     {
         std::lock_guard<std::mutex> lock(mutex);
@@ -119,6 +153,12 @@ public:
         std::lock_guard<std::mutex> lock(mutex);
         d.data = key.get();
         d.size = key_size;
+    }
+
+    void get_private_sign_key(KeyData &d){
+        std::lock_guard<std::mutex> lock(mutex);
+        d.data = private_sign_key.get();
+        d.size = private_sign_key_size;
     }
 
     void zero_keyData(KeyData &d)

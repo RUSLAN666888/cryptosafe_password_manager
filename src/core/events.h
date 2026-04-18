@@ -18,6 +18,7 @@ enum class EventType
     EntryAdded,
     EntryUpdated,
     EntryDeleted,
+    EntryReaded,
 
     // Auth events
     UserLoggedIn,
@@ -26,7 +27,20 @@ enum class EventType
     // Clipboard events
     ClipboardCopied,
     ClipboardCleared,
-    ClipboardWillClear
+    ClipboardWillClear,
+
+    LoginSuccess,
+    LoginFailure,
+
+    PasswordChange,
+
+    //System events
+    Startup,
+    Shutdown,
+    Lock,
+    Unlock,
+
+    SettingsModification
 };
 
 // Класс события
