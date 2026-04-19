@@ -258,8 +258,6 @@ std::vector<PlaintextEntry> VaultManager::getAllEntries(bool rotate)
     sqlite3_exec(conn, "COMMIT;", nullptr, nullptr, nullptr);
     db.releaseConnection(conn);
 
-    db.addAuditLog("READ_ALL", -1, "All entries accessed");
-
     return entries;
 }
 
@@ -336,7 +334,6 @@ bool VaultManager::updateEntry(int entry_id, const PlaintextEntry& entry)
             if (sqlite3_exec(conn, "COMMIT;", nullptr, nullptr, nullptr) == SQLITE_OK)
             {
                 success = true;
-                db.addAuditLog("UPDATE", entry_id, "Entry updated");
             }
             else
             {
@@ -401,7 +398,6 @@ bool VaultManager::deleteEntry(int entry_id)
             if (sqlite3_exec(conn, "COMMIT;", nullptr, nullptr, nullptr) == SQLITE_OK)
             {
                 success = true;
-                db.addAuditLog("DELETE", entry_id, "Entry deleted");
             }
             else
             {

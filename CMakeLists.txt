@@ -64,39 +64,21 @@ find_package(GTest REQUIRED)
 
 
 set(SOURCES
-    # Core
-    src/core/audit_logger.h
-    src/core/config_handler.h
-    src/core/crypto/abstract.h
-    src/core/crypto/AES256.h
-    src/core/events.h
-    src/core/key_manager.h
-    src/core/crypto/authentication.h
-
-    # Vault
+    src/core/audit/log_signer/log_signer.cpp
+    src/core/audit/audit_logger/audit_logger.cpp
     src/core/vault/VaultManager.cpp
-
-    # Database
     src/database/DB_helper/db_helper.cpp
-
-    # GUI Main
     src/gui/MainWindow.cpp
-
-    # GUI Dialogs
     src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp
     src/gui/dialogs/settings_dialog/SettingsDialog.cpp
     src/gui/dialogs/login_dialog/LoginDialog.cpp
     src/gui/dialogs/password_change/password_change.cpp
     src/gui/dialogs/entry_dialog/entry_dialog.cpp
-
-    # GUI Widgets
-    src/gui/widgets/audit_log_viewer/AuditLogViewer.cpp
     src/gui/widgets/password_entry/PasswordEntry.cpp
     src/gui/widgets/secure_table/SecureTable.cpp
     src/gui/widgets/secure_table/VaultTableModel.cpp
     src/gui/widgets/secure_table/SearchProxyModel.cpp
     src/gui/widgets/secure_table/PasswordDelegate.cpp
-
     src/core/clipboard_service/clipboard_service.cpp
 )
 
@@ -112,7 +94,6 @@ set(HEADERS
     src/gui/dialogs/login_dialog/LoginDialog.h
     src/gui/dialogs/entry_dialog/entry_dialog.h
     src/gui/dialogs/password_change/password_change.h
-    src/gui/widgets/audit_log_viewer/AuditLogViewer.h
     src/gui/widgets/password_entry/PasswordEntry.h
     src/gui/widgets/secure_table/SecureTable.h
     src/gui/widgets/secure_table/VaultTableModel.h
@@ -120,7 +101,6 @@ set(HEADERS
     src/gui/widgets/secure_table/PasswordDelegate.h
     src/core/clipboard_service/clipboard_service.h
 )
-
 
 
 # Создаем список файлов для библиотеки
@@ -132,7 +112,9 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/crypto
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit/audit_logger
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit/log_signer
     ${CMAKE_CURRENT_SOURCE_DIR}/src/database
     ${CMAKE_CURRENT_SOURCE_DIR}/src/database/DB_helper
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui
@@ -149,8 +131,7 @@ target_include_directories(cryptosafe_lib PUBLIC
 )
 
 add_executable(${TARGET_NAME} ${MAIN_SOURCES}
-    src/core/audit/log_signer/log_signer.h
-    src/core/LogEntry.h)
+    src/core/audit/log_verifier/log_verifier.h)
 
 
 

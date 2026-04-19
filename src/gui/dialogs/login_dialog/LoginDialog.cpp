@@ -3,6 +3,7 @@
 #include <thread>
 #include <QMessageBox>
 #include "../src/core/state_manager.h"
+#include "../src/core/audit/log_signer/log_signer.h"
 
 LoginDialog::LoginDialog(QWidget *parent, ConfigHander &cfg, Database &database)
     : QDialog(parent)
@@ -157,7 +158,7 @@ void LoginDialog::onLogin()
     // Конвертируем QString в std::string
     std::string pwdStr = password.toStdString();
 
-    // Шаг 1: Verify password against Argon2 hash
+    // Verify password against Argon2 hash
     if (!verify_password(pwdStr, authData))
     {
         StateManager::getInstance().addFailedAttempt();
@@ -186,9 +187,14 @@ void LoginDialog::onLogin()
         return;
     }
 
-    // Шаг 2: выводим ключ через PBKDF2
+    // выводим ключ через PBKDF2
     std::vector<uint8_t> encKey;
     derive_encryption_key(pwdStr, encSalt, encKey);
+
+    LogSigner::getInstance().initFromMasterPassword(pwdStr);
+
+
+    db.addPublicKey(LogSigner::getInstance().get_public_key(), 1, 1);
 
     // Зануляем пароль в памяти
     volatile char *p = const_cast<char*>(pwdStr.data());
@@ -197,10 +203,10 @@ void LoginDialog::onLogin()
         p[i] = 0;
     }
 
-    // Шаг 3: Cache encryption key in secure memory
+    // cache encryption key in secure memory
     KeyManager::getInstance().store_key(encKey);
 
-    // Шаг 4: Publish UserLoggedIn event
+    // Publish UserLoggedIn event
     struct LoginEventData
     {
         std::string username;

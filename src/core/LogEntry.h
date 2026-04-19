@@ -23,11 +23,11 @@ struct LogEntry {
     int entry_id;
     std::string source;
     json details;
-    Severity severiity;
+    Severity severity;
     std::string timestamp;
 };
 
-std::string getUTCTimestamp(){
+inline std::string getUTCTimestamp(){
     auto now = std::chrono::system_clock::now();  
     auto now_time_t = std::chrono::system_clock::to_time_t(now);
     
@@ -39,7 +39,7 @@ std::string getUTCTimestamp(){
     return oss.str();
 }
 
-json to_json(const LogEntry& entry){
+inline json to_json(const LogEntry& entry){
 
     json j = json{
         {"user_id", entry.user_id},
@@ -47,7 +47,7 @@ json to_json(const LogEntry& entry){
         {"entry_id", entry.entry_id},
         {"source", entry.source},
         {"details", entry.details},
-        {"severity", entry.severiity},
+        {"severity", entry.severity},
         {"timestamp", entry.timestamp},
         };
 

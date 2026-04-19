@@ -27,25 +27,31 @@ private:
     bool is_active;
     std::mutex mutex;
 
-    void zero_memory()
-    {
-        //ключ для AES-256
-        volatile uint8_t *data = key.get();
-        for (size_t i = 0; i < key_size; i++)
-        {
-          data[i] = 0;
+    void zero_encryption_key() {
+        if (key) {
+            volatile uint8_t *data = key.get();
+            for (size_t i = 0; i < key_size; i++) {
+                data[i] = 0;
+            }
+            key.reset();
+            key_size = 0;
         }
-        key.reset();
-        key_size = 0;
+    }
 
-
-        data = private_sign_key.get();
-        for (size_t i = 0; i < private_sign_key_size; i++)
-        {
-            data[i] = 0;
+    void zero_sign_key() {
+        if (private_sign_key) {
+            volatile uint8_t *data = private_sign_key.get();
+            for (size_t i = 0; i < private_sign_key_size; i++) {
+                data[i] = 0;
+            }
+            private_sign_key.reset();
+            private_sign_key_size = 0;
         }
-        private_sign_key.reset();
-        private_sign_key_size = 0;
+    }
+
+    void zero_memory() {
+        zero_encryption_key();
+        zero_sign_key();
     }
 
     KeyManager() : is_unlocked(false), is_active(true) {}
@@ -71,7 +77,7 @@ public:
     {
         std::lock_guard<std::mutex> lock(mutex);
 
-        zero_memory(); // очищаем старый ключ
+        zero_encryption_key(); // очищаем старый ключ
 
         // Забираем память у вектора
         key_size = source.size();
@@ -97,7 +103,7 @@ public:
     void store_private_sign_key(std::vector<uint8_t> &source){
         std::lock_guard<std::mutex> lock(mutex);
 
-        zero_memory(); // очищаем старый ключ
+        zero_sign_key(); // очищаем старый ключ
 
         // Забираем память у вектора
         private_sign_key_size = source.size();

@@ -112,15 +112,9 @@
 	"HEADERS" : 
 	[
 		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/LogEntry.h",
+			"/home/master666/development/cryptosafe_password_manager/src/core/audit/log_verifier/log_verifier.h",
 			"MU",
-			"PRMOGMWJPH/moc_LogEntry.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/audit/log_signer/log_signer.h",
-			"MU",
-			"TG6BYHBCMB/moc_log_signer.cpp",
+			"2ZJZAIFZ6S/moc_log_verifier.cpp",
 			null
 		]
 	],
@@ -140,7 +134,9 @@
 		"/home/master666/development/cryptosafe_password_manager",
 		"/home/master666/development/cryptosafe_password_manager/src",
 		"/home/master666/development/cryptosafe_password_manager/src/core",
-		"/home/master666/development/cryptosafe_password_manager/src/core/crypto",
+		"/home/master666/development/cryptosafe_password_manager/src/core/audit",
+		"/home/master666/development/cryptosafe_password_manager/src/core/audit/audit_logger",
+		"/home/master666/development/cryptosafe_password_manager/src/core/audit/log_signer",
 		"/home/master666/development/cryptosafe_password_manager/src/database",
 		"/home/master666/development/cryptosafe_password_manager/src/database/DB_helper",
 		"/home/master666/development/cryptosafe_password_manager/src/gui",

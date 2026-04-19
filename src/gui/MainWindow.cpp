@@ -9,6 +9,8 @@
 #include "../src/gui/widgets/secure_table/PasswordDelegate.h"
 #include "../src/core/vault/VaultManager.h"
 #include "../src/core/clipboard_service/clipboard_service.h"
+#include "../src/core/audit/log_signer/log_signer.h"
+#include "../src/core/audit/audit_logger/audit_logger.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QDebug>
@@ -18,6 +20,11 @@
 //#include <random>
 #include <unordered_set>
 #include <QProgressDialog>
+#include <nlohmann/json.hpp>
+
+
+using json = nlohmann::json;
+
 
 MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaultManager)
     : QMainWindow(nullptr)
@@ -234,6 +241,8 @@ void MainWindow::registerEventHandlers()
                            int timeout = ClipboardService::getInstance().getAutoClearTimeout();
                            showTemporaryMessage(QString("Пароль скопирован. Очистится через %1 сек").arg(timeout), 3000);
                        });
+
+    //AuditLogger::getInstance().init(db);
 }
 
 void MainWindow::createMenuBar()
@@ -569,8 +578,15 @@ void MainWindow::onAddEntry()
         try {
             int id = m_vaultManager.createEntry(entry);
             if (id != -1) {
-                //refreshTable();  // обновляем таблицу
-                showTemporaryMessage("Запись успешно добавлена", 3000);
+                //showTemporaryMessage("Запись успешно добавлена", 3000);
+                json details = json{
+                    {"entry_id", id},
+                    {"title", entry.title},
+                    {"username", entry.username},
+                    {"category", entry.category},
+                    {"action", "create"}
+                };
+                EventBus::getInstance().publish(EventType::EntryAdded, details, "VaultManager");
             } else {
                 QMessageBox::warning(this, "Ошибка", "Не удалось добавить запись");
             }
@@ -579,6 +595,8 @@ void MainWindow::onAddEntry()
                                   QString("Ошибка при добавлении записи: %1").arg(e.what()));
         }
     }
+
+
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* event)

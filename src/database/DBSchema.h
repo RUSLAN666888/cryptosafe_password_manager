@@ -142,13 +142,14 @@ const std::string CREATE_TABLES_V2 = R"(
             -- Таблица: audit_log
             -- =====================================================
             CREATE TABLE IF NOT EXISTS audit_log (
-                sequence_number BIGINT PRIMARY KEY AUTOINCREMENT,
+                sequence_number INTEGER PRIMARY KEY AUTOINCREMENT,
                 previous_hash TEXT,
-                entry_data BLOB,
+                current_hash TEXT,
+                entry_data TEXT,
                 signature TEXT,
                 key_version INTEGER NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                event_type TEXT
+                event_type INTEGER
             );
 
             CREATE INDEX idx_timestamp ON audit_log (created_at);

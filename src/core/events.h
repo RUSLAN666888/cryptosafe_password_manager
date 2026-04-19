@@ -10,6 +10,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <iostream>
 
 // Типы событий
 enum class EventType
@@ -115,6 +116,20 @@ public:
   void publish(EventType type, const std::any &data = std::any(),
                const std::string &source = "")
   {
+      // Отладочный вывод только для json
+      if (data.has_value() && data.type() == typeid(std::string)) {
+          try {
+              std::string j = std::any_cast<std::string>(data);
+              std::cout << "=== EVENT PUBLISH (json) ===" << std::endl;
+              std::cout << "Event type: " << static_cast<int>(type) << std::endl;
+              std::cout << "Source: " << source << std::endl;
+              std::cout << "Data: " << j << std::endl;
+              std::cout << "============================" << std::endl;
+          } catch (const std::exception& e) {
+              std::cout << "Failed to dump json: " << e.what() << std::endl;
+          }
+      }
+
     Event event(type, data, source);
 
     std::lock_guard<std::recursive_mutex> lock(mutex);
@@ -126,7 +141,7 @@ public:
       {
         try
         {
-          callback(event);
+              callback(event);
         }
         catch (...)
         {

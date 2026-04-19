@@ -61,59 +61,59 @@ void AuditLogViewer::initUI()
 
 void AuditLogViewer::refreshLogs()
 {
-    // Очищаем таблицу
-    logTable->clearContents();
-    logTable->setRowCount(0);
+    // // Очищаем таблицу
+    // logTable->clearContents();
+    // logTable->setRowCount(0);
 
-    // Получаем логи из базы данных (последние 100 записей)
-    auto logs = db.getAuditLogs(100);
+    // // Получаем логи из базы данных (последние 100 записей)
+    // auto logs = db.getAuditLogs(100);
 
-    int row = 0;
-    for (const auto &log : logs)
-    {
-        logTable->insertRow(row);
+    // int row = 0;
+    // for (const auto &log : logs)
+    // {
+    //     logTable->insertRow(row);
 
-        // Конвертируем данные в QString (предполагаем, что поля - std::string или wxString)
-        logTable->setItem(row, 0, new QTableWidgetItem(QString::number(log.id)));
-        logTable->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(log.action)));
-        logTable->setItem(row, 2, new QTableWidgetItem(QString::fromStdString(log.timestamp)));
+    //     // Конвертируем данные в QString (предполагаем, что поля - std::string или wxString)
+    //     logTable->setItem(row, 0, new QTableWidgetItem(QString::number(log.id)));
+    //     logTable->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(log.action)));
+    //     logTable->setItem(row, 2, new QTableWidgetItem(QString::fromStdString(log.timestamp)));
 
-        // Entry ID
-        if (log.entry_id >= 0)
-        {
-            logTable->setItem(row, 3, new QTableWidgetItem(QString::number(log.entry_id)));
-        }
-        else
-        {
-            logTable->setItem(row, 3, new QTableWidgetItem("-"));
-        }
+    //     // Entry ID
+    //     if (log.entry_id >= 0)
+    //     {
+    //         logTable->setItem(row, 3, new QTableWidgetItem(QString::number(log.entry_id)));
+    //     }
+    //     else
+    //     {
+    //         logTable->setItem(row, 3, new QTableWidgetItem("-"));
+    //     }
 
-        logTable->setItem(row, 4, new QTableWidgetItem(QString::fromStdString(log.details)));
+    //     logTable->setItem(row, 4, new QTableWidgetItem(QString::fromStdString(log.details)));
 
-        row++;
-    }
+    //     row++;
+    // }
 
-    // Если нет логов, показываем сообщение
-    if (logs.empty())
-    {
-        logTable->insertRow(0);
-        logTable->setItem(0, 0, new QTableWidgetItem("-"));
-        logTable->setItem(0, 1, new QTableWidgetItem("No audit logs found"));
-        logTable->setItem(0, 2, new QTableWidgetItem(""));
-        logTable->setItem(0, 3, new QTableWidgetItem(""));
-        logTable->setItem(0, 4, new QTableWidgetItem(""));
-    }
+    // // Если нет логов, показываем сообщение
+    // if (logs.empty())
+    // {
+    //     logTable->insertRow(0);
+    //     logTable->setItem(0, 0, new QTableWidgetItem("-"));
+    //     logTable->setItem(0, 1, new QTableWidgetItem("No audit logs found"));
+    //     logTable->setItem(0, 2, new QTableWidgetItem(""));
+    //     logTable->setItem(0, 3, new QTableWidgetItem(""));
+    //     logTable->setItem(0, 4, new QTableWidgetItem(""));
+    // }
 
-    // Автоматически подгоняем ширину колонок
-    for (int i = 0; i < 5; i++)
-    {
-        logTable->resizeColumnToContents(i);
-        // Минимальная ширина для колонки Details
-        if (i == 4 && logTable->columnWidth(i) < 200)
-        {
-            logTable->setColumnWidth(i, 200);
-        }
-    }
+    // // Автоматически подгоняем ширину колонок
+    // for (int i = 0; i < 5; i++)
+    // {
+    //     logTable->resizeColumnToContents(i);
+    //     // Минимальная ширина для колонки Details
+    //     if (i == 4 && logTable->columnWidth(i) < 200)
+    //     {
+    //         logTable->setColumnWidth(i, 200);
+    //     }
+    // }
 }
 
 void AuditLogViewer::onRefresh()

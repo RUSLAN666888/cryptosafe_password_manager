@@ -361,106 +361,7 @@ bool Database::setSetting(const std::string &key, const std::string &value,
   return success;
 }
 
-// Добавить запись в аудит
-int Database::addAuditLog(const std::string &action, int entry_id,
-                          const std::string &details,
-                          const std::vector<uint8_t> &signature)
-{
 
-  sqlite3 *conn = getConnection();
-  if (!conn)
-    return -1;
-
-  sqlite3_stmt *stmt;
-  const char *sql = R"(
-            INSERT INTO audit_log (action, entry_id, details, signature)
-            VALUES (?, ?, ?, ?)
-        )";
-
-  int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
-  if (rc != SQLITE_OK)
-  {
-    std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
-    releaseConnection(conn);
-    return -1;
-  }
-
-  sqlite3_bind_text(stmt, 1, action.c_str(), -1, SQLITE_STATIC);
-  if (entry_id >= 0)
-  {
-    sqlite3_bind_int(stmt, 2, entry_id);
-  }
-  else
-  {
-    sqlite3_bind_null(stmt, 2);
-  }
-  sqlite3_bind_text(stmt, 3, details.c_str(), -1, SQLITE_STATIC);
-
-  if (!signature.empty())
-  {
-    sqlite3_bind_blob(stmt, 4, signature.data(), signature.size(),
-                      SQLITE_STATIC);
-  }
-  else
-  {
-    sqlite3_bind_null(stmt, 4);
-  }
-
-  rc = sqlite3_step(stmt);
-  int log_id = -1;
-
-  if (rc == SQLITE_DONE)
-  {
-    log_id = sqlite3_last_insert_rowid(conn);
-  }
-
-  sqlite3_finalize(stmt);
-  releaseConnection(conn);
-
-  return log_id;
-}
-
-// Получить записи аудита
-std::vector<AuditLog> Database::getAuditLogs(int limit)
-{
-  std::vector<AuditLog> logs;
-
-  sqlite3 *conn = getConnection();
-  if (!conn)
-    return logs;
-
-  sqlite3_stmt *stmt;
-  std::string sql = "SELECT * FROM audit_log ORDER BY timestamp DESC LIMIT ?";
-
-  int rc = sqlite3_prepare_v2(conn, sql.c_str(), -1, &stmt, nullptr);
-  if (rc != SQLITE_OK)
-  {
-    std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
-    releaseConnection(conn);
-    return logs;
-  }
-
-  sqlite3_bind_int(stmt, 1, limit);
-
-  while (sqlite3_step(stmt) == SQLITE_ROW)
-  {
-    AuditLog log;
-    log.id = sqlite3_column_int(stmt, 0);
-    log.action = getColumnString(stmt, 1);
-    log.timestamp = getColumnString(stmt, 2);
-    log.entry_id = sqlite3_column_type(stmt, 3) == SQLITE_NULL
-                       ? -1
-                       : sqlite3_column_int(stmt, 3);
-    log.details = getColumnString(stmt, 4);
-    log.signature = getColumnBlob(stmt, 5);
-    logs.push_back(log);
-  }
-
-  sqlite3_finalize(stmt);
-  releaseConnection(conn);
-
-  return logs;
-}
 
 // Бэкап базы данных (заглушка для Sprint 8)
 bool Database::backup(const std::string &backup_path) { return true; }
@@ -737,4 +638,209 @@ bool Database::getEncSalt(std::vector<uint8_t> &salt)
   releaseConnection(conn);
 
   return found;
+}
+
+
+bool Database::addLogEntry(std::string previous_hash,
+                           std::string current_hash,
+                           std::string entry_data,
+                           std::string signature,
+                           int key_version,
+                           EventType type){
+    sqlite3 *conn = getConnection();
+    if (!conn)
+        return false;
+
+    sqlite3_stmt *stmt;
+    const char *sql = R"(
+        INSERT INTO audit_log (previous_hash, current_hash, entry_data, signature, key_version, created_at, event_type)
+        VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+    )";
+
+    int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK)
+    {
+        std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+        releaseConnection(conn);
+        return false;
+    }
+
+    sqlite3_bind_text(stmt, 1, previous_hash.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, current_hash.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, entry_data.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 4, signature.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 5, key_version);
+    sqlite3_bind_int(stmt, 6, static_cast<int>(type));
+
+    rc = sqlite3_step(stmt);
+
+    sqlite3_finalize(stmt);
+    releaseConnection(conn);
+
+    return (rc == SQLITE_DONE);
+}
+
+bool Database::getLogEntry(int sequence_number,
+                           std::string& previous_hash,
+                           std::string& current_hash,
+                           std::string& entry_data,
+                           std::string& signature,
+                           int& key_version,
+                           std::string& created_at,
+                           std::string& event_type) {
+    sqlite3 *conn = getConnection();
+    if (!conn)
+        return false;
+
+    sqlite3_stmt *stmt;
+    const char *sql = R"(
+        SELECT previous_hash, current_hash, entry_data, signature, key_version, created_at, event_type
+        FROM audit_log
+        WHERE sequence_number = ?
+    )";
+
+    int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+        releaseConnection(conn);
+        return false;
+    }
+
+    sqlite3_bind_int(stmt, 1, sequence_number);
+
+    rc = sqlite3_step(stmt);
+
+    if (rc == SQLITE_ROW) {
+        // previous_hash (колонка 0)
+        const unsigned char* text = sqlite3_column_text(stmt, 0);
+        previous_hash = text ? reinterpret_cast<const char*>(text) : "";
+
+        // current_hash (колонка 1)
+        text = sqlite3_column_text(stmt, 1);
+        current_hash = text ? reinterpret_cast<const char*>(text) : "";
+
+        // entry_data (колонка 2)
+        text = sqlite3_column_text(stmt, 2);
+        entry_data = text ? reinterpret_cast<const char*>(text) : "";
+
+        // signature (колонка 3)
+        text = sqlite3_column_text(stmt, 3);
+        signature = text ? reinterpret_cast<const char*>(text) : "";
+
+        // key_version (колонка 4)
+        key_version = sqlite3_column_int(stmt, 4);
+
+        // created_at (колонка 5)
+        text = sqlite3_column_text(stmt, 5);
+        created_at = text ? reinterpret_cast<const char*>(text) : "";
+
+        // event_type (колонка 6)
+        text = sqlite3_column_text(stmt, 6);
+        event_type = text ? reinterpret_cast<const char*>(text) : "";
+
+        sqlite3_finalize(stmt);
+        releaseConnection(conn);
+        return true;
+    }
+
+    sqlite3_finalize(stmt);
+    releaseConnection(conn);
+    return false;
+}
+
+int Database::getLogEntryCount() {
+    sqlite3 *conn = getConnection();
+    if (!conn)
+        return -1;
+
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT COUNT(*) FROM audit_log";
+
+    int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+        releaseConnection(conn);
+        return -1;
+    }
+
+    rc = sqlite3_step(stmt);
+    int count = -1;
+
+    if (rc == SQLITE_ROW) {
+        count = sqlite3_column_int(stmt, 0);
+    }
+
+    sqlite3_finalize(stmt);
+    releaseConnection(conn);
+    return count;
+}
+
+std::string Database::getLastEntryHash() {
+    sqlite3 *conn = getConnection();
+    if (!conn)
+        return "";
+
+    sqlite3_stmt *stmt;
+    const char *sql = R"(
+        SELECT current_hash
+        FROM audit_log
+        ORDER BY sequence_number DESC
+        LIMIT 1
+    )";
+
+    int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+        releaseConnection(conn);
+        return "";
+    }
+
+    rc = sqlite3_step(stmt);
+
+    if (rc == SQLITE_ROW) {
+        const unsigned char* current_hash = sqlite3_column_text(stmt, 0);
+        std::string result = current_hash ? reinterpret_cast<const char*>(current_hash) : "";
+
+        sqlite3_finalize(stmt);
+        releaseConnection(conn);
+        return result;
+    }
+
+    sqlite3_finalize(stmt);
+    releaseConnection(conn);
+    return "";
+}
+
+
+bool Database::addPublicKey(const std::vector<uint8_t>& publicKey,
+                            int keyVersion,
+                            int validFromSequence) {
+
+    sqlite3 *conn = getConnection();
+    if (!conn)
+        return false;
+
+    sqlite3_stmt *stmt;
+    const char *sql = R"(
+        INSERT OR IGNORE INTO public_keys (public_key, key_version, valid_from_sequence, valid_to_sequence)
+        VALUES (?, ?, ?, NULL)
+    )";
+
+    int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+        releaseConnection(conn);
+        return false;
+    }
+
+    sqlite3_bind_blob(stmt, 1, publicKey.data(), publicKey.size(), SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 2, keyVersion);
+    sqlite3_bind_int(stmt, 3, validFromSequence);
+
+    rc = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+    releaseConnection(conn);
+
+    // rc == SQLITE_DONE если вставлено, SQLITE_CONSTRAINT если существовало (IGNORE)
+    return true;  // В любом случае возвращаем true (ключ есть или добавлен)
 }
