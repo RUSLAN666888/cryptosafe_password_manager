@@ -377,6 +377,30 @@ src/core/audit/log_signer/log_signer.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/audit/log_signer/log_signer.cpp.s
 .PHONY : src/core/audit/log_signer/log_signer.cpp.s
 
+src/core/audit/log_verifier/log_verifier.o: src/core/audit/log_verifier/log_verifier.cpp.o
+.PHONY : src/core/audit/log_verifier/log_verifier.o
+
+# target to build an object file
+src/core/audit/log_verifier/log_verifier.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/audit/log_verifier/log_verifier.cpp.o
+.PHONY : src/core/audit/log_verifier/log_verifier.cpp.o
+
+src/core/audit/log_verifier/log_verifier.i: src/core/audit/log_verifier/log_verifier.cpp.i
+.PHONY : src/core/audit/log_verifier/log_verifier.i
+
+# target to preprocess a source file
+src/core/audit/log_verifier/log_verifier.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/audit/log_verifier/log_verifier.cpp.i
+.PHONY : src/core/audit/log_verifier/log_verifier.cpp.i
+
+src/core/audit/log_verifier/log_verifier.s: src/core/audit/log_verifier/log_verifier.cpp.s
+.PHONY : src/core/audit/log_verifier/log_verifier.s
+
+# target to generate assembly for a file
+src/core/audit/log_verifier/log_verifier.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/audit/log_verifier/log_verifier.cpp.s
+.PHONY : src/core/audit/log_verifier/log_verifier.cpp.s
+
 src/core/clipboard_service/clipboard_service.o: src/core/clipboard_service/clipboard_service.cpp.o
 .PHONY : src/core/clipboard_service/clipboard_service.o
 
@@ -472,6 +496,54 @@ src/gui/MainWindow.s: src/gui/MainWindow.cpp.s
 src/gui/MainWindow.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/MainWindow.cpp.s
 .PHONY : src/gui/MainWindow.cpp.s
+
+src/gui/dialogs/audit_dialog/audit_log_dialog.o: src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.o
+.PHONY : src/gui/dialogs/audit_dialog/audit_log_dialog.o
+
+# target to build an object file
+src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.o
+.PHONY : src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.o
+
+src/gui/dialogs/audit_dialog/audit_log_dialog.i: src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.i
+.PHONY : src/gui/dialogs/audit_dialog/audit_log_dialog.i
+
+# target to preprocess a source file
+src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.i
+.PHONY : src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.i
+
+src/gui/dialogs/audit_dialog/audit_log_dialog.s: src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.s
+.PHONY : src/gui/dialogs/audit_dialog/audit_log_dialog.s
+
+# target to generate assembly for a file
+src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.s
+.PHONY : src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.s
+
+src/gui/dialogs/audit_dialog/audit_log_model.o: src/gui/dialogs/audit_dialog/audit_log_model.cpp.o
+.PHONY : src/gui/dialogs/audit_dialog/audit_log_model.o
+
+# target to build an object file
+src/gui/dialogs/audit_dialog/audit_log_model.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/audit_dialog/audit_log_model.cpp.o
+.PHONY : src/gui/dialogs/audit_dialog/audit_log_model.cpp.o
+
+src/gui/dialogs/audit_dialog/audit_log_model.i: src/gui/dialogs/audit_dialog/audit_log_model.cpp.i
+.PHONY : src/gui/dialogs/audit_dialog/audit_log_model.i
+
+# target to preprocess a source file
+src/gui/dialogs/audit_dialog/audit_log_model.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/audit_dialog/audit_log_model.cpp.i
+.PHONY : src/gui/dialogs/audit_dialog/audit_log_model.cpp.i
+
+src/gui/dialogs/audit_dialog/audit_log_model.s: src/gui/dialogs/audit_dialog/audit_log_model.cpp.s
+.PHONY : src/gui/dialogs/audit_dialog/audit_log_model.s
+
+# target to generate assembly for a file
+src/gui/dialogs/audit_dialog/audit_log_model.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/audit_dialog/audit_log_model.cpp.s
+.PHONY : src/gui/dialogs/audit_dialog/audit_log_model.cpp.s
 
 src/gui/dialogs/entry_dialog/entry_dialog.o: src/gui/dialogs/entry_dialog/entry_dialog.cpp.o
 .PHONY : src/gui/dialogs/entry_dialog/entry_dialog.o
@@ -713,173 +785,29 @@ src/gui/widgets/secure_table/VaultTableModel.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/secure_table/VaultTableModel.cpp.s
 .PHONY : src/gui/widgets/secure_table/VaultTableModel.cpp.s
 
-tests/test_config.o: tests/test_config.cpp.o
-.PHONY : tests/test_config.o
+tests/test_log_verification.o: tests/test_log_verification.cpp.o
+.PHONY : tests/test_log_verification.o
 
 # target to build an object file
-tests/test_config.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_config.cpp.o
-.PHONY : tests/test_config.cpp.o
+tests/test_log_verification.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_log_verification.cpp.o
+.PHONY : tests/test_log_verification.cpp.o
 
-tests/test_config.i: tests/test_config.cpp.i
-.PHONY : tests/test_config.i
-
-# target to preprocess a source file
-tests/test_config.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_config.cpp.i
-.PHONY : tests/test_config.cpp.i
-
-tests/test_config.s: tests/test_config.cpp.s
-.PHONY : tests/test_config.s
-
-# target to generate assembly for a file
-tests/test_config.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_config.cpp.s
-.PHONY : tests/test_config.cpp.s
-
-tests/test_crud.o: tests/test_crud.cpp.o
-.PHONY : tests/test_crud.o
-
-# target to build an object file
-tests/test_crud.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_crud.cpp.o
-.PHONY : tests/test_crud.cpp.o
-
-tests/test_crud.i: tests/test_crud.cpp.i
-.PHONY : tests/test_crud.i
+tests/test_log_verification.i: tests/test_log_verification.cpp.i
+.PHONY : tests/test_log_verification.i
 
 # target to preprocess a source file
-tests/test_crud.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_crud.cpp.i
-.PHONY : tests/test_crud.cpp.i
+tests/test_log_verification.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_log_verification.cpp.i
+.PHONY : tests/test_log_verification.cpp.i
 
-tests/test_crud.s: tests/test_crud.cpp.s
-.PHONY : tests/test_crud.s
-
-# target to generate assembly for a file
-tests/test_crud.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_crud.cpp.s
-.PHONY : tests/test_crud.cpp.s
-
-tests/test_database.o: tests/test_database.cpp.o
-.PHONY : tests/test_database.o
-
-# target to build an object file
-tests/test_database.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_database.cpp.o
-.PHONY : tests/test_database.cpp.o
-
-tests/test_database.i: tests/test_database.cpp.i
-.PHONY : tests/test_database.i
-
-# target to preprocess a source file
-tests/test_database.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_database.cpp.i
-.PHONY : tests/test_database.cpp.i
-
-tests/test_database.s: tests/test_database.cpp.s
-.PHONY : tests/test_database.s
+tests/test_log_verification.s: tests/test_log_verification.cpp.s
+.PHONY : tests/test_log_verification.s
 
 # target to generate assembly for a file
-tests/test_database.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_database.cpp.s
-.PHONY : tests/test_database.cpp.s
-
-tests/test_database_auth_data.o: tests/test_database_auth_data.cpp.o
-.PHONY : tests/test_database_auth_data.o
-
-# target to build an object file
-tests/test_database_auth_data.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_database_auth_data.cpp.o
-.PHONY : tests/test_database_auth_data.cpp.o
-
-tests/test_database_auth_data.i: tests/test_database_auth_data.cpp.i
-.PHONY : tests/test_database_auth_data.i
-
-# target to preprocess a source file
-tests/test_database_auth_data.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_database_auth_data.cpp.i
-.PHONY : tests/test_database_auth_data.cpp.i
-
-tests/test_database_auth_data.s: tests/test_database_auth_data.cpp.s
-.PHONY : tests/test_database_auth_data.s
-
-# target to generate assembly for a file
-tests/test_database_auth_data.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_database_auth_data.cpp.s
-.PHONY : tests/test_database_auth_data.cpp.s
-
-tests/test_encryption.o: tests/test_encryption.cpp.o
-.PHONY : tests/test_encryption.o
-
-# target to build an object file
-tests/test_encryption.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_encryption.cpp.o
-.PHONY : tests/test_encryption.cpp.o
-
-tests/test_encryption.i: tests/test_encryption.cpp.i
-.PHONY : tests/test_encryption.i
-
-# target to preprocess a source file
-tests/test_encryption.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_encryption.cpp.i
-.PHONY : tests/test_encryption.cpp.i
-
-tests/test_encryption.s: tests/test_encryption.cpp.s
-.PHONY : tests/test_encryption.s
-
-# target to generate assembly for a file
-tests/test_encryption.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_encryption.cpp.s
-.PHONY : tests/test_encryption.cpp.s
-
-tests/test_events.o: tests/test_events.cpp.o
-.PHONY : tests/test_events.o
-
-# target to build an object file
-tests/test_events.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_events.cpp.o
-.PHONY : tests/test_events.cpp.o
-
-tests/test_events.i: tests/test_events.cpp.i
-.PHONY : tests/test_events.i
-
-# target to preprocess a source file
-tests/test_events.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_events.cpp.i
-.PHONY : tests/test_events.cpp.i
-
-tests/test_events.s: tests/test_events.cpp.s
-.PHONY : tests/test_events.s
-
-# target to generate assembly for a file
-tests/test_events.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_events.cpp.s
-.PHONY : tests/test_events.cpp.s
-
-tests/test_key_rotation.o: tests/test_key_rotation.cpp.o
-.PHONY : tests/test_key_rotation.o
-
-# target to build an object file
-tests/test_key_rotation.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_key_rotation.cpp.o
-.PHONY : tests/test_key_rotation.cpp.o
-
-tests/test_key_rotation.i: tests/test_key_rotation.cpp.i
-.PHONY : tests/test_key_rotation.i
-
-# target to preprocess a source file
-tests/test_key_rotation.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_key_rotation.cpp.i
-.PHONY : tests/test_key_rotation.cpp.i
-
-tests/test_key_rotation.s: tests/test_key_rotation.cpp.s
-.PHONY : tests/test_key_rotation.s
-
-# target to generate assembly for a file
-tests/test_key_rotation.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_key_rotation.cpp.s
-.PHONY : tests/test_key_rotation.cpp.s
+tests/test_log_verification.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/tests/test_log_verification.cpp.s
+.PHONY : tests/test_log_verification.cpp.s
 
 # Help Target
 help:
@@ -916,6 +844,9 @@ help:
 	@echo "... src/core/audit/log_signer/log_signer.o"
 	@echo "... src/core/audit/log_signer/log_signer.i"
 	@echo "... src/core/audit/log_signer/log_signer.s"
+	@echo "... src/core/audit/log_verifier/log_verifier.o"
+	@echo "... src/core/audit/log_verifier/log_verifier.i"
+	@echo "... src/core/audit/log_verifier/log_verifier.s"
 	@echo "... src/core/clipboard_service/clipboard_service.o"
 	@echo "... src/core/clipboard_service/clipboard_service.i"
 	@echo "... src/core/clipboard_service/clipboard_service.s"
@@ -928,6 +859,12 @@ help:
 	@echo "... src/gui/MainWindow.o"
 	@echo "... src/gui/MainWindow.i"
 	@echo "... src/gui/MainWindow.s"
+	@echo "... src/gui/dialogs/audit_dialog/audit_log_dialog.o"
+	@echo "... src/gui/dialogs/audit_dialog/audit_log_dialog.i"
+	@echo "... src/gui/dialogs/audit_dialog/audit_log_dialog.s"
+	@echo "... src/gui/dialogs/audit_dialog/audit_log_model.o"
+	@echo "... src/gui/dialogs/audit_dialog/audit_log_model.i"
+	@echo "... src/gui/dialogs/audit_dialog/audit_log_model.s"
 	@echo "... src/gui/dialogs/entry_dialog/entry_dialog.o"
 	@echo "... src/gui/dialogs/entry_dialog/entry_dialog.i"
 	@echo "... src/gui/dialogs/entry_dialog/entry_dialog.s"
@@ -958,27 +895,9 @@ help:
 	@echo "... src/gui/widgets/secure_table/VaultTableModel.o"
 	@echo "... src/gui/widgets/secure_table/VaultTableModel.i"
 	@echo "... src/gui/widgets/secure_table/VaultTableModel.s"
-	@echo "... tests/test_config.o"
-	@echo "... tests/test_config.i"
-	@echo "... tests/test_config.s"
-	@echo "... tests/test_crud.o"
-	@echo "... tests/test_crud.i"
-	@echo "... tests/test_crud.s"
-	@echo "... tests/test_database.o"
-	@echo "... tests/test_database.i"
-	@echo "... tests/test_database.s"
-	@echo "... tests/test_database_auth_data.o"
-	@echo "... tests/test_database_auth_data.i"
-	@echo "... tests/test_database_auth_data.s"
-	@echo "... tests/test_encryption.o"
-	@echo "... tests/test_encryption.i"
-	@echo "... tests/test_encryption.s"
-	@echo "... tests/test_events.o"
-	@echo "... tests/test_events.i"
-	@echo "... tests/test_events.s"
-	@echo "... tests/test_key_rotation.o"
-	@echo "... tests/test_key_rotation.i"
-	@echo "... tests/test_key_rotation.s"
+	@echo "... tests/test_log_verification.o"
+	@echo "... tests/test_log_verification.i"
+	@echo "... tests/test_log_verification.s"
 .PHONY : help
 
 

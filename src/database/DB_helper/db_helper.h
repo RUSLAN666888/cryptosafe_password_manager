@@ -113,18 +113,18 @@ public:
                   bool encrypted = false);
 
 
-    bool addLogEntry(std::string previous_hash,
-                               std::string current_hash,
-                               std::string entry_data,
-                               std::string signature,
+    bool addLogEntry(std::string& previous_hash,
+                               std::string& current_hash,
+                               std::string& entry_data,
+                               std::vector<uint8_t>& signature,
                                int key_version,
-                     EventType type);
+                               EventType type);
 
     bool getLogEntry(int sequence_number,
                                std::string& previous_hash,
                                std::string& current_hash,
                                std::string& entry_data,
-                               std::string& signature,
+                               std::vector<uint8_t>& signature,
                                int& key_version,
                                std::string& created_at,
                                std::string& event_type);
@@ -132,6 +132,8 @@ public:
     bool addPublicKey(const std::vector<uint8_t>& publicKey,
                                 int keyVersion,
                       int validFromSequence);
+
+    bool getPublicKeyForSequence(int sequenceNumber, std::vector<uint8_t>& publicKey, int& keyVersion);
 
     std::string getLastEntryHash();
 

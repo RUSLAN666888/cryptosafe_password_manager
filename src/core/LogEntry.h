@@ -25,32 +25,34 @@ struct LogEntry {
     json details;
     Severity severity;
     std::string timestamp;
+
 };
 
 inline std::string getUTCTimestamp(){
-    auto now = std::chrono::system_clock::now();  
+    auto now = std::chrono::system_clock::now();
     auto now_time_t = std::chrono::system_clock::to_time_t(now);
-    
-    std::tm* utc_time = std::gmtime(&now_time_t);  
-    
+
+    std::tm* utc_time = std::gmtime(&now_time_t);
+
     std::ostringstream oss;
     oss << std::put_time(utc_time, "%Y-%m-%dT%H:%M:%S") << "Z";
-    
+
     return oss.str();
 }
 
-inline json to_json(const LogEntry& entry){
+inline json to_json(const LogEntry& entry) {
 
-    json j = json{
-        {"user_id", entry.user_id},
-        {"event_type", entry.type},
-        {"entry_id", entry.entry_id},
-        {"source", entry.source},
-        {"details", entry.details},
-        {"severity", entry.severity},
-        {"timestamp", entry.timestamp},
-        };
+    json j = json::object();
+    j["user_id"] = entry.user_id;
+    j["event_type"] = static_cast<int>(entry.type);
+    j["entry_id"] = entry.entry_id;
+    j["source"] = entry.source;
+    j["details"] = entry.details;
+    j["severity"] = static_cast<int>(entry.severity);
+    j["timestamp"] = entry.timestamp;
 
     return j;
 }
+
+
 #endif // LOGENTRY_H

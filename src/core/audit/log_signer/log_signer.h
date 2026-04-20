@@ -14,7 +14,7 @@ public:
     std::vector<uint8_t> m_public_key;
 
     void initFromMasterPassword(const std::string& password);
-    std::string sign(LogEntry entry);
+    std::vector<uint8_t> sign(LogEntry entry);
     std::string getHash(LogEntry entry, std::string previous_hash = "");
 
     std::vector<uint8_t> get_public_key(){return m_public_key;}
@@ -23,6 +23,7 @@ public:
         static LogSigner instance;
         return instance;
     }
+
 };
 
 

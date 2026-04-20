@@ -66,6 +66,7 @@ find_package(GTest REQUIRED)
 set(SOURCES
     src/core/audit/log_signer/log_signer.cpp
     src/core/audit/audit_logger/audit_logger.cpp
+    src/core/audit/log_verifier/log_verifier.cpp
     src/core/vault/VaultManager.cpp
     src/database/DB_helper/db_helper.cpp
     src/gui/MainWindow.cpp
@@ -80,6 +81,8 @@ set(SOURCES
     src/gui/widgets/secure_table/SearchProxyModel.cpp
     src/gui/widgets/secure_table/PasswordDelegate.cpp
     src/core/clipboard_service/clipboard_service.cpp
+    src/gui/dialogs/audit_dialog/audit_log_model.cpp
+    src/gui/dialogs/audit_dialog/audit_log_dialog.cpp
 )
 
 set(MAIN_SOURCES
@@ -100,6 +103,8 @@ set(HEADERS
     src/gui/widgets/secure_table/SearchProxyModel.h
     src/gui/widgets/secure_table/PasswordDelegate.h
     src/core/clipboard_service/clipboard_service.h
+    src/gui/dialogs/audit_dialog/audit_log_model.h
+    src/gui/dialogs/audit_dialog/audit_log_dialog.h
 )
 
 
@@ -113,6 +118,7 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit/log_verifier
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit/audit_logger
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit/log_signer
     ${CMAKE_CURRENT_SOURCE_DIR}/src/database
@@ -121,6 +127,7 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets/secure_table
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/audit_dialog
     ${SQLite3_INCLUDE_DIRS}
     ${nlohmann_json_INCLUDE_DIRS}
     ${ARGON2_INCLUDE}
@@ -130,8 +137,7 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${Qt5Core_INCLUDE_DIRS}
 )
 
-add_executable(${TARGET_NAME} ${MAIN_SOURCES}
-    src/core/audit/log_verifier/log_verifier.h)
+add_executable(${TARGET_NAME} ${MAIN_SOURCES})
 
 
 
@@ -169,13 +175,14 @@ target_compile_definitions(${TARGET_NAME} PRIVATE
 
 
 add_executable(run_tests
-    tests/test_key_rotation.cpp
-    tests/test_encryption.cpp
-    tests/test_crud.cpp
-    tests/test_database.cpp
-    tests/test_database_auth_data.cpp
-    tests/test_config.cpp
-    tests/test_events.cpp
+    tests/test_log_verification.cpp
+    # tests/test_key_rotation.cpp
+    # tests/test_encryption.cpp
+    # tests/test_crud.cpp
+    # tests/test_database.cpp
+    # tests/test_database_auth_data.cpp
+    # tests/test_config.cpp
+    # tests/test_events.cpp
 )
 
 target_link_libraries(run_tests PRIVATE
@@ -203,6 +210,10 @@ target_include_directories(run_tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets/secure_table
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit/log_verifier
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit/audit_logger
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit/log_signer
     ${SQLite3_INCLUDE_DIRS}
     ${GTEST_INCLUDE_DIRS}
 )

@@ -146,7 +146,7 @@ const std::string CREATE_TABLES_V2 = R"(
                 previous_hash TEXT,
                 current_hash TEXT,
                 entry_data TEXT,
-                signature TEXT,
+                signature BLOB,
                 key_version INTEGER NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 event_type INTEGER

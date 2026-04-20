@@ -102,6 +102,8 @@ private slots:
     void onCopyPassword();
     void onCopyAll();
 
+    void onViewAuditLogs();
+
 public:
     MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaultManager);
     ~MainWindow();

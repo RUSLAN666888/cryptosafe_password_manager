@@ -20,6 +20,10 @@
 #include <objc/objc-runtime.h>
 #endif
 
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
 ClipboardService::ClipboardService()
     : QObject(nullptr)
     , m_timer(new QTimer(this))
@@ -141,6 +145,7 @@ void ClipboardService::copyText(const QString& text, const QString& source, cons
     if (m_notifyOnCopy) {
         eventBus.publish(EventType::ClipboardCopied, source.toStdString(), type.toStdString());
     }
+
 }
 
 void ClipboardService::clear()
@@ -218,6 +223,9 @@ void ClipboardService::clear()
     }
 
     eventBus.publish(EventType::ClipboardCleared, "", "");
+    json details = json::object();
+    details["action"] = "clipboard_cleared";
+    EventBus::getInstance().publish(EventType::ClipboardCleared, details, "ClipboardService");
 }
 
 int ClipboardService::getAutoClearTimeout() const

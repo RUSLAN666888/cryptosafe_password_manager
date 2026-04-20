@@ -164,6 +164,12 @@ void LoginDialog::onLogin()
         StateManager::getInstance().addFailedAttempt();
         failedAttempts = StateManager::getInstance().getFailedAttempts();
 
+        json details = json::object();
+        details["action"] = "login_failed";
+        details["reason"] = "invalid_password";
+
+        EventBus::getInstance().publish(EventType::LoginFailure, details, "LoginDialog");
+
         // Exponential backoff
         if (failedAttempts <= 2)
         {
@@ -213,8 +219,9 @@ void LoginDialog::onLogin()
         std::chrono::system_clock::time_point loginTime;
     };
 
-    LoginEventData eventData{"user", std::chrono::system_clock::now()};
-    eventBus.publish(EventType::UserLoggedIn, eventData, "LoginDialog");
+    json details = json::object();
+    details["action"] = "login_success";
+    eventBus.publish(EventType::UserLoggedIn, details, "LoginDialog");
 
     // Сбрасываем счетчик попыток при успешном входе
     resetBackoff();

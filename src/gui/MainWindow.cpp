@@ -11,6 +11,7 @@
 #include "../src/core/clipboard_service/clipboard_service.h"
 #include "../src/core/audit/log_signer/log_signer.h"
 #include "../src/core/audit/audit_logger/audit_logger.h"
+#include "../src/gui/dialogs/audit_dialog/audit_log_dialog.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QDebug>
@@ -34,6 +35,10 @@ MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaul
     , isLoggedIn(false)
     , m_temporaryMessage("")
 {
+    // json details = json::object();
+    // details["action"] = "Startup";
+    // EventBus::getInstance().publish(EventType::Startup, details, "MainWindow");
+
     setWindowTitle("CryptoSafe Manager");
     resize(900, 600);
 
@@ -215,6 +220,10 @@ MainWindow::~MainWindow()
         //ClipboardService::getInstance().saveRemainingTime();
         ClipboardService::getInstance().resetTimer();
         KeyManager::getInstance().logout();
+
+        json details = json::object();
+        details["action"] = "Shutdown";
+        EventBus::getInstance().publish(EventType::Shutdown, details, "MainWindow");
     }
 }
 
@@ -267,9 +276,9 @@ void MainWindow::createMenuBar()
     editMenu->addAction("&Change Master Password", this, &MainWindow::onChangePassword, QKeySequence("Ctrl+Shift+P"));
 
     QMenu *viewMenu = menuBar->addMenu("&View");
-    viewMenu->addAction("&Audit Logs", this, &MainWindow::onViewLogs);
+    viewMenu->addAction("&Audit Logs", this, &MainWindow::onViewAuditLogs, QKeySequence("Ctrl+Shift+A"));
     viewMenu->addSeparator();
-    viewMenu->addAction("&Settings", this, &MainWindow::onSettings);
+    viewMenu->addAction("&Settings", this, &MainWindow::onSettings, QKeySequence("Ctrl+,"));
 
     QMenu *helpMenu = menuBar->addMenu("&Help");
     helpMenu->addAction("Setup &Wizard", this, &MainWindow::onFirstRunWizard);
@@ -477,6 +486,10 @@ void MainWindow::unlockApplication()
         StateManager::getInstance().login();
 
         resetInactivityTimer();
+
+        json details = json::object();
+        details["action"] = "Vault_unlocked";
+        eventBus.publish(EventType::Unlock, details, "MainWindow");
     }
 }
 
@@ -502,9 +515,9 @@ void MainWindow::lockApplication()
             inactivityTimer->stop();
         }
 
-        struct EmptyData {};
-        EmptyData emptyData;
-        eventBus.publish(EventType::UserLoggedOut, emptyData, "MainWindow");
+        json details = json::object();
+        details["action"] = "Vault_locked";
+        eventBus.publish(EventType::Lock, details, "MainWindow");
     }
 }
 
@@ -522,6 +535,10 @@ void MainWindow::onInactivityTimeout()
 {
     if (isLoggedIn)
     {
+        json details = json::object();
+        details["action"] = "InactivityTimeout";
+        EventBus::getInstance().publish(EventType::InactivityTimeout, details, "MainWindow");
+
         lockApplication();
         KeyManager::getInstance().logout();
         QMessageBox::information(this, "Auto-Lock", "Application locked due to inactivity.");
@@ -579,13 +596,12 @@ void MainWindow::onAddEntry()
             int id = m_vaultManager.createEntry(entry);
             if (id != -1) {
                 //showTemporaryMessage("Запись успешно добавлена", 3000);
-                json details = json{
-                    {"entry_id", id},
-                    {"title", entry.title},
-                    {"username", entry.username},
-                    {"category", entry.category},
-                    {"action", "create"}
-                };
+                json details = json::object();
+                details["entry_id"] = static_cast<int>(id);
+                details["title"] = entry.title;
+                details["username"] = entry.username;
+                details["category"] = entry.category;
+                details["action"] = "create";
                 EventBus::getInstance().publish(EventType::EntryAdded, details, "VaultManager");
             } else {
                 QMessageBox::warning(this, "Ошибка", "Не удалось добавить запись");
@@ -623,6 +639,8 @@ void MainWindow::onEditEntry()
         return;
     }
 
+    PlaintextEntry oldEntry = *entry;
+
     // Открываем диалог с данными записи
     EntryDialog dialog(db, *entry, this);  // конструктор для редактирования
     if (dialog.exec() == QDialog::Accepted)
@@ -636,6 +654,17 @@ void MainWindow::onEditEntry()
         if (m_vaultManager.updateEntry(static_cast<int>(entryId), updatedEntry)) {
             // Обновляем модель (таблицу)
             //m_tableModel->refresh();
+
+            json details = json::object();
+            details["entry_id"] = static_cast<int>(entryId);
+            details["old_title"] = oldEntry.title;
+            details["new_title"] = updatedEntry.title;
+            details["old_username"] = oldEntry.username;
+            details["new_username"] = updatedEntry.username;
+            details["old_category"] = oldEntry.category;
+            details["new_category"] = updatedEntry.category;
+            details["action"] = "update";
+            EventBus::getInstance().publish(EventType::EntryUpdated, details, "VaultManager");
 
             // Если пароль был в кэше - обновляем его
             m_tableModel->updatePasswordInCache(entryId, updatedEntry.password);
@@ -660,25 +689,26 @@ void MainWindow::onDeleteEntry()
         return;
     }
 
-    // Собираем ID выбранных записей
-    QList<long> ids;
+    // Собираем ID и title выбранных записей
+    QMap<long, QString> entries;  // id -> title
     for (const QModelIndex& idx : selected) {
         QModelIndex sourceIdx = m_proxyModel->mapToSource(idx);
         long id = m_tableModel->getId(sourceIdx.row());
         if (id != -1) {
-            ids.append(id);
+            QString title = m_tableModel->data(m_tableModel->index(sourceIdx.row(), 0)).toString();
+            entries[id] = title;
         }
     }
 
-    if (ids.isEmpty()) {
+    if (entries.isEmpty()) {
         QMessageBox::warning(this, "Ошибка", "Не удалось получить ID записей");
         return;
     }
 
     // Подтверждение удаления
-    QString message = ids.size() == 1
+    QString message = entries.size() == 1
                           ? "Вы уверены, что хотите удалить эту запись?"
-                          : QString("Вы уверены, что хотите удалить %1 записей?").arg(ids.size());
+                          : QString("Вы уверены, что хотите удалить %1 записей?").arg(entries.size());
 
     QMessageBox::StandardButton reply = QMessageBox::question(
         this, "Подтверждение удаления", message,
@@ -690,23 +720,31 @@ void MainWindow::onDeleteEntry()
         bool allSuccess = true;
         int deletedCount = 0;
 
-        for (long id : ids) {
+        for (auto it = entries.begin(); it != entries.end(); ++it) {
+            long id = it.key();
+            QString title = it.value();
+
             if (m_vaultManager.deleteEntry(static_cast<int>(id))) {
                 deletedCount++;
+
+                json details = json::object();
+                details["entry_id"] = static_cast<int>(id);
+                details["title"] = title.toStdString();
+                details["action"] = "delete";
+                EventBus::getInstance().publish(EventType::EntryDeleted, details, "VaultManager");
             } else {
                 allSuccess = false;
             }
         }
 
         if (allSuccess) {
-            // Обновляем таблицу
-            //m_tableModel->refresh();
+            m_tableModel->refresh();
             statusBar->showMessage(QString("Удалено %1 записей").arg(deletedCount), 3000);
         } else {
             QMessageBox::warning(this, "Ошибка",
                                  QString("Удалено %1 из %2 записей. Некоторые записи не удалось удалить.")
-                                     .arg(deletedCount).arg(ids.size()));
-            //m_tableModel->refresh();  // все равно обновляем, чтобы показать актуальное состояние
+                                     .arg(deletedCount).arg(entries.size()));
+            m_tableModel->refresh();
         }
     }
 }
@@ -861,6 +899,12 @@ void MainWindow::onCopyUsername()
     try {
         auto entry = m_vaultManager.getEntry(static_cast<int>(id));
         if (entry) {
+            json details = json::object();
+            details["entry_id"] = static_cast<int>(id);
+            details["copied_field"] = "username";
+            details["action"] = "copy";
+            EventBus::getInstance().publish(EventType::ClipboardCopied, details, "MainWindow");
+
             ClipboardService::getInstance().copyText(
                 QString::fromStdString(entry->username),
                 QString::fromStdString(entry->title),
@@ -885,6 +929,12 @@ void MainWindow::onCopyPassword()
     try {
         auto entry = m_vaultManager.getEntry(static_cast<int>(id));
         if (entry) {
+            json details = json::object();
+            details["entry_id"] = static_cast<int>(id);
+            details["copied_field"] = "password";
+            details["action"] = "copy";
+            EventBus::getInstance().publish(EventType::ClipboardCopied, details, "MainWindow");
+
             ClipboardService::getInstance().copyText(
                 QString::fromStdString(entry->password),
                 QString::fromStdString(entry->title),
@@ -907,6 +957,12 @@ void MainWindow::onCopyAll()
     try {
         auto entry = m_vaultManager.getEntry(static_cast<int>(id));
         if (entry) {
+            json details = json::object();
+            details["entry_id"] = static_cast<int>(id);
+            details["copied_field"] = "all";
+            details["action"] = "copy";
+            EventBus::getInstance().publish(EventType::ClipboardCopied, details, "MainWindow");
+
             QString allData = QString(
                                   "Title: %1\n"
                                   "Username: %2\n"
@@ -931,4 +987,14 @@ void MainWindow::onCopyAll()
     }
 }
 
+void MainWindow::onViewAuditLogs()
+{
+    if (!isLoggedIn) {
+        QMessageBox::warning(this, "Not Logged In",
+                             "Please log in to view audit logs.");
+        return;
+    }
 
+    AuditLogDialog dialog(db, this);
+    dialog.exec();
+}

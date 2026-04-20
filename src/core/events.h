@@ -30,7 +30,6 @@ enum class EventType
     ClipboardCleared,
     ClipboardWillClear,
 
-    LoginSuccess,
     LoginFailure,
 
     PasswordChange,
@@ -41,7 +40,11 @@ enum class EventType
     Lock,
     Unlock,
 
-    SettingsModification
+    SettingsModification,
+
+    IntegrityCheckFailed,
+
+    InactivityTimeout
 };
 
 // Класс события

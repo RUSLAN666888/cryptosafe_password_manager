@@ -641,12 +641,13 @@ bool Database::getEncSalt(std::vector<uint8_t> &salt)
 }
 
 
-bool Database::addLogEntry(std::string previous_hash,
-                           std::string current_hash,
-                           std::string entry_data,
-                           std::string signature,
+bool Database::addLogEntry(std::string& previous_hash,
+                           std::string& current_hash,
+                           std::string& entry_data,
+                           std::vector<uint8_t>& signature,
                            int key_version,
                            EventType type){
+
     sqlite3 *conn = getConnection();
     if (!conn)
         return false;
@@ -668,7 +669,7 @@ bool Database::addLogEntry(std::string previous_hash,
     sqlite3_bind_text(stmt, 1, previous_hash.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, current_hash.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, entry_data.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 4, signature.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_blob(stmt, 4, signature.data(), signature.size(), SQLITE_STATIC);
     sqlite3_bind_int(stmt, 5, key_version);
     sqlite3_bind_int(stmt, 6, static_cast<int>(type));
 
@@ -684,7 +685,7 @@ bool Database::getLogEntry(int sequence_number,
                            std::string& previous_hash,
                            std::string& current_hash,
                            std::string& entry_data,
-                           std::string& signature,
+                           std::vector<uint8_t>& signature,
                            int& key_version,
                            std::string& created_at,
                            std::string& event_type) {
@@ -711,30 +712,35 @@ bool Database::getLogEntry(int sequence_number,
     rc = sqlite3_step(stmt);
 
     if (rc == SQLITE_ROW) {
-        // previous_hash (колонка 0)
+        // previous_hash (колонка 0) - TEXT
         const unsigned char* text = sqlite3_column_text(stmt, 0);
         previous_hash = text ? reinterpret_cast<const char*>(text) : "";
 
-        // current_hash (колонка 1)
+        // current_hash (колонка 1) - TEXT
         text = sqlite3_column_text(stmt, 1);
         current_hash = text ? reinterpret_cast<const char*>(text) : "";
 
-        // entry_data (колонка 2)
+        // entry_data (колонка 2) - TEXT
         text = sqlite3_column_text(stmt, 2);
         entry_data = text ? reinterpret_cast<const char*>(text) : "";
 
-        // signature (колонка 3)
-        text = sqlite3_column_text(stmt, 3);
-        signature = text ? reinterpret_cast<const char*>(text) : "";
+        // signature (колонка 3) - BLOB
+        const void* blob = sqlite3_column_blob(stmt, 3);
+        int blobSize = sqlite3_column_bytes(stmt, 3);
+        if (blob && blobSize > 0) {
+            signature.assign(static_cast<const uint8_t*>(blob), static_cast<const uint8_t*>(blob) + blobSize);
+        } else {
+            signature.clear();
+        }
 
-        // key_version (колонка 4)
+        // key_version (колонка 4) - INTEGER
         key_version = sqlite3_column_int(stmt, 4);
 
-        // created_at (колонка 5)
+        // created_at (колонка 5) - TEXT
         text = sqlite3_column_text(stmt, 5);
         created_at = text ? reinterpret_cast<const char*>(text) : "";
 
-        // event_type (колонка 6)
+        // event_type (колонка 6) - TEXT
         text = sqlite3_column_text(stmt, 6);
         event_type = text ? reinterpret_cast<const char*>(text) : "";
 
@@ -841,6 +847,50 @@ bool Database::addPublicKey(const std::vector<uint8_t>& publicKey,
     sqlite3_finalize(stmt);
     releaseConnection(conn);
 
-    // rc == SQLITE_DONE если вставлено, SQLITE_CONSTRAINT если существовало (IGNORE)
-    return true;  // В любом случае возвращаем true (ключ есть или добавлен)
+    return true;
+}
+
+bool Database::getPublicKeyForSequence(int sequenceNumber, std::vector<uint8_t>& publicKey, int& keyVersion) {
+    sqlite3 *conn = getConnection();
+    if (!conn)
+        return false;
+
+    sqlite3_stmt *stmt;
+    const char *sql = R"(
+        SELECT pk.public_key, pk.key_version
+        FROM public_keys pk
+        WHERE pk.valid_from_sequence <= ?
+        AND (pk.valid_to_sequence IS NULL OR pk.valid_to_sequence >= ?)
+        ORDER BY pk.key_version DESC
+        LIMIT 1
+    )";
+
+    int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+        releaseConnection(conn);
+        return false;
+    }
+
+    sqlite3_bind_int(stmt, 1, sequenceNumber);
+    sqlite3_bind_int(stmt, 2, sequenceNumber);
+    rc = sqlite3_step(stmt);
+
+    if (rc == SQLITE_ROW) {
+        const void* blob = sqlite3_column_blob(stmt, 0);
+        int blobSize = sqlite3_column_bytes(stmt, 0);
+
+        publicKey.resize(blobSize);
+        memcpy(publicKey.data(), blob, blobSize);
+
+        keyVersion = sqlite3_column_int(stmt, 1);
+
+        sqlite3_finalize(stmt);
+        releaseConnection(conn);
+        return true;
+    }
+
+    sqlite3_finalize(stmt);
+    releaseConnection(conn);
+    return false;
 }

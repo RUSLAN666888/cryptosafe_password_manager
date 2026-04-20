@@ -109,15 +109,7 @@
 	"CMAKE_SOURCE_DIR" : "/home/master666/development/cryptosafe_password_manager",
 	"DEP_FILE" : "/home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/deps",
 	"DEP_FILE_RULE_NAME" : "cryptosafe_autogen/timestamp",
-	"HEADERS" : 
-	[
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/audit/log_verifier/log_verifier.h",
-			"MU",
-			"2ZJZAIFZ6S/moc_log_verifier.cpp",
-			null
-		]
-	],
+	"HEADERS" : [],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
 	"INCLUDE_DIR" : "/home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/include",
 	"MOC_COMPILATION_FILE" : "/home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/mocs_compilation.cpp",
@@ -135,6 +127,7 @@
 		"/home/master666/development/cryptosafe_password_manager/src",
 		"/home/master666/development/cryptosafe_password_manager/src/core",
 		"/home/master666/development/cryptosafe_password_manager/src/core/audit",
+		"/home/master666/development/cryptosafe_password_manager/src/core/audit/log_verifier",
 		"/home/master666/development/cryptosafe_password_manager/src/core/audit/audit_logger",
 		"/home/master666/development/cryptosafe_password_manager/src/core/audit/log_signer",
 		"/home/master666/development/cryptosafe_password_manager/src/database",
@@ -143,6 +136,7 @@
 		"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs",
 		"/home/master666/development/cryptosafe_password_manager/src/gui/widgets",
 		"/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table",
+		"/home/master666/development/cryptosafe_password_manager/src/gui/dialogs/audit_dialog",
 		"/usr/include/x86_64-linux-gnu/qt5",
 		"/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
 		"/usr/include/x86_64-linux-gnu/qt5/QtGui",

@@ -29,7 +29,7 @@ void LogSigner::initFromMasterPassword(const std::string& password)
     m_public_key = public_key;
 }
 
-std::string LogSigner::sign(LogEntry entry){
+std::vector<uint8_t> LogSigner::sign(LogEntry entry){
     json j = to_json(entry);
     std::string j_string = j.dump();
     std::vector<uint8_t> entry_data(j_string.begin(), j_string.end());
@@ -50,12 +50,10 @@ std::string LogSigner::sign(LogEntry entry){
 
     EVP_DigestSign(md_ctx, signature.data(), &sig_len, entry_data.data(), entry_data.size());
 
-    std::string result(signature.begin(), signature.end());
-
     EVP_MD_CTX_free(md_ctx);
     EVP_PKEY_free(pkey);
 
-    return result;
+    return signature;
 }
 
 std::string LogSigner::getHash(LogEntry entry, std::string previous_hash){
@@ -69,6 +67,9 @@ std::string LogSigner::getHash(LogEntry entry, std::string previous_hash){
     std::vector<uint8_t> digest(32);
     EVP_DigestFinal_ex(ctx, digest.data(), NULL);
 
-    std::string result(digest.begin(), digest.end());
-    return result;
+    std::stringstream ss;
+    for (uint8_t byte : digest) {
+        ss << std::hex << std::setw(2) << std::setfill('0') << (int)byte;
+    }
+    return ss.str();
 }

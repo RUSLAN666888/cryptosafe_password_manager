@@ -9,6 +9,9 @@
 #include "../src/core/crypto/AES256.h"
 #include "../src/core/clipboard_service/clipboard_service.h"
 #include "../src/core/audit/audit_logger/audit_logger.h"
+#include "../src/core/audit/log_verifier/log_verifier.h"
+#include "../src/core/events.h"
+
 
 int main(int argc, char *argv[])
 {
@@ -45,6 +48,7 @@ int main(int argc, char *argv[])
         //ClipboardService::getInstance().restoreRemainingTime();
 
         AuditLogger::getInstance().init(db);
+        LogVerifier::getInstance().init(&db);
 
         static AES256GCM crypto;
         static VaultManager m(db, crypto, KeyManager::getInstance());
