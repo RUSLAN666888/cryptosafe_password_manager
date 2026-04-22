@@ -37,12 +37,12 @@ private slots:
     void onRowSelected(const QModelIndex& current, const QModelIndex& previous);
     void onVerifyIntegrity();
     void onExportCSV();
-    void onVerifySignature();
     void onNextPage();
     void onPrevPage();
     void onContextMenu(const QPoint& pos);
     void onGoToVaultEntry();
     void onShowFailedLoginDetails();
+    void onExportSignedJSON();
 
 private:
     void setupUI();
@@ -67,7 +67,6 @@ private:
     QTextEdit* m_detailsTextEdit;
     QLabel* m_statusLabel;
     QLabel* m_hashChainLabel;
-    QLabel* m_signatureStatusLabel;
 
     // Пагинация
     QPushButton* m_prevButton;
@@ -75,6 +74,9 @@ private:
     QLabel* m_pageLabel;
     int m_currentPage;
     int m_pageSize;
+
+    QLabel* m_previousHashLabel;
+    QLabel* m_currentHashLabel;
 
     // Текущая выбранная запись
     AuditEntryDisplay m_currentEntry;

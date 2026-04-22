@@ -167,7 +167,7 @@ int AuditLogModel::rowCount(const QModelIndex& parent) const {
 }
 
 int AuditLogModel::columnCount(const QModelIndex& parent) const {
-    return parent.isValid() ? 0 : 8;
+    return parent.isValid() ? 0 : 7;
 }
 
 QVariant AuditLogModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -182,7 +182,6 @@ QVariant AuditLogModel::headerData(int section, Qt::Orientation orientation, int
         case 4: return "User";
         case 5: return "Source";
         case 6: return "Entry ID";
-        case 7: return "Status";
         default: return QVariant();
         }
     }
@@ -208,7 +207,6 @@ QVariant AuditLogModel::data(const QModelIndex& index, int role) const {
         case 4: return entry.user_id;
         case 5: return entry.source;
         case 6: return entry.entry_id == 0 ? "-" : QString::number(entry.entry_id);
-        case 7: return entry.signature_valid ? "✓ Valid" : "✗ Invalid";
         default: return QVariant();
         }
     }
@@ -221,9 +219,6 @@ QVariant AuditLogModel::data(const QModelIndex& index, int role) const {
     }
 
     if (role == Qt::ForegroundRole) {
-        if (index.column() == 7) {
-            return entry.signature_valid ? QColor(0, 150, 0) : QColor(255, 0, 0);
-        }
         if (entry.severity == "ERROR") return QColor(255, 165, 0);
         if (entry.severity == "CRITICAL") return QColor(255, 0, 0);
         if (entry.severity == "WARN") return QColor(255, 140, 0);
