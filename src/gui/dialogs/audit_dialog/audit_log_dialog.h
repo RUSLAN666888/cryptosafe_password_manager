@@ -43,6 +43,7 @@ private slots:
     void onGoToVaultEntry();
     void onShowFailedLoginDetails();
     void onExportSignedJSON();
+    void onImportJSON();
 
 private:
     void setupUI();

@@ -353,6 +353,30 @@ src/core/audit/audit_logger/audit_logger.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/audit/audit_logger/audit_logger.cpp.s
 .PHONY : src/core/audit/audit_logger/audit_logger.cpp.s
 
+src/core/audit/log_formatter/log_formatter.o: src/core/audit/log_formatter/log_formatter.cpp.o
+.PHONY : src/core/audit/log_formatter/log_formatter.o
+
+# target to build an object file
+src/core/audit/log_formatter/log_formatter.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/audit/log_formatter/log_formatter.cpp.o
+.PHONY : src/core/audit/log_formatter/log_formatter.cpp.o
+
+src/core/audit/log_formatter/log_formatter.i: src/core/audit/log_formatter/log_formatter.cpp.i
+.PHONY : src/core/audit/log_formatter/log_formatter.i
+
+# target to preprocess a source file
+src/core/audit/log_formatter/log_formatter.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/audit/log_formatter/log_formatter.cpp.i
+.PHONY : src/core/audit/log_formatter/log_formatter.cpp.i
+
+src/core/audit/log_formatter/log_formatter.s: src/core/audit/log_formatter/log_formatter.cpp.s
+.PHONY : src/core/audit/log_formatter/log_formatter.s
+
+# target to generate assembly for a file
+src/core/audit/log_formatter/log_formatter.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/audit/log_formatter/log_formatter.cpp.s
+.PHONY : src/core/audit/log_formatter/log_formatter.cpp.s
+
 src/core/audit/log_signer/log_signer.o: src/core/audit/log_signer/log_signer.cpp.o
 .PHONY : src/core/audit/log_signer/log_signer.o
 
@@ -841,6 +865,9 @@ help:
 	@echo "... src/core/audit/audit_logger/audit_logger.o"
 	@echo "... src/core/audit/audit_logger/audit_logger.i"
 	@echo "... src/core/audit/audit_logger/audit_logger.s"
+	@echo "... src/core/audit/log_formatter/log_formatter.o"
+	@echo "... src/core/audit/log_formatter/log_formatter.i"
+	@echo "... src/core/audit/log_formatter/log_formatter.s"
 	@echo "... src/core/audit/log_signer/log_signer.o"
 	@echo "... src/core/audit/log_signer/log_signer.i"
 	@echo "... src/core/audit/log_signer/log_signer.s"

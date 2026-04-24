@@ -4,6 +4,14 @@
 #include <QDebug>
 #include <QScrollBar>
 
+#include <iostream>
+#include <fstream>
+#include <QString>
+
+#include "../src/core/audit/log_formatter/log_formatter.h"
+
+using namespace std;
+
 AuditLogDialog::AuditLogDialog(Database& db, QWidget* parent)
     : QDialog(parent), m_db(db), m_currentPage(0), m_pageSize(50)
 {
@@ -165,6 +173,10 @@ void AuditLogDialog::setupUI() {
     QPushButton* exportJSONBtn = new QPushButton("Экспорт JSON");
     connect(exportJSONBtn, &QPushButton::clicked, this, &AuditLogDialog::onExportSignedJSON);
     paginationLayout->addWidget(exportJSONBtn);
+
+    QPushButton* importJSONBtn = new QPushButton("Импорт JSON");
+    connect(importJSONBtn, &QPushButton::clicked, this, &AuditLogDialog::onImportJSON);
+    paginationLayout->addWidget(importJSONBtn);
 
     QPushButton* closeBtn = new QPushButton("Закрыть");
     connect(closeBtn, &QPushButton::clicked, this, &QDialog::accept);
@@ -396,31 +408,44 @@ void AuditLogDialog::onShowFailedLoginDetails() {
 void AuditLogDialog::onExportSignedJSON() {
     QString filename = QFileDialog::getSaveFileName(this,
                                                     "Экспорт аудит-лога (JSON)",
-                                                    "audit_log.json",
-                                                    "JSON Files (*.json)");
+                                                    "audit_log.jsonl",
+                                                    "JSON Lines (*.jsonl);;JSON Files (*.json)");
 
-    if (filename.isEmpty()) return;
+    if (filename.isEmpty())
+        return;
 
-    // Собираем данные
-    json exportData;
+    ofstream out(filename.toStdString());
 
-    // Метаданные
-    exportData["metadata"]["export_timestamp"] = getUTCTimestamp();
-    exportData["metadata"]["exporter"] = "CryptoSafe Manager";
-    exportData["metadata"]["entry_count"] = m_proxyModel->rowCount();
-    exportData["metadata"]["algorithm"] = "Ed25519";
+    stringstream ss;
 
-    // Записи с хешами, подписями и ключами
-    json entries = json::array();
-    for (int row = 0; row < m_proxyModel->rowCount(); ++row) {
-        QModelIndex idx = m_proxyModel->index(row, 0);
-        QModelIndex sourceIdx = m_proxyModel->mapToSource(idx);
-        auto entry = m_model->getEntry(sourceIdx.row());
+    json metadata;
+    metadata["export_timestamp"] = getUTCTimestamp();
+    metadata["exporter"] = "CryptoSafe Manager";
+    metadata["entry_count"] = m_proxyModel->rowCount();
+    metadata["algorithm"] = "Ed25519";
+
+    ss << metadata.dump() << "\n";
+    out.write(ss.str().c_str(), ss.str().size());
+
+    ss.str("");
+
+    int totalCount = m_db.getLogEntryCount();
+
+    for (int seq = 1; seq <= totalCount; ++seq){
+        std::string previous_hash, current_hash, entry_data, created_at, event_type_str;
+        std::vector<uint8_t> signature;
+        int key_version;
+
+        // Получаем запись из БД по sequence_number
+        if (!m_db.getLogEntry(seq, previous_hash, current_hash, entry_data,
+                              signature, key_version, created_at, event_type_str)) {
+            qWarning() << "Failed to get log entry for sequence:" << seq;
+            continue;
+        }
 
         // Получаем публичный ключ для этой записи
         std::vector<uint8_t> publicKey;
-        int keyVersion;
-        m_db.getPublicKeyForSequence(entry.sequence_number, publicKey, keyVersion);
+        m_db.getPublicKeyForSequence(seq, publicKey, key_version);
 
         // Преобразуем публичный ключ в hex
         std::stringstream pubKeySs;
@@ -428,54 +453,66 @@ void AuditLogDialog::onExportSignedJSON() {
             pubKeySs << std::hex << std::setw(2) << std::setfill('0') << (int)byte;
         }
 
-        json entryJson;
-        entryJson["sequence"] = entry.sequence_number;
-        entryJson["timestamp"] = entry.created_at.toStdString();
-        entryJson["event_type"] = entry.event_type.toStdString();
-        entryJson["severity"] = entry.severity.toStdString();
-        entryJson["user_id"] = entry.user_id;
-        entryJson["source"] = entry.source.toStdString();
-        entryJson["entry_id"] = entry.entry_id;
+        json entryJson = json::parse(entry_data);
 
-        // Детали
-        try {
-            entryJson["details"] = json::parse(entry.entry_data.toStdString());
-        } catch (...) {
-            entryJson["details"] = entry.entry_data.toStdString();
-        }
+        json exportEntry;
 
-        // Хеши
-        entryJson["previous_hash"] = entry.previous_hash.toStdString();
-        entryJson["current_hash"] = entry.current_hash.toStdString();
+        exportEntry["user_id"] = entryJson["user_id"];
 
-        // Подпись в hex
+        exportEntry["event_type"] = entryJson["event_type"];
+
+        exportEntry["source"] = entryJson["source"];
+
+        exportEntry["timestamp"] = entryJson["timestamp"];
+        exportEntry["severity"] = entryJson["severity"];
+
+        exportEntry["entry_id"] = entryJson["entry_id"];
+
+        exportEntry["details"] = json::parse(entryJson["details"].dump());
+
+        exportEntry["previous_hash"] = previous_hash;
+        exportEntry["current_hash"] = current_hash;
+
         std::stringstream sigSs;
-        for (uint8_t byte : entry.signature) {
+        for (uint8_t byte : signature) {
             sigSs << std::hex << std::setw(2) << std::setfill('0') << (int)byte;
         }
-        entryJson["signature"] = sigSs.str();
 
-        // Публичный ключ для этой записи
-        entryJson["public_key"] = pubKeySs.str();
-        entryJson["key_version"] = keyVersion;
+        exportEntry["signature"] = sigSs.str();
 
-        entries.push_back(entryJson);
+        exportEntry["public_key"] = pubKeySs.str();
+
+        ss << exportEntry.dump() << "\n";
+        out.write(ss.str().c_str(), ss.str().size());
+
+        ss.str("");
     }
-    exportData["entries"] = entries;
 
-    // Сохраняем в файл
-    QFile file(filename);
-    if (file.open(QIODevice::WriteOnly)) {
-        std::string finalJson = exportData.dump(2);
-        file.write(finalJson.c_str(), finalJson.size());
-        file.close();
 
-        QMessageBox::information(this, "Экспорт",
-                                 QString("Лог успешно экспортирован в JSON\n"
-                                         "Записей: %1\n"
-                                         "Каждая запись содержит: previous_hash, current_hash, signature, public_key")
-                                     .arg(m_proxyModel->rowCount()));
-    } else {
-        QMessageBox::warning(this, "Ошибка", "Не удалось сохранить файл");
+    out.close();
+
+    QMessageBox::information(this, "Экспорт",
+                             QString("Лог успешно экспортирован в JSON Lines\n"
+                                     "Записей: %1\n"
+                                     "Формат: каждая запись на отдельной строке")
+                                 .arg(m_proxyModel->rowCount()));
+}
+
+
+void AuditLogDialog::onImportJSON(){
+    auto& formatter = LogFormatter::getInstance();
+
+    QString filePath = QFileDialog::getOpenFileName(this, "Выберите файл");
+
+    if (filePath.isEmpty())
+        return;
+
+    LogFormatter::ImportResult r = formatter.importJSON(filePath.toStdString());
+
+    if (r.isValid){
+        QMessageBox::information(this, "Импорт", QString("Лог валиден"));
+    }
+    else{
+        QMessageBox::information(this, "Импорт", QString("Лог невалиден.\nПричина: %1").arg(QString::fromStdString(r.msg)));
     }
 }

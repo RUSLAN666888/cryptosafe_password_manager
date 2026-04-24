@@ -251,7 +251,8 @@ void MainWindow::registerEventHandlers()
                            showTemporaryMessage(QString("Пароль скопирован. Очистится через %1 сек").arg(timeout), 3000);
                        });
 
-    //AuditLogger::getInstance().init(db);
+    AuditLogger::getInstance().init(db);
+    LogVerifier::getInstance().init(&db);
 }
 
 void MainWindow::createMenuBar()

@@ -95,9 +95,6 @@ public:
         last_activity = std::chrono::steady_clock::now();
         is_unlocked = true;
 
-        EventBus &eb = EventBus::getInstance();
-        // Публикуем событие успешного входа
-        eb.publish(EventType::UserLoggedIn, "KeyManager", "store_key");
     }
 
     void store_private_sign_key(std::vector<uint8_t> &source){
@@ -192,10 +189,6 @@ public:
         { // 1 час бездействия
           zero_memory();
           is_unlocked = false;
-
-          EventBus &eb = EventBus::getInstance();
-
-          eb.publish(EventType::UserLoggedOut, "auto_lock", "KeyManager");
         }
     }
 
@@ -225,9 +218,6 @@ public:
         std::lock_guard<std::mutex> lock(mutex);
         zero_memory();
         is_unlocked = false;
-
-        EventBus &eb = EventBus::getInstance();
-        eb.publish(EventType::UserLoggedOut, "user_logout", "KeyManager");
     }
 
     ~KeyManager() { logout(); }

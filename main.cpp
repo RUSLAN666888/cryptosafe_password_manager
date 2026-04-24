@@ -47,8 +47,8 @@ int main(int argc, char *argv[])
         ClipboardService::getInstance().checkAndRestoreTimer();
         //ClipboardService::getInstance().restoreRemainingTime();
 
-        AuditLogger::getInstance().init(db);
-        LogVerifier::getInstance().init(&db);
+        //AuditLogger::getInstance().init(db);
+        //LogVerifier::getInstance().init(&db);
 
         static AES256GCM crypto;
         static VaultManager m(db, crypto, KeyManager::getInstance());

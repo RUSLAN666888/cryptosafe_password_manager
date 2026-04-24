@@ -30,15 +30,17 @@ public:
 
     bool startupVerification();
 
+    std::string verifyImportedEntry(const std::string& entry_data, const std::string& previous_hash, const std::string& current_hash,
+                             std::vector<uint8_t>& signature, std::vector<uint8_t>& public_key);
+
 
 private:
     LogVerifier() = default;
     Database* m_db = nullptr;
 
     bool verifySignature(const std::string& entry_data,
-                         const std::string& previous_hash,
                          std::vector<uint8_t>& signature,
-                         int sequenceNumber);
+                         std::vector<uint8_t>& public_key);
 
     std::string computeHash(const std::string& entry_data,
                             const std::string& previous_hash);

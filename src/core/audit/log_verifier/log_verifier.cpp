@@ -33,23 +33,15 @@ std::string LogVerifier::computeHash(const std::string& entry_data,
 }
 
 bool LogVerifier::verifySignature(const std::string& entry_data,
-                                  const std::string& previous_hash,
                                   std::vector<uint8_t>& signature,
-                                  int sequenceNumber) {
+                                  std::vector<uint8_t>& public_key) {
     std::string data_to_verify = entry_data;
 
     std::vector<uint8_t> data(data_to_verify.begin(), data_to_verify.end());
 
-    // Получаем публичный ключ из БД по sequence_number
-    std::vector<uint8_t> publicKey;
-    int keyVersion;
-    if (!m_db->getPublicKeyForSequence(sequenceNumber, publicKey, keyVersion)) {
-        std::cerr << "Failed to get public key for sequence " << sequenceNumber << std::endl;
-        return false;
-    }
 
     EVP_PKEY* pkey = EVP_PKEY_new_raw_public_key(EVP_PKEY_ED25519, nullptr,
-                                                 publicKey.data(), publicKey.size());
+                                                 public_key.data(), public_key.size());
     if (!pkey) {
         std::cerr << "Failed to create EVP_PKEY from public key" << std::endl;
         ERR_print_errors_fp(stderr);
@@ -64,7 +56,6 @@ bool LogVerifier::verifySignature(const std::string& entry_data,
         return false;
     }
 
-    // Инициализация контекста верификации с явным указанием алгоритма SHA‑512 для Ed25519
     int init_result = EVP_DigestVerifyInit(ctx, nullptr, nullptr, nullptr, pkey);
     if (init_result != 1) {
         std::cerr << "EVP_DigestVerifyInit failed!" << std::endl;
@@ -148,8 +139,14 @@ LogVerifier::VerificationResult LogVerifier::verifyAllLogs() {
             return result;
         }
 
+        std::vector<uint8_t> publicKey;
+        int keyVersion;
+
+        m_db->getPublicKeyForSequence(seq, publicKey, keyVersion);
+
+
         // Проверка подписи
-        if (!verifySignature(entry_data, previous_hash, signature, seq)) {
+        if (!verifySignature(entry_data, signature, publicKey)) {
             result.isValid = false;
             result.signaturesValid = false;
             result.failedSequence = seq;
@@ -184,4 +181,21 @@ bool LogVerifier::startupVerification() {
 
     std::cout << "Audit log verification passed. " << result.verifiedCount << " entries verified." << std::endl;
     return true;
+}
+
+std::string LogVerifier::verifyImportedEntry(const std::string& entry_data, const std::string& previous_hash, const std::string& current_hash,
+                                      std::vector<uint8_t>& signature, std::vector<uint8_t>& public_key){
+
+    std::string computedHash = computeHash(entry_data, previous_hash);
+
+    if (computedHash != current_hash)
+        return "Hash chain broken";
+
+
+
+
+    if (!verifySignature(entry_data, signature, public_key))
+        return "Invalid signature at sequence";
+
+    return "";
 }

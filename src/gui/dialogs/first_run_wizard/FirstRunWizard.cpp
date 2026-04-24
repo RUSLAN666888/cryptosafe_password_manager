@@ -438,8 +438,8 @@ void FirstRunWizard::accept()
     for (size_t i = 0; i < pwdStr.size(); ++i)
         p[i] = 0;
 
-    QMessageBox::information(this, "CryptoSafe",
-                             "Setup completed successfully!");
+    //QMessageBox::information(this, "CryptoSafe",
+                             //"Setup completed successfully!");
 
     QWizard::accept();
 }

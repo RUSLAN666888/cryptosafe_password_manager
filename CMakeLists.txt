@@ -137,7 +137,9 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${Qt5Core_INCLUDE_DIRS}
 )
 
-add_executable(${TARGET_NAME} ${MAIN_SOURCES})
+add_executable(${TARGET_NAME} ${MAIN_SOURCES}
+    src/core/audit/log_formatter/log_formatter.h
+    src/core/audit/log_formatter/log_formatter.cpp)
 
 
 

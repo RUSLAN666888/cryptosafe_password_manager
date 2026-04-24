@@ -6,6 +6,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/cryptosafe.dir/cryptosafe_autogen/mocs_compilation.cpp.o.d"
   "CMakeFiles/cryptosafe.dir/main.cpp.o"
   "CMakeFiles/cryptosafe.dir/main.cpp.o.d"
+  "CMakeFiles/cryptosafe.dir/src/core/audit/log_formatter/log_formatter.cpp.o"
+  "CMakeFiles/cryptosafe.dir/src/core/audit/log_formatter/log_formatter.cpp.o.d"
   "cryptosafe"
   "cryptosafe.pdb"
   "cryptosafe_autogen/mocs_compilation.cpp"
