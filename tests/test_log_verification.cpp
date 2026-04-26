@@ -3,11 +3,13 @@
 #include <chrono>
 #include <nlohmann/json.hpp>
 #include <sqlite3.h>
+#include <fstream>
 
 #include "../src/database/DB_helper/db_helper.h"
 #include "../src/core/audit/log_signer/log_signer.h"
 #include "../src/core/audit/log_verifier/log_verifier.h"
 #include "../src/core/audit/audit_logger/audit_logger.h"
+#include "../src/gui/dialogs/audit_dialog/audit_log_dialog.h"
 #include "../src/core/key_manager.h"
 #include "../src/core/LogEntry.h"
 
@@ -86,7 +88,6 @@ protected:
         std::string previous_hash = db.getLastEntryHash();
 
         std::string hash = LogSigner::getInstance().getHash(logEntry, previous_hash);
-        std::cout<<hash<<std::endl;
         std::vector<uint8_t> signature = LogSigner::getInstance().sign(logEntry);
 
         bool a = j.empty();
@@ -95,10 +96,9 @@ protected:
 
     // Генерация 1000 записей
     void generate1000Entries() {
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= 1000; i++) {
             addTestEntry(i);
         }
-        std::cout<<"===================="<<std::endl;
     }
 
     // Изменение записи в БД напрямую (симуляция взлома)
@@ -121,49 +121,43 @@ protected:
 };
 
 // Тест: Генерация 1000 записей + взлом + проверка обнаружения
-// TEST_F(IntegrityTest, IntegrityTestWithTampering) {
-//     // Генерируем 1000 записей
-//     generate1000Entries();
+TEST_F(IntegrityTest, IntegrityTestWithTampering) {
+    // Генерируем 1000 записей
+    generate1000Entries();
 
-//     int count = db.getLogEntryCount();
-//     ASSERT_EQ(count, 1000);
-//     std::cout << "1000 entries generated successfully" << std::endl;
+    int count = db.getLogEntryCount();
+    ASSERT_EQ(count, 1000);
 
-//     // Проверяем, что без взлома всё валидно
-//     auto& verifier = LogVerifier::getInstance();
-//     auto result = verifier.verifyAllLogs();
+    // Проверяем, что без взлома всё валидно
+    auto& verifier = LogVerifier::getInstance();
+    auto result = verifier.verifyAllLogs();
 
-//     ASSERT_TRUE(result.isValid);
-//     ASSERT_TRUE(result.hashChainValid);
-//     ASSERT_TRUE(result.signaturesValid);
-//     ASSERT_EQ(result.verifiedCount, 1000);
-//     std::cout << "All 1000 entries are valid (no tampering)" << std::endl;
+    ASSERT_TRUE(result.isValid);
+    ASSERT_TRUE(result.hashChainValid);
+    ASSERT_TRUE(result.signaturesValid);
+    ASSERT_EQ(result.verifiedCount, 1000);
 
-//     //Взламываем запись №500 (изменяем данные)
-//     std::string fakeData = R"({"fake": "data", "hacked": true, "original": "modified"})";
-//     tamperWithEntry(500, fakeData);
-//     std::cout << "Entry #500 tampered (modified)" << std::endl;
+    //Взламываем запись №500 (изменяем данные)
+    std::string fakeData = R"({"fake": "data", "hacked": true, "original": "modified"})";
+    tamperWithEntry(500, fakeData);
 
-//     // Проверяем, что взлом обнаружен
-//     result = verifier.verifyAllLogs();
+    // Проверяем, что взлом обнаружен
+    result = verifier.verifyAllLogs();
 
-//     // Должно быть обнаружено нарушение целостности
-//     ASSERT_FALSE(result.isValid);
+    // Должно быть обнаружено нарушение целостности
+    ASSERT_FALSE(result.isValid);
 
-//     // Проверяем, что ошибка обнаружена именно на записи 500
-//     EXPECT_EQ(result.failedSequence, 500);
+    // Проверяем, что ошибка обнаружена именно на записи 500
+    EXPECT_EQ(result.failedSequence, 500);
 
-//     // Проверяем, что в списке взломанных записей есть 500
-//     bool found500 = false;
-//     for (int seq : result.tamperedEntries) {
-//         if (seq == 500) found500 = true;
-//     }
-//     EXPECT_TRUE(found500);
+    // Проверяем, что в списке взломанных записей есть 500
+    bool found500 = false;
+    for (int seq : result.tamperedEntries) {
+        if (seq == 500) found500 = true;
+    }
+    EXPECT_TRUE(found500);
 
-//     std::cout << "Tampering detected!" << std::endl;
-//     std::cout << "Failed at sequence: " << result.failedSequence << std::endl;
-//     std::cout << "Error: " << result.errorMessage << std::endl;
-// }
+}
 
 // Тест: Удаление записи
 TEST_F(IntegrityTest, DeletionTest) {
@@ -182,12 +176,9 @@ TEST_F(IntegrityTest, DeletionTest) {
     sqlite3_step(stmt);
     sqlite3_finalize(stmt);
     db.releaseConnection(conn);
-    std::cout << "Entry #300 deleted" << std::endl;
 
     result = verifier.verifyAllLogs();
 
-    //ASSERT_FALSE(result.isValid);
-    //EXPECT_FALSE(result.hashChainValid);
-    //EXPECT_EQ(result.failedSequence, 301);  // Следующая запись ожидает другой previous_hash
-    std::cout << "Deletion detected at sequence: " << result.failedSequence << std::endl;
+    ASSERT_FALSE(result.isValid);
 }
+

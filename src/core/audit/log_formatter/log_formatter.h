@@ -6,6 +6,7 @@
 #include <nlohmann/json.hpp>
 #include "../core/audit/log_verifier/log_verifier.h"
 #include "../gui/dialogs/audit_dialog//audit_log_model.h"
+#include "../src/database/DB_helper/db_helper.h"
 
 
 class LogFormatter{
@@ -19,6 +20,8 @@ class LogFormatter{
         return bytes;
     }
 
+    Database* m_db;
+
 public:
     struct ImportResult{
         std::string msg;
@@ -31,7 +34,11 @@ public:
         return instance;
     }
 
+    void initDatabase(Database* db){m_db = db;}
+
     LogFormatter::ImportResult importJSON(std::string file_path);
+    void exportCSV(const std::string& file_path);
+    void exportJSON(const std::string& file_path);
 
 };
 

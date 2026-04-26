@@ -47,6 +47,7 @@ enum class EventType
     InactivityTimeout
 };
 
+
 // Класс события
 class Event
 {
@@ -65,6 +66,50 @@ public:
     template <typename T> T getData() const { return std::any_cast<T>(data); }
 
     bool hasData() const { return data.has_value(); }
+
+    static std::string eventTypeToString(EventType type)
+    {
+        switch (type)
+        {
+        // Entry events
+        case EventType::EntryAdded:         return "Entry Added";
+        case EventType::EntryUpdated:       return "Entry Updated";
+        case EventType::EntryDeleted:       return "Entry Deleted";
+        case EventType::EntryReaded:        return "Entry Readed";
+
+        // Auth events
+        case EventType::UserLoggedIn:       return "User Logged In";
+        case EventType::UserLoggedOut:      return "User Logged Out";
+
+        // Clipboard events
+        case EventType::ClipboardCopied:    return "Clipboard Copied";
+        case EventType::ClipboardCleared:   return "Clipboard Cleared";
+        case EventType::ClipboardWillClear: return "Clipboard Will Clear";
+
+        // Login events
+        case EventType::LoginFailure:       return "Login Failure";
+
+        // Password events
+        case EventType::PasswordChange:     return "Password Change";
+
+        // System events
+        case EventType::Startup:            return "Startup";
+        case EventType::Shutdown:           return "Shutdown";
+        case EventType::Lock:               return "Lock";
+        case EventType::Unlock:             return "Unlock";
+
+        // Settings
+        case EventType::SettingsModification: return "Settings Modified";
+
+        // Integrity
+        case EventType::IntegrityCheckFailed: return "Integrity Check Failed";
+
+        // Timeout
+        case EventType::InactivityTimeout:    return "Inactivity Timeout";
+
+        default: return "Unknown";
+        }
+    }
 };
 
 // Тип для callback функции

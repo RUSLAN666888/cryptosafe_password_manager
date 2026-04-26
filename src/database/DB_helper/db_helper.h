@@ -133,6 +133,17 @@ public:
                                 int keyVersion,
                       int validFromSequence);
 
+    std::vector<AuditEntryDisplay> getAuditPage(
+        int offset,                          // с какой записи начать (пропустить N записей)
+        int limit,                           // сколько записей взять (размер страницы)
+        std::string& sortColumn,           // по какой колонке сортировать
+        bool sortOrder,             // порядок сортировки (ASC - true/DESC - false)
+        std::string& eventTypeFilter,      // фильтр по типу события (пустая строка = все)
+        const std::string& dateFrom,               // фильтр по дате "с" (невалидная = без фильтра)
+        const std::string& dateTo,                 // фильтр по дате "по" (невалидная = без фильтра)
+        const std::string& searchText            // поисковый текст (пустая строка = без поиска)
+        );
+
     bool getPublicKeyForSequence(int sequenceNumber, std::vector<uint8_t>& publicKey, int& keyVersion);
 
     std::string getLastEntryHash();

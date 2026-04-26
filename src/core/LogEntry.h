@@ -28,6 +28,22 @@ struct LogEntry {
 
 };
 
+struct AuditEntryDisplay {
+    int sequence_number;
+    std::string created_at;
+    std::string event_type;
+    std::string severity;
+    int user_id;
+    std::string source;
+    int entry_id;
+    std::string entry_data;
+    std::vector<uint8_t> signature;
+    std::string previous_hash;
+    std::string current_hash;
+    bool signature_valid;
+    int key_version;
+};
+
 inline std::string getUTCTimestamp(){
     auto now = std::chrono::system_clock::now();
     auto now_time_t = std::chrono::system_clock::to_time_t(now);

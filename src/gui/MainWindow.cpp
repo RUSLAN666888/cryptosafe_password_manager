@@ -12,6 +12,8 @@
 #include "../src/core/audit/log_signer/log_signer.h"
 #include "../src/core/audit/audit_logger/audit_logger.h"
 #include "../src/gui/dialogs/audit_dialog/audit_log_dialog.h"
+#include "../src/core/audit/log_verifier/log_verifier.h"
+#include "../src/core/audit/log_formatter/log_formatter.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QDebug>
@@ -79,6 +81,7 @@ MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaul
     }
 
     updateStatusBar();
+
 
     // ПРОВЕРКА НА ПРОИЗОДИТЕЛЬНОСТЬ (ПРОСТО ДОБАВЛЯЕМ ЗАПИСИ В БД)
     // int count = 1000;
@@ -211,7 +214,11 @@ MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaul
     // }
 
     // std::cout << "Done! Generated " << count << " test entries." << std::endl;
+
+
 }
+
+
 
 MainWindow::~MainWindow()
 {
@@ -253,6 +260,7 @@ void MainWindow::registerEventHandlers()
 
     AuditLogger::getInstance().init(db);
     LogVerifier::getInstance().init(&db);
+    LogFormatter::getInstance().initDatabase(&db);
 }
 
 void MainWindow::createMenuBar()
@@ -313,21 +321,17 @@ void MainWindow::createToolBar()
     QShortcut* shortcut = new QShortcut(QKeySequence("Ctrl+Shift+P"), this);
     connect(shortcut, &QShortcut::activated, togglePasswordsAction, &QAction::toggle);
 
-    QAction* crashAction = toolBar->addAction("краш");
-    crashAction->setToolTip("Вызвать segmentation fault (реальный краш)");
-    connect(crashAction, &QAction::triggered, this, [this]() {
-
-        // Создаём segmentation fault
-        int* p = nullptr;
-        *p = 42;
-    });
-
 }
 
 void MainWindow::createCentralWidget()
 {
     centralWidget = new QWidget(this);
     mainLayout = new QVBoxLayout(centralWidget);
+
+    QTabWidget* tabWidget = new QTabWidget(this);
+
+    QWidget* passwordsTab = new QWidget();
+    QVBoxLayout* passwordsLayout = new QVBoxLayout(passwordsTab);
 
     // Панель поиска
     QHBoxLayout* searchLayout = new QHBoxLayout();
@@ -336,7 +340,7 @@ void MainWindow::createCentralWidget()
     m_searchField->setFixedWidth(250);
     searchLayout->addStretch();
     searchLayout->addWidget(m_searchField);
-    mainLayout->addLayout(searchLayout);
+    passwordsLayout->addLayout(searchLayout);
 
     // Создаем модель и прокси
     m_tableModel = new VaultTableModel(m_vaultManager, this);
@@ -375,8 +379,7 @@ void MainWindow::createCentralWidget()
                 }
             });
 
-    mainLayout->addWidget(m_tableView);
-    setCentralWidget(centralWidget);
+    passwordsLayout->addWidget(m_tableView);
 
     // Подключаем поиск
     connect(m_searchField, &QLineEdit::textChanged, this, [this](const QString& text) {
@@ -387,6 +390,23 @@ void MainWindow::createCentralWidget()
     m_tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_tableView, &QTableView::customContextMenuRequested,
             this, &MainWindow::showContextMenu);
+
+    tabWidget->addTab(passwordsTab, "Пароли");
+
+    QWidget* auditTab = new QWidget();
+    QVBoxLayout* auditLayout = new QVBoxLayout(auditTab);
+    auditLayout->setContentsMargins(0, 0, 0, 0);
+
+    m_auditLogViewer = new AuditLogViewer(auditTab);
+    m_auditLogViewer->setDatabase(&db);
+    auditLayout->addWidget(m_auditLogViewer);
+
+    tabWidget->addTab(auditTab, "Аудит Лог");
+
+    mainLayout->addWidget(tabWidget);
+
+    // Устанавливаем центральный виджет
+    setCentralWidget(centralWidget);
 }
 
 void MainWindow::createStatusBar()
@@ -409,11 +429,6 @@ void MainWindow::updateStatusBar()
         msg = "Not logged in";
     }
 
-    // // Статус буфера обмена
-    // if (ClipboardService::getInstance().isTimerActive()) {
-    //     int remaining = ClipboardService::getInstance().getRemainingSeconds();
-    //     msg += QString(" | Clipboard: %1 sec").arg(remaining);
-    // }
 
     // Временное сообщение (если есть)
     if (!m_temporaryMessage.isEmpty()) {
@@ -435,16 +450,6 @@ void MainWindow::showTemporaryMessage(const QString& msg, int timeoutMs)
     });
 }
 
-// void MainWindow::updatePermanentStatus()
-// {
-//     QString msg = isLoggedIn ? "Logged in" : "Not logged in";
-
-//     if (m_clipboardTimer && m_clipboardTimer->isActive()) {
-//         msg += QString(" | Clipboard: %1 sec").arg(m_clipboardSeconds);
-//     }
-
-//     statusBar->showMessage(msg);
-// }
 
 bool MainWindow::showFirstRunWizard()
 {
@@ -750,10 +755,6 @@ void MainWindow::onDeleteEntry()
     }
 }
 
-void MainWindow::onViewLogs()
-{
-    QMessageBox::information(this, "Info", "Audit Logs - will be implemented in Sprint 5");
-}
 
 void MainWindow::onSettings()
 {
@@ -990,12 +991,14 @@ void MainWindow::onCopyAll()
 
 void MainWindow::onViewAuditLogs()
 {
-    if (!isLoggedIn) {
-        QMessageBox::warning(this, "Not Logged In",
-                             "Please log in to view audit logs.");
-        return;
-    }
+    // if (!isLoggedIn) {
+    //     QMessageBox::warning(this, "Not Logged In",
+    //                          "Please log in to view audit logs.");
+    //     return;
+    // }
 
-    AuditLogDialog dialog(db, this);
-    dialog.exec();
+    // AuditLogDialog dialog(db, this);
+    // dialog.exec();
+
+    // updateStatusBar();
 }

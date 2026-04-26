@@ -358,7 +358,7 @@ src/core/audit/log_formatter/log_formatter.o: src/core/audit/log_formatter/log_f
 
 # target to build an object file
 src/core/audit/log_formatter/log_formatter.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/audit/log_formatter/log_formatter.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/audit/log_formatter/log_formatter.cpp.o
 .PHONY : src/core/audit/log_formatter/log_formatter.cpp.o
 
 src/core/audit/log_formatter/log_formatter.i: src/core/audit/log_formatter/log_formatter.cpp.i
@@ -366,7 +366,7 @@ src/core/audit/log_formatter/log_formatter.i: src/core/audit/log_formatter/log_f
 
 # target to preprocess a source file
 src/core/audit/log_formatter/log_formatter.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/audit/log_formatter/log_formatter.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/audit/log_formatter/log_formatter.cpp.i
 .PHONY : src/core/audit/log_formatter/log_formatter.cpp.i
 
 src/core/audit/log_formatter/log_formatter.s: src/core/audit/log_formatter/log_formatter.cpp.s
@@ -374,7 +374,7 @@ src/core/audit/log_formatter/log_formatter.s: src/core/audit/log_formatter/log_f
 
 # target to generate assembly for a file
 src/core/audit/log_formatter/log_formatter.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/audit/log_formatter/log_formatter.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/audit/log_formatter/log_formatter.cpp.s
 .PHONY : src/core/audit/log_formatter/log_formatter.cpp.s
 
 src/core/audit/log_signer/log_signer.o: src/core/audit/log_signer/log_signer.cpp.o
@@ -689,6 +689,30 @@ src/gui/dialogs/settings_dialog/SettingsDialog.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.s
 .PHONY : src/gui/dialogs/settings_dialog/SettingsDialog.cpp.s
 
+src/gui/widgets/audit_log/audit_logViewer.o: src/gui/widgets/audit_log/audit_logViewer.cpp.o
+.PHONY : src/gui/widgets/audit_log/audit_logViewer.o
+
+# target to build an object file
+src/gui/widgets/audit_log/audit_logViewer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/audit_log/audit_logViewer.cpp.o
+.PHONY : src/gui/widgets/audit_log/audit_logViewer.cpp.o
+
+src/gui/widgets/audit_log/audit_logViewer.i: src/gui/widgets/audit_log/audit_logViewer.cpp.i
+.PHONY : src/gui/widgets/audit_log/audit_logViewer.i
+
+# target to preprocess a source file
+src/gui/widgets/audit_log/audit_logViewer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/audit_log/audit_logViewer.cpp.i
+.PHONY : src/gui/widgets/audit_log/audit_logViewer.cpp.i
+
+src/gui/widgets/audit_log/audit_logViewer.s: src/gui/widgets/audit_log/audit_logViewer.cpp.s
+.PHONY : src/gui/widgets/audit_log/audit_logViewer.s
+
+# target to generate assembly for a file
+src/gui/widgets/audit_log/audit_logViewer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/widgets/audit_log/audit_logViewer.cpp.s
+.PHONY : src/gui/widgets/audit_log/audit_logViewer.cpp.s
+
 src/gui/widgets/password_entry/PasswordEntry.o: src/gui/widgets/password_entry/PasswordEntry.cpp.o
 .PHONY : src/gui/widgets/password_entry/PasswordEntry.o
 
@@ -907,6 +931,9 @@ help:
 	@echo "... src/gui/dialogs/settings_dialog/SettingsDialog.o"
 	@echo "... src/gui/dialogs/settings_dialog/SettingsDialog.i"
 	@echo "... src/gui/dialogs/settings_dialog/SettingsDialog.s"
+	@echo "... src/gui/widgets/audit_log/audit_logViewer.o"
+	@echo "... src/gui/widgets/audit_log/audit_logViewer.i"
+	@echo "... src/gui/widgets/audit_log/audit_logViewer.s"
 	@echo "... src/gui/widgets/password_entry/PasswordEntry.o"
 	@echo "... src/gui/widgets/password_entry/PasswordEntry.i"
 	@echo "... src/gui/widgets/password_entry/PasswordEntry.s"

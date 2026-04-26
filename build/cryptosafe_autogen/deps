@@ -4,8 +4,6 @@ cryptosafe_autogen/timestamp: \
 	/home/master666/development/cryptosafe_password_manager/build/CMakeFiles/3.28.3/CMakeCXXCompiler.cmake \
 	/home/master666/development/cryptosafe_password_manager/build/CMakeFiles/3.28.3/CMakeSystem.cmake \
 	/home/master666/development/cryptosafe_password_manager/main.cpp \
-	/home/master666/development/cryptosafe_password_manager/src/core/audit/log_formatter/log_formatter.cpp \
-	/home/master666/development/cryptosafe_password_manager/src/core/audit/log_formatter/log_formatter.h \
 	/usr/lib/x86_64-linux-gnu/cmake/GTest/GTestConfig.cmake \
 	/usr/lib/x86_64-linux-gnu/cmake/GTest/GTestConfigVersion.cmake \
 	/usr/lib/x86_64-linux-gnu/cmake/GTest/GTestTargets-none.cmake \

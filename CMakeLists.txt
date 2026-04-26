@@ -83,6 +83,9 @@ set(SOURCES
     src/core/clipboard_service/clipboard_service.cpp
     src/gui/dialogs/audit_dialog/audit_log_model.cpp
     src/gui/dialogs/audit_dialog/audit_log_dialog.cpp
+    src/core/audit/log_formatter/log_formatter.cpp
+    src/gui/widgets/audit_log/audit_logViewer.cpp
+
 )
 
 set(MAIN_SOURCES
@@ -105,6 +108,7 @@ set(HEADERS
     src/core/clipboard_service/clipboard_service.h
     src/gui/dialogs/audit_dialog/audit_log_model.h
     src/gui/dialogs/audit_dialog/audit_log_dialog.h
+    src/gui/widgets/audit_log/audit_logViewer.h
 )
 
 
@@ -126,6 +130,7 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets/audit_log/
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets/secure_table
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/audit_dialog
     ${SQLite3_INCLUDE_DIRS}
@@ -137,9 +142,7 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${Qt5Core_INCLUDE_DIRS}
 )
 
-add_executable(${TARGET_NAME} ${MAIN_SOURCES}
-    src/core/audit/log_formatter/log_formatter.h
-    src/core/audit/log_formatter/log_formatter.cpp)
+add_executable(${TARGET_NAME} ${MAIN_SOURCES})
 
 
 

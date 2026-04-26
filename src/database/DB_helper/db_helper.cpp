@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 #include <sqlite3.h>
 #include <thread>
+#include <stdexcept>
 
 using json = nlohmann::json;
 
@@ -893,4 +894,142 @@ bool Database::getPublicKeyForSequence(int sequenceNumber, std::vector<uint8_t>&
     sqlite3_finalize(stmt);
     releaseConnection(conn);
     return false;
+}
+
+
+std::vector<AuditEntryDisplay> Database::getAuditPage(
+    int offset,
+    int limit,
+    std::string& sortColumn,
+    bool sortOrder,
+    std::string& eventTypeFilter,
+    const std::string& dateFrom,
+    const std::string& dateTo,
+    const std::string& searchText)
+{
+    sqlite3 *conn = getConnection();
+    if (!conn)
+        throw std::runtime_error("Failed to get connection");
+
+    // Белый список для sortColumn
+    std::vector<std::string> allowedColumns = {"sequence_number", "created_at", "event_type"};
+    if (std::find(allowedColumns.begin(), allowedColumns.end(), sortColumn) == allowedColumns.end()) {
+        sortColumn = "sequence_number";
+    }
+
+    std::string orderDirection = sortOrder ? "ASC" : "DESC";
+
+    // Собираем SQL динамически
+    std::string sql = "SELECT * FROM audit_log WHERE 1=1";
+
+    if (!eventTypeFilter.empty()) {
+        sql += " AND event_type = ?";
+    }
+    if (!dateFrom.empty()) {
+        sql += " AND DATE(created_at) >= ?";
+    }
+    if (!dateTo.empty()) {
+        sql += " AND DATE(created_at) <= ?";
+    }
+    if (!searchText.empty()) {
+        sql += " AND entry_data LIKE ?";
+    }
+
+    sql += " ORDER BY " + sortColumn + " " + orderDirection;
+    sql += " LIMIT ? OFFSET ?";
+
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(conn, sql.c_str(), -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        throw std::runtime_error("Failed to prepare statement: " + std::string(sqlite3_errmsg(conn)));
+    }
+
+    int paramIndex = 1;
+
+    if (!eventTypeFilter.empty()) {
+        sqlite3_bind_int(stmt, paramIndex++, std::stoi(eventTypeFilter));
+    }
+    if (!dateFrom.empty()) {
+        sqlite3_bind_text(stmt, paramIndex++, dateFrom.c_str(), -1, SQLITE_TRANSIENT);
+    }
+    if (!dateTo.empty()) {
+        sqlite3_bind_text(stmt, paramIndex++, dateTo.c_str(), -1, SQLITE_TRANSIENT);
+    }
+    if (!searchText.empty()) {
+        std::string likePattern = "%" + searchText + "%";
+        sqlite3_bind_text(stmt, paramIndex++, likePattern.c_str(), -1, SQLITE_TRANSIENT);
+    }
+
+    sqlite3_bind_int(stmt, paramIndex++, limit);
+    sqlite3_bind_int(stmt, paramIndex++, offset);
+
+    std::vector<AuditEntryDisplay> entries;
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        AuditEntryDisplay entry;
+        entry.sequence_number = sqlite3_column_int(stmt, 0);
+
+        const unsigned char* previous_hash = sqlite3_column_text(stmt, 1);
+        entry.previous_hash = previous_hash ? reinterpret_cast<const char*>(previous_hash) : "";
+
+        const unsigned char* current_hash = sqlite3_column_text(stmt, 2);
+        entry.current_hash = current_hash ? reinterpret_cast<const char*>(current_hash) : "";
+
+        const unsigned char* entry_data = sqlite3_column_text(stmt, 3);
+        entry.entry_data = entry_data ? reinterpret_cast<const char*>(entry_data) : "";
+
+        const void* signature_blob = sqlite3_column_blob(stmt, 4);
+        int signature_size = sqlite3_column_bytes(stmt, 4);
+        if (signature_blob && signature_size > 0) {
+            const uint8_t* bytes = static_cast<const uint8_t*>(signature_blob);
+            entry.signature.assign(bytes, bytes + signature_size);
+        }
+
+        entry.key_version = sqlite3_column_int(stmt, 5);
+
+        const unsigned char* created_at = sqlite3_column_text(stmt, 6);
+        entry.created_at = created_at ? reinterpret_cast<const char*>(created_at) : "";
+
+        EventType event_type_enum = static_cast<EventType>(sqlite3_column_int(stmt, 7));
+        entry.event_type = Event::eventTypeToString(event_type_enum);
+
+        // Значения по умолчанию
+        entry.severity = "";
+        entry.user_id = 0;
+        entry.source = "";
+        entry.entry_id = -1;
+        entry.signature_valid = false;
+
+        // Парсим JSON
+        if (!entry.entry_data.empty()) {
+            try {
+                json j = json::parse(entry.entry_data);
+
+                if (j.contains("severity")) {
+                    int severityInt = j["severity"].get<int>();
+                    switch (severityInt) {
+                    case 0: entry.severity = "INFO"; break;
+                    case 1: entry.severity = "WARN"; break;
+                    case 2: entry.severity = "ERROR"; break;
+                    case 3: entry.severity = "CRITICAL"; break;
+                    default: entry.severity = "INFO"; break;
+                    }
+                }
+
+                if (j.contains("user_id")) entry.user_id = j["user_id"].get<int>();
+
+                if (j.contains("source")) entry.source = j["source"].get<std::string>();
+
+                if (j.contains("entry_id")) entry.entry_id = j["entry_id"].get<int>();
+
+            } catch (const std::exception& e) {
+                // ошибка парсинга
+            }
+        }
+
+        entries.push_back(entry);
+    }
+
+    sqlite3_finalize(stmt);
+    return entries;
 }

@@ -18,6 +18,7 @@
 #include "../src/gui/widgets/secure_table/SearchProxyModel.h"
 #include "../src/core/vault/VaultManager.h"
 #include "../src/core/crypto/AES256.h"
+#include "../src/gui/widgets/audit_log/audit_logViewer.h"
 
 class MainWindow : public QMainWindow
 {
@@ -35,6 +36,8 @@ private:
 
     QTimer* m_clipboardUpdateTimer;
     int m_clipboardSeconds;
+
+    AuditLogViewer* m_auditLogViewer;
 
     // Элементы UI
     QMenuBar *menuBar;
@@ -79,6 +82,7 @@ private:
 
     QTimer* m_clipboardTimer;
 
+
 private slots:
     void onInactivityTimeout();
     void onLock();
@@ -91,7 +95,6 @@ private slots:
     void onAddEntry();
     void onEditEntry();
     void onDeleteEntry();
-    void onViewLogs();
     void onSettings();
     void onAbout();
     void onFirstRunWizard();
