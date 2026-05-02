@@ -14,6 +14,7 @@ public:
     void onEntryDeleted(const Event& event);
     void onLoginSuccess(const Event& event);
     void onLoginFailure(const Event& event);
+    void onLogOut(const Event& event);
     void onLock(const Event& event);
     void onUnlock(const Event& event);
     void onStartup(const Event& event);

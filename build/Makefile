@@ -449,6 +449,30 @@ src/core/clipboard_service/clipboard_service.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/clipboard_service/clipboard_service.cpp.s
 .PHONY : src/core/clipboard_service/clipboard_service.cpp.s
 
+src/core/import_export/export/export.o: src/core/import_export/export/export.cpp.o
+.PHONY : src/core/import_export/export/export.o
+
+# target to build an object file
+src/core/import_export/export/export.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/import_export/export/export.cpp.o
+.PHONY : src/core/import_export/export/export.cpp.o
+
+src/core/import_export/export/export.i: src/core/import_export/export/export.cpp.i
+.PHONY : src/core/import_export/export/export.i
+
+# target to preprocess a source file
+src/core/import_export/export/export.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/import_export/export/export.cpp.i
+.PHONY : src/core/import_export/export/export.cpp.i
+
+src/core/import_export/export/export.s: src/core/import_export/export/export.cpp.s
+.PHONY : src/core/import_export/export/export.s
+
+# target to generate assembly for a file
+src/core/import_export/export/export.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/import_export/export/export.cpp.s
+.PHONY : src/core/import_export/export/export.cpp.s
+
 src/core/vault/VaultManager.o: src/core/vault/VaultManager.cpp.o
 .PHONY : src/core/vault/VaultManager.o
 
@@ -592,6 +616,30 @@ src/gui/dialogs/entry_dialog/entry_dialog.s: src/gui/dialogs/entry_dialog/entry_
 src/gui/dialogs/entry_dialog/entry_dialog.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/entry_dialog/entry_dialog.cpp.s
 .PHONY : src/gui/dialogs/entry_dialog/entry_dialog.cpp.s
+
+src/gui/dialogs/export_dialog/ExportDialog.o: src/gui/dialogs/export_dialog/ExportDialog.cpp.o
+.PHONY : src/gui/dialogs/export_dialog/ExportDialog.o
+
+# target to build an object file
+src/gui/dialogs/export_dialog/ExportDialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/export_dialog/ExportDialog.cpp.o
+.PHONY : src/gui/dialogs/export_dialog/ExportDialog.cpp.o
+
+src/gui/dialogs/export_dialog/ExportDialog.i: src/gui/dialogs/export_dialog/ExportDialog.cpp.i
+.PHONY : src/gui/dialogs/export_dialog/ExportDialog.i
+
+# target to preprocess a source file
+src/gui/dialogs/export_dialog/ExportDialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/export_dialog/ExportDialog.cpp.i
+.PHONY : src/gui/dialogs/export_dialog/ExportDialog.cpp.i
+
+src/gui/dialogs/export_dialog/ExportDialog.s: src/gui/dialogs/export_dialog/ExportDialog.cpp.s
+.PHONY : src/gui/dialogs/export_dialog/ExportDialog.s
+
+# target to generate assembly for a file
+src/gui/dialogs/export_dialog/ExportDialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/export_dialog/ExportDialog.cpp.s
+.PHONY : src/gui/dialogs/export_dialog/ExportDialog.cpp.s
 
 src/gui/dialogs/first_run_wizard/FirstRunWizard.o: src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
 .PHONY : src/gui/dialogs/first_run_wizard/FirstRunWizard.o
@@ -901,6 +949,9 @@ help:
 	@echo "... src/core/clipboard_service/clipboard_service.o"
 	@echo "... src/core/clipboard_service/clipboard_service.i"
 	@echo "... src/core/clipboard_service/clipboard_service.s"
+	@echo "... src/core/import_export/export/export.o"
+	@echo "... src/core/import_export/export/export.i"
+	@echo "... src/core/import_export/export/export.s"
 	@echo "... src/core/vault/VaultManager.o"
 	@echo "... src/core/vault/VaultManager.i"
 	@echo "... src/core/vault/VaultManager.s"
@@ -919,6 +970,9 @@ help:
 	@echo "... src/gui/dialogs/entry_dialog/entry_dialog.o"
 	@echo "... src/gui/dialogs/entry_dialog/entry_dialog.i"
 	@echo "... src/gui/dialogs/entry_dialog/entry_dialog.s"
+	@echo "... src/gui/dialogs/export_dialog/ExportDialog.o"
+	@echo "... src/gui/dialogs/export_dialog/ExportDialog.i"
+	@echo "... src/gui/dialogs/export_dialog/ExportDialog.s"
 	@echo "... src/gui/dialogs/first_run_wizard/FirstRunWizard.o"
 	@echo "... src/gui/dialogs/first_run_wizard/FirstRunWizard.i"
 	@echo "... src/gui/dialogs/first_run_wizard/FirstRunWizard.s"

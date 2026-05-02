@@ -14,6 +14,7 @@
 #include "../src/gui/dialogs/audit_dialog/audit_log_dialog.h"
 #include "../src/core/audit/log_verifier/log_verifier.h"
 #include "../src/core/audit/log_formatter/log_formatter.h"
+#include "../src/gui/dialogs/export_dialog/ExportDialog.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QDebug>
@@ -78,6 +79,9 @@ MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaul
             QMetaObject::invokeMethod(this, &MainWindow::close, Qt::QueuedConnection);
             return;
         }
+        json details = json::object();
+        details["action"] = "startup";
+        eventBus.publish(EventType::UserLoggedIn, details, "StateMnager");
     }
 
     updateStatusBar();
@@ -224,13 +228,12 @@ MainWindow::~MainWindow()
 {
     if (isLoggedIn)
     {
+        json details = json::object();
+        details["reason"] = "manual shutdown";
+        eventBus.publish(EventType::UserLoggedOut, details, "MainWindow");
         //ClipboardService::getInstance().saveRemainingTime();
         ClipboardService::getInstance().resetTimer();
         KeyManager::getInstance().logout();
-
-        json details = json::object();
-        details["action"] = "Shutdown";
-        EventBus::getInstance().publish(EventType::Shutdown, details, "MainWindow");
     }
 }
 
@@ -271,7 +274,7 @@ void MainWindow::createMenuBar()
     fileMenu->addAction("&New Database", this, &MainWindow::onNewDatabase, QKeySequence::New);
     fileMenu->addAction("&Open Database", this, &MainWindow::onOpenDatabase, QKeySequence::Open);
     fileMenu->addSeparator();
-    fileMenu->addAction("&Backup...", this, &MainWindow::onBackup);
+    //fileMenu->addAction("&Backup...", this, &MainWindow::onBackup);
     fileMenu->addSeparator();
     fileMenu->addAction("E&xit", this, &MainWindow::onExit, QKeySequence::Quit);
 
@@ -304,7 +307,7 @@ void MainWindow::createToolBar()
     toolBar->addAction("Edit", this, &MainWindow::onEditEntry);
     toolBar->addAction("Delete", this, &MainWindow::onDeleteEntry);
     toolBar->addSeparator();
-    toolBar->addAction("Backup", this, &MainWindow::onBackup);
+    toolBar->addAction("Экспорт", this, &MainWindow::onExport);
 
 
     toolBar->addSeparator();
@@ -493,9 +496,9 @@ void MainWindow::unlockApplication()
 
         resetInactivityTimer();
 
-        json details = json::object();
-        details["action"] = "Vault_unlocked";
-        eventBus.publish(EventType::Unlock, details, "MainWindow");
+        // json details = json::object();
+        // details["action"] = "Vault_unlocked";
+        // eventBus.publish(EventType::Unlock, details, "MainWindow");
     }
 }
 
@@ -521,9 +524,9 @@ void MainWindow::lockApplication()
             inactivityTimer->stop();
         }
 
-        json details = json::object();
-        details["action"] = "Vault_locked";
-        eventBus.publish(EventType::Lock, details, "MainWindow");
+        // json details = json::object();
+        // details["action"] = "Vault_locked";
+        // eventBus.publish(EventType::Lock, details, "MainWindow");
     }
 }
 
@@ -564,9 +567,10 @@ void MainWindow::onOpenDatabase()
     QMessageBox::information(this, "Info", "Open Database - will be implemented in Sprint 2");
 }
 
-void MainWindow::onBackup()
+void MainWindow::onExport()
 {
-    QMessageBox::information(this, "Info", "Backup - will be implemented in Sprint 8");
+    ExportDialog dialog(&db, this);
+    dialog.exec();
 }
 
 void MainWindow::onExit()
@@ -847,6 +851,7 @@ void MainWindow::onLock()
             QMetaObject::invokeMethod(this, &MainWindow::close, Qt::QueuedConnection);
             return;
         }
+        StateManager::getInstance().publishUserLoggedIn();
     }
 }
 

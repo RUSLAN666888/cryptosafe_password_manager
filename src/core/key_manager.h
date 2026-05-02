@@ -17,10 +17,12 @@ private:
     std::unique_ptr<uint8_t[]> key;
     std::unique_ptr<uint8_t[]> old_key;
     std::unique_ptr<uint8_t[]> private_sign_key;
+    std::unique_ptr<uint8_t[]> export_key;
 
     size_t key_size;
     size_t old_key_size;
     size_t private_sign_key_size;
+    size_t export_key_size;
 
     std::chrono::steady_clock::time_point last_activity;
     bool is_unlocked;
@@ -49,9 +51,21 @@ private:
         }
     }
 
+    void zero_export_key() {
+        if (export_key) {
+            volatile uint8_t *data = export_key.get();
+            for (size_t i = 0; i < export_key_size; i++) {
+                data[i] = 0;
+            }
+            export_key.reset();
+            export_key_size = 0;
+        }
+    }
+
     void zero_memory() {
         zero_encryption_key();
         zero_sign_key();
+        zero_export_key();
     }
 
     KeyManager() : is_unlocked(false), is_active(true) {}
@@ -143,6 +157,27 @@ public:
         source.clear();
     }
 
+    void store_export_key(std::vector<uint8_t> &source)
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+
+        zero_export_key();
+
+        export_key_size = source.size();
+        export_key = std::make_unique<uint8_t[]>(export_key_size);
+        std::copy(source.begin(), source.end(), export_key.get());
+
+        volatile uint8_t *src_data = source.data();
+        for (size_t i = 0; i < source.size(); i++)
+        {
+            src_data[i] = 0;
+        }
+        source.clear();
+
+        last_activity = std::chrono::steady_clock::now();
+        is_unlocked = true;
+    }
+
     void get_old_key(KeyData &d)
     {
         std::lock_guard<std::mutex> lock(mutex);
@@ -150,7 +185,6 @@ public:
         d.size = old_key_size;
     }
 
-    // Получить ключ
     void get_key(KeyData &d)
     {
         std::lock_guard<std::mutex> lock(mutex);
@@ -162,6 +196,12 @@ public:
         std::lock_guard<std::mutex> lock(mutex);
         d.data = private_sign_key.get();
         d.size = private_sign_key_size;
+    }
+
+    void get_export_key(KeyData &d){
+        std::lock_guard<std::mutex> lock(mutex);
+        d.data = export_key.get();
+        d.size = export_key_size;
     }
 
     void zero_keyData(KeyData &d)
@@ -191,26 +231,6 @@ public:
           is_unlocked = false;
         }
     }
-
-    // // Приложение свернулось/потеряло фокус
-    // void on_app_inactive()
-    // {
-    //   std::lock_guard<std::mutex> lock(mutex);
-    //   is_active = false;
-    //   zero_memory();
-    //   is_unlocked = false;
-
-    //   EventBus &eb = EventBus::getInstance();
-
-    //   eb.publish(EventType::UserLoggedOut, "app_minimized", "KeyManager");
-    // }
-
-    // // Приложение активно
-    // void on_app_active()
-    // {
-    //   std::lock_guard<std::mutex> lock(mutex);
-    //   is_active = true;
-    // }
 
     // Выход из системы
     void logout()

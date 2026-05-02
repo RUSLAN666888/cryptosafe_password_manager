@@ -90,7 +90,7 @@ private slots:
     // Обработчики меню
     void onNewDatabase();
     void onOpenDatabase();
-    void onBackup();
+    void onExport();
     void onExit();
     void onAddEntry();
     void onEditEntry();

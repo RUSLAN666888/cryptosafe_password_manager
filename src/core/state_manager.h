@@ -3,6 +3,11 @@
 
 #include <chrono>
 #include <mutex>
+#include <nlohmann/json.hpp>
+#include "../src/core/events.h"
+
+using json = nlohmann::json;
+
 
 class StateManager
 {
@@ -12,6 +17,7 @@ private:
     std::chrono::steady_clock::time_point lastActivity;
     int failedAttempts;
     std::mutex mutex;
+    bool isFirstRun;
 
     StateManager() : loggedIn(false), failedAttempts(0) {}
 
@@ -72,6 +78,12 @@ public:
 
         auto now = std::chrono::steady_clock::now();
         return std::chrono::duration_cast<std::chrono::seconds>(now - lastActivity).count();
+    }
+
+    void publishUserLoggedIn(){
+        json details = json::object();
+        details["action"] = "login_success";
+        eventBus.publish(EventType::UserLoggedIn, details, "StateMnager");
     }
 };
 

@@ -20,6 +20,8 @@ void AuditLogger::init(Database& db)
                        [this](const Event& event) { onEntryDeleted(event); });
     eventBus.subscribe(EventType::UserLoggedIn,
                        [this](const Event& event) { onLoginSuccess(event); });
+    eventBus.subscribe(EventType::UserLoggedOut,
+                       [this](const Event& event) { onLogOut(event); });
     eventBus.subscribe(EventType::LoginFailure,
                        [this](const Event& event) { onLoginFailure(event); });
     eventBus.subscribe(EventType::ClipboardCopied,
@@ -160,6 +162,38 @@ void AuditLogger::onLoginSuccess(const Event& event){
     std::vector<uint8_t> signature = LogSigner::getInstance().sign(logEntry);
 
     m_db->addLogEntry(previous_hash, hash, j, signature, 1, EventType::UserLoggedIn);
+}
+
+void AuditLogger::onLogOut(const Event& event){
+    LogEntry logEntry;
+    logEntry.user_id = 1;
+    logEntry.type = EventType::UserLoggedOut;
+    logEntry.source = event.source;
+    logEntry.timestamp = getUTCTimestamp();
+    logEntry.severity = Severity::INFO;
+
+
+    if (event.hasData()) {
+        json details = event.getData<json>();
+        logEntry.details = details;
+
+        // Извлекаем entry_id из details
+        if (logEntry.details.contains("entry_id")) {
+            logEntry.entry_id = logEntry.details["entry_id"].get<int>();
+        }
+        else{
+            logEntry.entry_id = -1;
+        }
+    }
+
+    std::string j = to_json(logEntry).dump();
+
+    std::string previous_hash = m_db->getLastEntryHash();
+
+    std::string hash = LogSigner::getInstance().getHash(logEntry, previous_hash);
+    std::vector<uint8_t> signature = LogSigner::getInstance().sign(logEntry);
+
+    m_db->addLogEntry(previous_hash, hash, j, signature, 1, EventType::UserLoggedOut);
 }
 
 void AuditLogger::onLoginFailure(const Event& event){

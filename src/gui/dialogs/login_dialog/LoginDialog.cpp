@@ -219,10 +219,6 @@ void LoginDialog::onLogin()
         std::chrono::system_clock::time_point loginTime;
     };
 
-    json details = json::object();
-    details["action"] = "login_success";
-    eventBus.publish(EventType::UserLoggedIn, details, "LoginDialog");
-
     // Сбрасываем счетчик попыток при успешном входе
     resetBackoff();
 

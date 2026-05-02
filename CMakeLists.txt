@@ -85,6 +85,7 @@ set(SOURCES
     src/gui/dialogs/audit_dialog/audit_log_dialog.cpp
     src/core/audit/log_formatter/log_formatter.cpp
     src/gui/widgets/audit_log/audit_logViewer.cpp
+    src/gui/dialogs/export_dialog/ExportDialog.cpp
 
 )
 
@@ -109,6 +110,7 @@ set(HEADERS
     src/gui/dialogs/audit_dialog/audit_log_model.h
     src/gui/dialogs/audit_dialog/audit_log_dialog.h
     src/gui/widgets/audit_log/audit_logViewer.h
+    src/gui/dialogs/export_dialog/ExportDialog.h
 )
 
 
@@ -142,7 +144,10 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${Qt5Core_INCLUDE_DIRS}
 )
 
-add_executable(${TARGET_NAME} ${MAIN_SOURCES})
+add_executable(${TARGET_NAME} ${MAIN_SOURCES}
+    src/core/import_export/export/export.h
+    src/core/import_export/export/export.cpp
+    src/core/crypto/AES128.h)
 
 
 
