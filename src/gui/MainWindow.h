@@ -17,7 +17,6 @@
 #include "../src/gui/widgets/secure_table/VaultTableModel.h"
 #include "../src/gui/widgets/secure_table/SearchProxyModel.h"
 #include "../src/core/vault/VaultManager.h"
-#include "../src/core/crypto/AES256.h"
 #include "../src/gui/widgets/audit_log/audit_logViewer.h"
 
 class MainWindow : public QMainWindow
@@ -29,7 +28,6 @@ private:
     Database &db;
     VaultManager& m_vaultManager;
 
-    AES256GCM m_crypto;
 
     bool isLoggedIn;
     QString m_temporaryMessage;

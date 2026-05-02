@@ -2,7 +2,6 @@
 #define AUTHENTICATION_H
 
 #include <argon2.h>
-#include <iostream>
 #include <sodium.h>
 #include <stdexcept>
 #include <string>

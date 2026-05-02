@@ -109,21 +109,7 @@
 	"CMAKE_SOURCE_DIR" : "/home/master666/development/cryptosafe_password_manager",
 	"DEP_FILE" : "/home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/deps",
 	"DEP_FILE_RULE_NAME" : "cryptosafe_autogen/timestamp",
-	"HEADERS" : 
-	[
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/crypto/AES128.h",
-			"MU",
-			"PCXAAPSLAK/moc_AES128.cpp",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/import_export/export/export.h",
-			"MU",
-			"7Y7C2ZOIDD/moc_export.cpp",
-			null
-		]
-	],
+	"HEADERS" : [],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
 	"INCLUDE_DIR" : "/home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/include",
 	"MOC_COMPILATION_FILE" : "/home/master666/development/cryptosafe_password_manager/build/cryptosafe_autogen/mocs_compilation.cpp",
@@ -140,6 +126,8 @@
 		"/home/master666/development/cryptosafe_password_manager",
 		"/home/master666/development/cryptosafe_password_manager/src",
 		"/home/master666/development/cryptosafe_password_manager/src/core",
+		"/home/master666/development/cryptosafe_password_manager/src/core/crypto",
+		"/home/master666/development/cryptosafe_password_manager/src/core/serialization",
 		"/home/master666/development/cryptosafe_password_manager/src/core/audit",
 		"/home/master666/development/cryptosafe_password_manager/src/core/audit/log_verifier",
 		"/home/master666/development/cryptosafe_password_manager/src/core/audit/audit_logger",
@@ -195,11 +183,6 @@
 	[
 		[
 			"/home/master666/development/cryptosafe_password_manager/main.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/master666/development/cryptosafe_password_manager/src/core/import_export/export/export.cpp",
 			"MU",
 			null
 		]

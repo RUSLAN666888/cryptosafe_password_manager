@@ -4,10 +4,7 @@
 #include <string>
 #include <nlohmann/json.hpp>
 
-
-using json = nlohmann::json;
-
-struct PlaintextEntry {
+struct PlaintextEntry{
     std::string title;
     std::string username;
     std::string password;
@@ -36,17 +33,28 @@ struct PlaintextEntry {
         creation_timestamp(timestamp), tags(tags) {}
 
     // Сериализация в JSON
-    static void to_json(json& j, const PlaintextEntry& entry) {
-        j = json{
-            {"title", entry.title},
-            {"username", entry.username},
-            {"password", entry.password},
-            {"url", entry.url},
-            {"notes", entry.notes},
-            {"category", entry.category},
-            {"creation_timestamp", entry.creation_timestamp},
-            {"version", entry.version}
+    void to_json(nlohmann::json& j) const {
+        j = nlohmann::json{
+            {"title", title},
+            {"username", username},
+            {"password", password},
+            {"url", url},
+            {"notes", notes},
+            {"category", category},
+            {"creation_timestamp", creation_timestamp},
+            {"version", version}
         };
+    }
+
+    void from_json(const nlohmann::json& j) {
+        title = j.value("title", "");
+        username = j.value("username", "");
+        password = j.value("password", "");
+        url = j.value("url", "");
+        notes = j.value("notes", "");
+        category = j.value("category", "");
+        creation_timestamp = j.value("creation_timestamp", "");
+        version = j.value("version", 1);
     }
 };
 

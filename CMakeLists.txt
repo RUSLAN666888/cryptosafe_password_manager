@@ -86,7 +86,7 @@ set(SOURCES
     src/core/audit/log_formatter/log_formatter.cpp
     src/gui/widgets/audit_log/audit_logViewer.cpp
     src/gui/dialogs/export_dialog/ExportDialog.cpp
-
+    src/core/import_export/export/export.cpp
 )
 
 set(MAIN_SOURCES
@@ -123,6 +123,8 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/crypto
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/serialization
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit/log_verifier
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit/audit_logger
@@ -144,10 +146,7 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${Qt5Core_INCLUDE_DIRS}
 )
 
-add_executable(${TARGET_NAME} ${MAIN_SOURCES}
-    src/core/import_export/export/export.h
-    src/core/import_export/export/export.cpp
-    src/core/crypto/AES128.h)
+add_executable(${TARGET_NAME} ${MAIN_SOURCES})
 
 
 

@@ -50,8 +50,7 @@ int main(int argc, char *argv[])
         //AuditLogger::getInstance().init(db);
         //LogVerifier::getInstance().init(&db);
 
-        static AES256GCM crypto;
-        static VaultManager m(db, crypto, KeyManager::getInstance());
+        static VaultManager m(db, KeyManager::getInstance());
 
         // Создаем главное окно
         MainWindow mainWindow(config, db, m);

@@ -454,7 +454,7 @@ src/core/import_export/export/export.o: src/core/import_export/export/export.cpp
 
 # target to build an object file
 src/core/import_export/export/export.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/import_export/export/export.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/import_export/export/export.cpp.o
 .PHONY : src/core/import_export/export/export.cpp.o
 
 src/core/import_export/export/export.i: src/core/import_export/export/export.cpp.i
@@ -462,7 +462,7 @@ src/core/import_export/export/export.i: src/core/import_export/export/export.cpp
 
 # target to preprocess a source file
 src/core/import_export/export/export.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/import_export/export/export.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/import_export/export/export.cpp.i
 .PHONY : src/core/import_export/export/export.cpp.i
 
 src/core/import_export/export/export.s: src/core/import_export/export/export.cpp.s
@@ -470,7 +470,7 @@ src/core/import_export/export/export.s: src/core/import_export/export/export.cpp
 
 # target to generate assembly for a file
 src/core/import_export/export/export.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe.dir/build.make CMakeFiles/cryptosafe.dir/src/core/import_export/export/export.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/import_export/export/export.cpp.s
 .PHONY : src/core/import_export/export/export.cpp.s
 
 src/core/vault/VaultManager.o: src/core/vault/VaultManager.cpp.o
