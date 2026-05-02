@@ -126,6 +126,7 @@
 		"/home/master666/development/cryptosafe_password_manager",
 		"/home/master666/development/cryptosafe_password_manager/src",
 		"/home/master666/development/cryptosafe_password_manager/src/core",
+		"/home/master666/development/cryptosafe_password_manager/src/core/key_management",
 		"/home/master666/development/cryptosafe_password_manager/src/core/crypto",
 		"/home/master666/development/cryptosafe_password_manager/src/core/serialization",
 		"/home/master666/development/cryptosafe_password_manager/src/core/audit",

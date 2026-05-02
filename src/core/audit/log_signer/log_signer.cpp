@@ -5,20 +5,20 @@
 #include <iostream>
 
 
-#include "../src/core/key_manager.h"
-#include "../src/core/crypto/key_derivation.h"
-#include "../src/core/LogEntry.h"
-#include "../src/core/audit/log_signer/log_signer.h"
+#include "key_manager.h"
+#include "key_derivation.h"
+#include "LogEntry.h"
+#include "log_signer.h"
 
 
 void LogSigner::initFromMasterPassword(const std::string& password)
 {
     std::vector<uint8_t> private_key(32);
     derive_log_seed(password, private_key);
-    KeyManager::getInstance().store_private_sign_key(private_key);
+    KeyManager::getInstance().storeSignKey(private_key);
 
-    KeyManager::KeyData d;
-    KeyManager::getInstance().get_private_sign_key(d);
+    KeyData d;
+    KeyManager::getInstance().getSignKey(d);
 
     EVP_PKEY* pkey = EVP_PKEY_new_raw_private_key(EVP_PKEY_ED25519, NULL, d.data, d.size);
 
@@ -36,8 +36,8 @@ std::vector<uint8_t> LogSigner::sign(LogEntry entry){
 
     EVP_MD_CTX *md_ctx = EVP_MD_CTX_new();
 
-    KeyManager::KeyData d;
-    KeyManager::getInstance().get_private_sign_key(d);
+    KeyData d;
+    KeyManager::getInstance().getSignKey(d);
 
     EVP_PKEY* pkey = EVP_PKEY_new_raw_private_key(EVP_PKEY_ED25519, NULL, d.data, d.size);
     EVP_DigestSignInit_ex(md_ctx, NULL, NULL, NULL, NULL, pkey, NULL);

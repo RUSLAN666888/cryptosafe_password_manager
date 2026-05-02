@@ -168,6 +168,90 @@ cryptosafe_autogen/timestamp: /home/master666/development/cryptosafe_password_ma
   /usr/share/cmake-3.28/Modules/Platform/UnixPaths.cmake \
   /usr/share/cmake/nlohmann_json/nlohmann_jsonConfig.cmake \
   /usr/share/cmake/nlohmann_json/nlohmann_jsonConfigVersion.cmake \
+  /usr/share/cmake/nlohmann_json/nlohmann_jsonTargets.cmake \
+  /home/master666/development/cryptosafe_password_manager/CMakeLists.txt \
+  CMakeFiles/3.28.3/CMakeCCompiler.cmake \
+  CMakeFiles/3.28.3/CMakeCXXCompiler.cmake \
+  CMakeFiles/3.28.3/CMakeSystem.cmake \
+  /home/master666/development/cryptosafe_password_manager/main.cpp \
+  /usr/bin/cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/GTest/GTestConfig.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/GTest/GTestConfigVersion.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/GTest/GTestTargets-none.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/GTest/GTestTargets.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5Config.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ConfigVersion.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ModuleLocation.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfig.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfigExtras.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfigVersion.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreMacros.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfig.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfigExtras.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfigVersion.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QComposePlatformInputContextPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSEmulatorIntegrationPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSIntegrationPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSKmsGbmIntegrationPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevKeyboardPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevMousePlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevTabletPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevTouchScreenPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QGifPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QICOPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QIbusPlatformInputContextPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QJpegPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QLibInputPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QLinuxFbIntegrationPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QMinimalEglIntegrationPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QMinimalIntegrationPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QVncIntegrationPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QXcbGlxIntegrationPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QXcbIntegrationPlugin.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfigExtras.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfigVersion.cmake \
+  /usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake \
+  /usr/share/cmake-3.28/Modules/CMakeCInformation.cmake \
+  /usr/share/cmake-3.28/Modules/CMakeCXXInformation.cmake \
+  /usr/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake \
+  /usr/share/cmake-3.28/Modules/CMakeFindDependencyMacro.cmake \
+  /usr/share/cmake-3.28/Modules/CMakeGenericSystem.cmake \
+  /usr/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake \
+  /usr/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake \
+  /usr/share/cmake-3.28/Modules/CMakeParseArguments.cmake \
+  /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake \
+  /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake \
+  /usr/share/cmake-3.28/Modules/CheckCSourceCompiles.cmake \
+  /usr/share/cmake-3.28/Modules/CheckIncludeFile.cmake \
+  /usr/share/cmake-3.28/Modules/CheckLibraryExists.cmake \
+  /usr/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake \
+  /usr/share/cmake-3.28/Modules/Compiler/GNU-C.cmake \
+  /usr/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake \
+  /usr/share/cmake-3.28/Modules/Compiler/GNU.cmake \
+  /usr/share/cmake-3.28/Modules/FindGTest.cmake \
+  /usr/share/cmake-3.28/Modules/FindOpenSSL.cmake \
+  /usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake \
+  /usr/share/cmake-3.28/Modules/FindPackageMessage.cmake \
+  /usr/share/cmake-3.28/Modules/FindPkgConfig.cmake \
+  /usr/share/cmake-3.28/Modules/FindSQLite3.cmake \
+  /usr/share/cmake-3.28/Modules/FindThreads.cmake \
+  /usr/share/cmake-3.28/Modules/GoogleTest.cmake \
+  /usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake \
+  /usr/share/cmake-3.28/Modules/Platform/Linux-GNU-C.cmake \
+  /usr/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake \
+  /usr/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake \
+  /usr/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake \
+  /usr/share/cmake-3.28/Modules/Platform/Linux.cmake \
+  /usr/share/cmake-3.28/Modules/Platform/UnixPaths.cmake \
+  /usr/share/cmake/nlohmann_json/nlohmann_jsonConfig.cmake \
+  /usr/share/cmake/nlohmann_json/nlohmann_jsonConfigVersion.cmake \
   /usr/share/cmake/nlohmann_json/nlohmann_jsonTargets.cmake
 
 CMakeFiles/cryptosafe.dir/cryptosafe_autogen/mocs_compilation.cpp.o: cryptosafe_autogen/mocs_compilation.cpp \
@@ -181,7 +265,6 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
   /home/master666/development/cryptosafe_password_manager/src/core/config_handler.h \
   /home/master666/development/cryptosafe_password_manager/src/core/crypto/AES256.h \
   /home/master666/development/cryptosafe_password_manager/src/core/events.h \
-  /home/master666/development/cryptosafe_password_manager/src/core/key_manager.h \
   /home/master666/development/cryptosafe_password_manager/src/core/vault/VaultManager.h \
   /home/master666/development/cryptosafe_password_manager/src/core/vault/plaintext_entry.h \
   /home/master666/development/cryptosafe_password_manager/src/database/DB_helper/db_helper.h \
@@ -190,9 +273,6 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
   /home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/VaultTableModel.h \
   /home/master666/development/cryptosafe_password_manager/src/database/DB_helper/db_helper.h \
   /home/master666/development/cryptosafe_password_manager/src/core/config_handler.h \
-  /home/master666/development/cryptosafe_password_manager/src/core/crypto/IEncryptionService.h \
-  /home/master666/development/cryptosafe_password_manager/src/core/crypto/aes_gcm.h \
-  /home/master666/development/cryptosafe_password_manager/src/core/key_manager.h \
   /home/master666/development/cryptosafe_password_manager/src/database/DBSchema.h \
   /home/master666/development/cryptosafe_password_manager/src/database/DB_helper/db_helper.h \
   /home/master666/development/cryptosafe_password_manager/src/gui/MainWindow.h \
@@ -483,32 +563,6 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
   /usr/include/nlohmann/ordered_map.hpp \
   /usr/include/nlohmann/thirdparty/hedley/hedley.hpp \
   /usr/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
-  /usr/include/openssl/asn1.h \
-  /usr/include/openssl/asn1err.h \
-  /usr/include/openssl/bio.h \
-  /usr/include/openssl/bioerr.h \
-  /usr/include/openssl/bn.h \
-  /usr/include/openssl/bnerr.h \
-  /usr/include/openssl/core.h \
-  /usr/include/openssl/core_dispatch.h \
-  /usr/include/openssl/crypto.h \
-  /usr/include/openssl/cryptoerr.h \
-  /usr/include/openssl/cryptoerr_legacy.h \
-  /usr/include/openssl/e_os2.h \
-  /usr/include/openssl/evp.h \
-  /usr/include/openssl/evperr.h \
-  /usr/include/openssl/macros.h \
-  /usr/include/openssl/obj_mac.h \
-  /usr/include/openssl/objects.h \
-  /usr/include/openssl/objectserr.h \
-  /usr/include/openssl/opensslv.h \
-  /usr/include/openssl/params.h \
-  /usr/include/openssl/rand.h \
-  /usr/include/openssl/randerr.h \
-  /usr/include/openssl/safestack.h \
-  /usr/include/openssl/stack.h \
-  /usr/include/openssl/symhacks.h \
-  /usr/include/openssl/types.h \
   /usr/include/pthread.h \
   /usr/include/sched.h \
   /usr/include/semaphore.h \
@@ -627,8 +681,6 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
   /usr/include/x86_64-linux-gnu/c++/13/bits/time_members.h \
   /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
   /usr/include/x86_64-linux-gnu/gnu/stubs.h \
-  /usr/include/x86_64-linux-gnu/openssl/configuration.h \
-  /usr/include/x86_64-linux-gnu/openssl/opensslconf.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QAbstractTableModel \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QDateTime \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QObject \
@@ -952,6 +1004,8 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qrefcount.h:
 
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qrect.h:
+
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qprocessordetection.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qpoint.h:
@@ -968,53 +1022,11 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qlist.h:
 
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QToolBar:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qhashfunctions.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qlogging.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qhash.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qglobalstatic.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qglobal.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qgenericatomic.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qflags.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qdatetime.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreevent.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qcontainertools_impl.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qsysinfo.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qcontainerfwd.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qcompilerdetection.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qchar.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qcalendar.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearraylist.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qbasicatomic.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic_cxx11.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qarraydata.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qalgorithms.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qabstractitemmodel.h:
-
 /usr/include/c++/13/compare:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qobject.h:
+
+/usr/include/c++/13/ctime:
 
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qguiapplication.h:
 
@@ -1036,8 +1048,6 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 
 /usr/include/c++/13/backward/binders.h:
 
-/usr/include/openssl/obj_mac.h:
-
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qtgui-config.h:
 
 /usr/include/c++/13/bits/vector.tcc:
@@ -1053,6 +1063,10 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 /usr/include/c++/13/streambuf:
 
 /usr/include/nlohmann/adl_serializer.hpp:
+
+/usr/include/c++/13/bits/unique_lock.h:
+
+/usr/include/c++/13/bits/valarray_before.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qtcore-config.h:
 
@@ -1074,11 +1088,17 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 
 /usr/include/c++/13/bits/utility.h:
 
+/usr/include/c++/13/bits/stl_function.h:
+
 /usr/include/c++/13/bits/stl_construct.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextdocument.h:
 
 /usr/include/c++/13/bits/std_mutex.h:
+
+/home/master666/development/cryptosafe_password_manager/main.cpp:
+
+/usr/include/nlohmann/detail/meta/cpp_future.hpp:
 
 /usr/include/c++/13/cstdint:
 
@@ -1094,15 +1114,13 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 
 /usr/include/c++/13/bits/slice_array.h:
 
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qarraydata.h:
+
 /usr/include/c++/13/bits/shared_ptr_base.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qregion.h:
 
 /usr/include/c++/13/bits/shared_ptr.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qabstractproxymodel.h:
-
-/usr/include/c++/13/bits/ranges_algobase.h:
 
 /usr/include/c++/13/bits/ranges_cmp.h:
 
@@ -1128,6 +1146,8 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 
 /usr/include/c++/13/bits/locale_facets_nonio.h:
 
+/usr/include/x86_64-linux-gnu/bits/confname.h:
+
 /usr/include/c++/13/bits/requires_hosted.h:
 
 /usr/include/nlohmann/detail/string_concat.hpp:
@@ -1141,6 +1161,10 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 /usr/include/c++/13/bits/locale_facets.h:
 
 /usr/include/c++/13/bits/istream.tcc:
+
+/home/master666/development/cryptosafe_password_manager/src/core/audit/audit_logger/audit_logger.h:
+
+/usr/include/c++/13/iterator:
 
 /usr/include/c++/13/bits/invoke.h:
 
@@ -1169,6 +1193,10 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 /usr/include/nlohmann/detail/meta/call_std/end.hpp:
 
 /usr/include/c++/13/bits/fstream.tcc:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qnumeric.h:
+
+/usr/include/nlohmann/json_fwd.hpp:
 
 /usr/include/c++/13/bits/forward_list.tcc:
 
@@ -1200,23 +1228,7 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 
 /usr/include/c++/13/bits/chrono_io.h:
 
-/home/master666/development/cryptosafe_password_manager/src/core/crypto/IEncryptionService.h:
-
 /usr/include/c++/13/bits/chrono.h:
-
-/usr/include/nlohmann/detail/input/parser.hpp:
-
-/usr/include/c++/13/bits/fs_path.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtwidgetsglobal.h:
-
-/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevMousePlugin.cmake:
-
-/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/QDateTime:
-
-/usr/include/c++/13/bits/hashtable_policy.h:
 
 /usr/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake:
 
@@ -1229,6 +1241,10 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 /usr/include/c++/13/bits/basic_ios.h:
 
 /usr/include/nlohmann/detail/conversions/from_json.hpp:
+
+/usr/include/c++/13/bits/ranges_algobase.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qabstractproxymodel.h:
 
 /usr/include/c++/13/bits/mask_array.h:
 
@@ -1244,19 +1260,19 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 
 /usr/include/x86_64-linux-gnu/bits/wordsize.h:
 
-/usr/include/c++/13/bits/charconv.h:
+/usr/share/cmake-3.28/Modules/CMakeFindDependencyMacro.cmake:
 
-/usr/include/x86_64-linux-gnu/c++/13/bits/atomic_word.h:
+/usr/include/nlohmann/detail/input/lexer.hpp:
 
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QXcbIntegrationPlugin.cmake:
-
-/home/master666/development/cryptosafe_password_manager/src/core/crypto/aes_gcm.h:
 
 /usr/include/c++/13/bits/fs_dir.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qframe.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qcalendar.h:
 
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake:
 
@@ -1267,6 +1283,8 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qstringview.h:
 
 /usr/include/c++/13/bits/stl_bvector.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h:
 
 /usr/include/c++/13/bits/allocator.h:
 
@@ -1284,13 +1302,7 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 
 /usr/include/nlohmann/detail/iterators/iterator_traits.hpp:
 
-/usr/include/x86_64-linux-gnu/qt5/QtGui/qimage.h:
-
-/usr/include/c++/13/bits/stl_pair.h:
-
-/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake:
-
-/home/master666/development/cryptosafe_password_manager/src/core/clipboard_service/clipboard_service.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic_cxx11.h:
 
 /usr/include/c++/13/map:
 
@@ -1338,11 +1350,35 @@ CMakeFiles/cryptosafe.dir/main.cpp.o: /home/master666/development/cryptosafe_pas
 
 /home/master666/development/cryptosafe_password_manager/src/core/crypto/AES256.h:
 
-/usr/include/c++/13/bit:
+/usr/include/nlohmann/detail/input/parser.hpp:
 
-/usr/include/openssl/stack.h:
+/usr/include/x86_64-linux-gnu/qt5/QtGui/qimage.h:
+
+/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake:
+
+/home/master666/development/cryptosafe_password_manager/src/core/clipboard_service/clipboard_service.h:
+
+/usr/include/c++/13/bits/stl_pair.h:
+
+/usr/include/c++/13/bits/fs_path.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtwidgetsglobal.h:
+
+/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevMousePlugin.cmake:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearraylist.h:
+
+/usr/include/x86_64-linux-gnu/c++/13/bits/atomic_word.h:
+
+/usr/include/c++/13/bits/charconv.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/QDateTime:
 
 /usr/include/c++/13/bits/std_thread.h:
+
+/usr/include/c++/13/initializer_list:
 
 /usr/include/c++/13/tr1/bessel_function.tcc:
 
@@ -1372,12 +1408,6 @@ CMakeFiles/3.28.3/CMakeSystem.cmake:
 
 /usr/include/c++/13/bits/ranges_base.h:
 
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qboxlayout.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qitemselectionmodel.h:
-
-/usr/include/c++/13/tr1/modified_bessel_func.tcc:
-
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QIbusPlatformInputContextPlugin.cmake:
 
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QVncIntegrationPlugin.cmake:
@@ -1398,8 +1428,6 @@ CMakeFiles/3.28.3/CMakeSystem.cmake:
 
 /usr/include/nlohmann/detail/input/input_adapters.hpp:
 
-/usr/include/openssl/macros.h:
-
 /home/master666/development/cryptosafe_password_manager/src/core/config_handler.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qregexp.h:
@@ -1416,31 +1444,19 @@ CMakeFiles/3.28.3/CMakeSystem.cmake:
 
 /usr/include/x86_64-linux-gnu/bits/posix_opt.h:
 
-/home/master666/development/cryptosafe_password_manager/main.cpp:
+/usr/include/c++/13/bits/ios_base.h:
 
-/usr/include/nlohmann/detail/meta/cpp_future.hpp:
+/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfigVersion.cmake:
 
 /usr/include/c++/13/bits/exception.h:
 
 /usr/include/c++/13/bits/ranges_uninitialized.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qconfig.h:
-
-/usr/include/nlohmann/detail/iterators/json_reverse_iterator.hpp:
 
 /usr/include/c++/13/bits/ptr_traits.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qsharedpointer.h:
 
 /usr/share/cmake-3.28/Modules/Compiler/GNU-C.cmake:
-
-/home/master666/development/cryptosafe_password_manager/src/core/audit/audit_logger/audit_logger.h:
-
-/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfigVersion.cmake:
-
-/usr/include/c++/13/bits/ios_base.h:
-
-/usr/include/c++/13/iterator:
 
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qwindowdefs.h:
 
@@ -1454,6 +1470,8 @@ CMakeFiles/3.28.3/CMakeCXXCompiler.cmake:
 
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake:
 
+/usr/include/c++/13/bit:
+
 /usr/include/c++/13/bits/uses_allocator.h:
 
 /usr/include/c++/13/bits/postypes.h:
@@ -1461,12 +1479,6 @@ CMakeFiles/3.28.3/CMakeCXXCompiler.cmake:
 /usr/include/c++/13/bits/valarray_array.tcc:
 
 /usr/include/c++/13/bits/indirect_array.h:
-
-/usr/include/openssl/params.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qbasictimer.h:
-
-/usr/include/c++/13/bits/functional_hash.h:
 
 /usr/include/c++/13/bits/quoted_string.h:
 
@@ -1477,8 +1489,6 @@ CMakeFiles/3.28.3/CMakeCXXCompiler.cmake:
 /usr/share/cmake-3.28/Modules/FindOpenSSL.cmake:
 
 /usr/include/x86_64-linux-gnu/bits/waitflags.h:
-
-/usr/include/openssl/randerr.h:
 
 /usr/include/unistd.h:
 
@@ -1500,19 +1510,15 @@ CMakeFiles/3.28.3/CMakeCXXCompiler.cmake:
 
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QGifPlugin.cmake:
 
-/usr/include/c++/13/bits/basic_string.tcc:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
-
 /usr/include/c++/13/bits/concept_check.h:
-
-/usr/include/openssl/symhacks.h:
 
 /usr/include/c++/13/bits/uses_allocator_args.h:
 
 /home/master666/development/cryptosafe_password_manager/CMakeLists.txt:
 
 /usr/include/c++/13/bits/alloc_traits.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreevent.h:
 
 /usr/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake:
 
@@ -1540,17 +1546,9 @@ CMakeFiles/3.28.3/CMakeCXXCompiler.cmake:
 
 /usr/include/endian.h:
 
-/usr/include/openssl/evp.h:
-
 /usr/include/stdint.h:
 
 /usr/share/cmake-3.28/Modules/FindPackageMessage.cmake:
-
-/home/master666/development/cryptosafe_password_manager/src/core/events.h:
-
-/usr/include/c++/13/bits/allocated_ptr.h:
-
-/usr/share/cmake-3.28/Modules/CheckCSourceCompiles.cmake:
 
 /usr/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake:
 
@@ -1630,17 +1628,15 @@ cryptosafe_autogen/mocs_compilation.cpp:
 
 /usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake:
 
-/usr/include/limits.h:
-
 /usr/include/c++/13/cstdlib:
+
+/usr/include/limits.h:
 
 /usr/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake:
 
 /usr/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake:
 
 /usr/include/c++/13/bits/unordered_map.h:
-
-/usr/include/openssl/e_os2.h:
 
 /usr/share/cmake-3.28/Modules/Platform/Linux.cmake:
 
@@ -1674,17 +1670,19 @@ cryptosafe_autogen/mocs_compilation.cpp:
 
 /usr/include/nlohmann/detail/output/binary_writer.hpp:
 
+/usr/include/c++/13/bits/allocated_ptr.h:
+
+/usr/share/cmake-3.28/Modules/CheckCSourceCompiles.cmake:
+
+/home/master666/development/cryptosafe_password_manager/src/core/events.h:
+
+/usr/include/c++/13/bits/hashtable_policy.h:
+
 /usr/include/c++/13/bits/unique_ptr.h:
 
 /usr/bin/cmake:
 
 /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
-
-/home/master666/development/cryptosafe_password_manager/src/core/key_manager.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qmetatype.h:
-
-/usr/include/c++/13/filesystem:
 
 /usr/include/c++/13/bits/stl_relops.h:
 
@@ -1706,19 +1704,23 @@ cryptosafe_autogen/mocs_compilation.cpp:
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/c++locale.h:
 
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qcompilerdetection.h:
+
+/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/VaultTableModel.h:
+
 /usr/include/x86_64-linux-gnu/sys/select.h:
 
 /home/master666/development/cryptosafe_password_manager/src/database/DB_helper/db_helper.h:
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/messages_members.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
+
+/usr/include/c++/13/bits/basic_string.tcc:
+
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qstringliteral.h:
 
 /usr/include/assert.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic.h:
-
-/home/master666/development/cryptosafe_password_manager/src/gui/widgets/audit_log/audit_logViewer.h:
 
 /usr/include/c++/13/tuple:
 
@@ -1731,6 +1733,10 @@ cryptosafe_autogen/mocs_compilation.cpp:
 /usr/share/cmake-3.28/Modules/FindGTest.cmake:
 
 /usr/share/cmake-3.28/Modules/CMakeGenericSystem.cmake:
+
+/usr/include/c++/13/bits/predefined_ops.h:
+
+/usr/include/x86_64-linux-gnu/c++/13/bits/error_constants.h:
 
 /usr/share/cmake-3.28/Modules/Compiler/GNU.cmake:
 
@@ -1748,27 +1754,19 @@ cryptosafe_autogen/mocs_compilation.cpp:
 
 /usr/include/nlohmann/detail/output/serializer.hpp:
 
-/usr/share/cmake-3.28/Modules/CMakeFindDependencyMacro.cmake:
-
-/usr/include/nlohmann/detail/input/lexer.hpp:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qobject.h:
-
-/usr/include/c++/13/ctime:
-
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qstringmatcher.h:
 
 /usr/include/c++/13/cwchar:
 
 /usr/include/c++/13/cwctype:
 
-/usr/include/openssl/cryptoerr.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qiodevice.h:
-
-/usr/include/c++/13/debug/assertions.h:
-
 /usr/include/nlohmann/detail/meta/identity_tag.hpp:
+
+/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake:
+
+/usr/include/c++/13/bits/stl_list.h:
+
+/usr/include/c++/13/debug/debug.h:
 
 /usr/include/c++/13/bits/std_abs.h:
 
@@ -1796,9 +1794,9 @@ cryptosafe_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/13/ext/string_conversions.h:
 
-/usr/include/x86_64-linux-gnu/bits/confname.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qmetatype.h:
 
-/usr/include/openssl/rand.h:
+/usr/include/c++/13/filesystem:
 
 /usr/include/c++/13/fstream:
 
@@ -1826,6 +1824,10 @@ cryptosafe_autogen/mocs_compilation.cpp:
 
 /usr/include/x86_64-linux-gnu/bits/types/wint_t.h:
 
+/home/master666/development/cryptosafe_password_manager/src/gui/widgets/audit_log/audit_logViewer.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic.h:
+
 /usr/include/c++/13/memory:
 
 /usr/include/c++/13/mutex:
@@ -1850,6 +1852,8 @@ cryptosafe_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/13/pstl/glue_numeric_defs.h:
 
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qglobal.h:
+
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstyleoption.h:
 
 /usr/include/c++/13/ranges:
@@ -1858,9 +1862,7 @@ cryptosafe_autogen/mocs_compilation.cpp:
 
 /usr/include/linux/limits.h:
 
-/usr/include/c++/13/bits/unique_lock.h:
-
-/usr/include/openssl/objectserr.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qflags.h:
 
 /usr/include/c++/13/sstream:
 
@@ -1896,6 +1898,10 @@ cryptosafe_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/13/tr1/special_function_util.h:
 
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qsysinfo.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qcontainerfwd.h:
+
 /usr/include/c++/13/typeinfo:
 
 /usr/include/x86_64-linux-gnu/bits/syscall.h:
@@ -1917,6 +1923,8 @@ cryptosafe_autogen/mocs_compilation.cpp:
 /usr/include/c++/13/semaphore:
 
 /usr/include/c++/13/version:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qabstractitemmodel.h:
 
 /usr/include/ctype.h:
 
@@ -1945,6 +1953,8 @@ cryptosafe_autogen/mocs_compilation.cpp:
 /usr/include/nlohmann/detail/input/position_t.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qdatastream.h:
 
 /usr/include/nlohmann/detail/iterators/internal_iterator.hpp:
 
@@ -1982,71 +1992,13 @@ cryptosafe_autogen/mocs_compilation.cpp:
 
 /usr/include/nlohmann/detail/meta/std_fs.hpp:
 
+/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QToolBar:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qhashfunctions.h:
+
 /usr/include/nlohmann/detail/string_escape.hpp:
 
 /usr/include/nlohmann/detail/value_t.hpp:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qnumeric.h:
-
-/usr/include/nlohmann/json_fwd.hpp:
-
-/usr/include/openssl/asn1.h:
-
-/usr/include/openssl/asn1err.h:
-
-/home/master666/development/cryptosafe_password_manager/src/gui/widgets/secure_table/VaultTableModel.h:
-
-/usr/include/openssl/bio.h:
-
-/usr/include/c++/13/bits/stl_function.h:
-
-/usr/include/openssl/bioerr.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qrect.h:
-
-/usr/include/openssl/bn.h:
-
-/usr/include/openssl/objects.h:
-
-/usr/include/c++/13/ext/aligned_buffer.h:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/c++allocator.h:
-
-/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake:
-
-/usr/include/c++/13/bits/stl_list.h:
-
-/usr/include/c++/13/debug/debug.h:
-
-/usr/include/openssl/bnerr.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qdatastream.h:
-
-/usr/include/openssl/core.h:
-
-/usr/include/openssl/core_dispatch.h:
-
-/usr/include/openssl/cryptoerr_legacy.h:
-
-/usr/include/c++/13/initializer_list:
-
-/usr/include/openssl/evperr.h:
-
-/usr/include/c++/13/bits/predefined_ops.h:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/error_constants.h:
-
-/usr/include/openssl/opensslv.h:
-
-/usr/include/wchar.h:
-
-/usr/include/nlohmann/detail/exceptions.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
-
-/usr/include/openssl/safestack.h:
-
-/usr/include/openssl/types.h:
 
 /usr/include/pthread.h:
 
@@ -2130,6 +2082,10 @@ cryptosafe_autogen/mocs_compilation.cpp:
 
 /usr/include/x86_64-linux-gnu/bits/time.h:
 
+/usr/include/nlohmann/detail/iterators/json_reverse_iterator.hpp:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qconfig.h:
+
 /usr/include/x86_64-linux-gnu/bits/stdint-least.h:
 
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfig.cmake:
@@ -2151,6 +2107,12 @@ cryptosafe_autogen/mocs_compilation.cpp:
 /usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
 
 /usr/include/x86_64-linux-gnu/bits/timex.h:
+
+/usr/include/wchar.h:
+
+/usr/include/nlohmann/detail/exceptions.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
 
 /usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
 
@@ -2182,15 +2144,25 @@ cryptosafe_autogen/mocs_compilation.cpp:
 
 /usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
 
+/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qboxlayout.h:
+
+/usr/include/c++/13/tr1/modified_bessel_func.tcc:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qitemselectionmodel.h:
+
 /usr/include/c++/13/ios:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h:
 
+/usr/include/c++/13/bits/functional_hash.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qbasictimer.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qglobalstatic.h:
+
 /usr/include/c++/13/tr1/poly_hermite.tcc:
 
 /usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
-
-/usr/include/openssl/crypto.h:
 
 /usr/include/x86_64-linux-gnu/bits/unistd_ext.h:
 
@@ -2201,6 +2173,12 @@ cryptosafe_autogen/mocs_compilation.cpp:
 /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h:
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/basic_file.h:
+
+/usr/include/c++/13/ext/aligned_buffer.h:
+
+/usr/include/x86_64-linux-gnu/c++/13/bits/c++allocator.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qgenericatomic.h:
 
 /usr/include/c++/13/stop_token:
 
@@ -2226,12 +2204,6 @@ cryptosafe_autogen/mocs_compilation.cpp:
 
 /usr/include/x86_64-linux-gnu/gnu/stubs.h:
 
-/usr/include/c++/13/bits/valarray_before.h:
-
-/usr/include/x86_64-linux-gnu/openssl/configuration.h:
-
-/usr/include/x86_64-linux-gnu/openssl/opensslconf.h:
-
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qiterator.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/QAbstractTableModel:
@@ -2239,3 +2211,21 @@ cryptosafe_autogen/mocs_compilation.cpp:
 /usr/include/x86_64-linux-gnu/qt5/QtCore/QObject:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qalgorithms.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qbasicatomic.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qchar.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qcontainertools_impl.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qdatetime.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qlogging.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qhash.h:
+
+/usr/include/c++/13/debug/assertions.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qiodevice.h:

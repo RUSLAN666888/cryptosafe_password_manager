@@ -1,9 +1,10 @@
 #include "LoginDialog.h"
 #include <chrono>
-#include <thread>
 #include <QMessageBox>
 #include "../src/core/state_manager.h"
 #include "../src/core/audit/log_signer/log_signer.h"
+#include "key_manager.h"
+#include "key_derivation.h"
 
 LoginDialog::LoginDialog(QWidget *parent, ConfigHander &cfg, Database &database)
     : QDialog(parent)
@@ -210,7 +211,7 @@ void LoginDialog::onLogin()
     }
 
     // cache encryption key in secure memory
-    KeyManager::getInstance().store_key(encKey);
+    KeyManager::getInstance().storeEncryptionKey(encKey);
 
     // Publish UserLoggedIn event
     struct LoginEventData

@@ -1,6 +1,9 @@
 #include "../src/database/DB_helper/db_helper.h"
 #include "VaultManager.h"
 #include "Serializer.h"
+#include "key_manager.h"
+#include "key_storage.h"
+#include "aes_gcm.h"
 
 #include <sqlite3.h>
 #include <vector>
@@ -11,8 +14,8 @@
 #include <cstdint>
 
 
-VaultManager::VaultManager(Database& database, KeyManager& key_mgr) :
-    db(database), key_manager(key_mgr) {}
+VaultManager::VaultManager(Database& database) :
+    db(database) {}
 
 
 int VaultManager::createEntry(const PlaintextEntry& entry) {
@@ -46,8 +49,8 @@ int VaultManager::createEntry(const PlaintextEntry& entry) {
 
     std::vector<uint8_t> encrypted_data;
     try {
-        KeyManager::KeyData key;
-        key_manager.get_key(key);
+        KeyData key;
+        KeyManager::getInstance().getEncryptionKey(key);
 
         std::vector<uint8_t> plain_text = Serializer::serialize(entry);
 
@@ -130,11 +133,11 @@ std::unique_ptr<PlaintextEntry> VaultManager::getEntry(int entry_id, bool isKeyR
             );
 
         try {
-            KeyManager::KeyData key;
+            KeyData key;
             if (isKeyRotation)
-                key_manager.get_old_key(key);
+                KeyManager::getInstance().getOldEncryptionKey(key);
             else
-                key_manager.get_key(key);
+                KeyManager::getInstance().getEncryptionKey(key);
 
             std::vector<uint8_t> decrypted_data = AESGCM<256>().decrypt(key, encrypted_data);
             auto decrypted_entry = Serializer::deserialize<PlaintextEntry>(decrypted_data);
@@ -210,11 +213,11 @@ std::vector<PlaintextEntry> VaultManager::getAllEntries(bool rotate)
         return entries;
     }
 
-    KeyManager::KeyData key;
+    KeyData key;
     if (rotate)
-        key_manager.get_old_key(key);
+        KeyManager::getInstance().getOldEncryptionKey(key);
     else
-        key_manager.get_key(key);
+        KeyManager::getInstance().getEncryptionKey(key);
 
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
@@ -287,8 +290,8 @@ bool VaultManager::updateEntry(int entry_id, const PlaintextEntry& entry)
     std::vector<uint8_t> encrypted_data;
     try
     {
-        KeyManager::KeyData key;
-        key_manager.get_key(key);
+        KeyData key;
+        KeyManager::getInstance().getEncryptionKey(key);
 
         std::vector<uint8_t> plain_text = Serializer::serialize(entry);
         encrypted_data = AESGCM<256>().encrypt(key, plain_text);

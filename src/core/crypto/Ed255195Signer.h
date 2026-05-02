@@ -1,0 +1,4 @@
+#ifndef ED255195SIGNER_H
+#define ED255195SIGNER_H
+
+#endif // ED255195SIGNER_H

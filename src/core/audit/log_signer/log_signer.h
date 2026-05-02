@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "../src/core/LogEntry.h"
+#include "LogEntry.h"
 
 using json = nlohmann::json;
 

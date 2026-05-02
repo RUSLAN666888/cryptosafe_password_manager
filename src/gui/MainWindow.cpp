@@ -22,7 +22,6 @@
 #include <QShortcut>
 #include <QClipboard>
 //#include <random>
-#include <unordered_set>
 #include <QProgressDialog>
 #include <nlohmann/json.hpp>
 
@@ -233,7 +232,7 @@ MainWindow::~MainWindow()
         eventBus.publish(EventType::UserLoggedOut, details, "MainWindow");
         //ClipboardService::getInstance().saveRemainingTime();
         ClipboardService::getInstance().resetTimer();
-        KeyManager::getInstance().logout();
+        //KeyManager::getInstance().logout();
     }
 }
 
@@ -535,7 +534,7 @@ void MainWindow::resetInactivityTimer()
     if (isLoggedIn)
     {
         StateManager::getInstance().updateActivity();
-        KeyManager::getInstance().update_activity();
+        //KeyManager::getInstance().update_activity();
         inactivityTimer->start(INACTIVITY_TIMEOUT_MS);
     }
 }
@@ -549,7 +548,7 @@ void MainWindow::onInactivityTimeout()
         EventBus::getInstance().publish(EventType::InactivityTimeout, details, "MainWindow");
 
         lockApplication();
-        KeyManager::getInstance().logout();
+        //KeyManager::getInstance().logout();
         QMessageBox::information(this, "Auto-Lock", "Application locked due to inactivity.");
         showLoginDialog();
     }
@@ -577,7 +576,7 @@ void MainWindow::onExit()
 {
     if (isLoggedIn)
     {
-        KeyManager::getInstance().logout();
+        //KeyManager::getInstance().logout();
     }
     close();
 }
@@ -783,43 +782,43 @@ void MainWindow::onFirstRunWizard()
 
 void MainWindow::onChangePassword()
 {
-    if (!isLoggedIn)
-    {
-        QMessageBox::warning(this, "Not Logged In", "You must be logged in to change password");
-        return;
-    }
-    resetInactivityTimer();
+    // if (!isLoggedIn)
+    // {
+    //     QMessageBox::warning(this, "Not Logged In", "You must be logged in to change password");
+    //     return;
+    // }
+    // resetInactivityTimer();
 
-    ChangePasswordDialog dialog(this, db);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        lockApplication();
+    // ChangePasswordDialog dialog(this, db);
+    // if (dialog.exec() == QDialog::Accepted)
+    // {
+    //     lockApplication();
 
-        QProgressDialog progressDialog("Идёт перешифровка базы данных...\nПожалуйста, подождите.",
-                                       nullptr, 0, 0, this);
-        progressDialog.setWindowModality(Qt::WindowModal);
-        progressDialog.setMinimumDuration(0);
-        progressDialog.setCancelButton(nullptr);
-        progressDialog.show();
+    //     QProgressDialog progressDialog("Идёт перешифровка базы данных...\nПожалуйста, подождите.",
+    //                                    nullptr, 0, 0, this);
+    //     progressDialog.setWindowModality(Qt::WindowModal);
+    //     progressDialog.setMinimumDuration(0);
+    //     progressDialog.setCancelButton(nullptr);
+    //     progressDialog.show();
 
-        KeyManager::getInstance().logout();
+    //     KeyManager::getInstance().logout();
 
-        if (!showLoginDialog()) {
-            QMetaObject::invokeMethod(this, &MainWindow::close, Qt::QueuedConnection);
-        }
+    //     if (!showLoginDialog()) {
+    //         QMetaObject::invokeMethod(this, &MainWindow::close, Qt::QueuedConnection);
+    //     }
 
-        // Синхронный вызов
-        bool success = m_vaultManager.rotate();
+    //     // Синхронный вызов
+    //     bool success = m_vaultManager.rotate();
 
-        progressDialog.close();
-        setEnabled(true);
+    //     progressDialog.close();
+    //     setEnabled(true);
 
-        if (success) {
-            QMessageBox::information(this, "Успех", "База данных успешно перешифрована");
-        } else {
-            QMessageBox::critical(this, "Ошибка", "Не удалось перешифровать базу данных");
-        }
-    }
+    //     if (success) {
+    //         QMessageBox::information(this, "Успех", "База данных успешно перешифрована");
+    //     } else {
+    //         QMessageBox::critical(this, "Ошибка", "Не удалось перешифровать базу данных");
+    //     }
+    // }
 }
 
 // ============== ОБРАБОТЧИКИ СОБЫТИЙ ==============
@@ -844,7 +843,7 @@ void MainWindow::onLock()
     {
         qDebug() << "User manually locked application";
         lockApplication();
-        KeyManager::getInstance().logout();
+        //KeyManager::getInstance().logout();
 
         if (!showLoginDialog())
         {

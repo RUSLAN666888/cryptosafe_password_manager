@@ -6,6 +6,7 @@
 #include <vector>
 #include <openssl/rand.h>
 #include "IEncryptionService.h"
+#include "key_manager.h"
 
 template<size_t KeyBits>
 class AESGCM : public IEncryptionService{
@@ -16,7 +17,7 @@ class AESGCM : public IEncryptionService{
     static constexpr size_t TAG_LEN = 16;
 
 public:
-    std::vector<uint8_t> encrypt(const KeyManager::KeyData& key, const std::vector<uint8_t>& plaintext) override {
+    std::vector<uint8_t> encrypt(const KeyData& key, const std::vector<uint8_t>& plaintext) override {
         // Проверка размера ключа
         if (key.size != KEY_SIZE) {
             throw std::runtime_error("Invalid key size");
@@ -87,7 +88,7 @@ public:
         return result;
     }
 
-    std::vector<uint8_t> decrypt(const KeyManager::KeyData& key, const std::vector<uint8_t>& ciphertext_package) override {
+    std::vector<uint8_t> decrypt(const KeyData& key, const std::vector<uint8_t>& ciphertext_package) override {
         if (key.size != KEY_SIZE) {
             throw std::runtime_error("Invalid key size");
         }

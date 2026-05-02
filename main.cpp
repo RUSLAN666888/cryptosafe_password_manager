@@ -5,7 +5,6 @@
 #include "src/database/DB_helper/db_helper.h"
 #include "../src/core/vault/VaultManager.h"
 #include "src/gui/MainWindow.h"
-#include "../src/core/key_manager.h"
 #include "../src/core/crypto/AES256.h"
 #include "../src/core/clipboard_service/clipboard_service.h"
 #include "../src/core/audit/audit_logger/audit_logger.h"
@@ -50,7 +49,7 @@ int main(int argc, char *argv[])
         //AuditLogger::getInstance().init(db);
         //LogVerifier::getInstance().init(&db);
 
-        static VaultManager m(db, KeyManager::getInstance());
+        static VaultManager m(db);
 
         // Создаем главное окно
         MainWindow mainWindow(config, db, m);

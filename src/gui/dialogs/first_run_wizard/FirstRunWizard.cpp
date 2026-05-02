@@ -1,7 +1,8 @@
 #include "FirstRunWizard.h"
 #include "../src/core/crypto/authentication.h"
 #include "../src/core/crypto/key_derivation.h"
-#include "../src/core/key_manager.h"
+#include "key_manager.h"
+#include "key_storage.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QVBoxLayout>
@@ -431,7 +432,7 @@ void FirstRunWizard::accept()
     std::vector<uint8_t> key;
     derive_encryption_key(pwdStr, encSalt, key);
 
-    KeyManager::getInstance().store_key(key);
+    KeyManager::getInstance().storeEncryptionKey(key);
 
     // Зануляем пароль в памяти
     volatile char *p = const_cast<char*>(pwdStr.data());

@@ -12,7 +12,6 @@
 #include <QLineEdit>
 #include "../src/core/config_handler.h"
 #include "../src/core/events.h"
-#include "../src/core/key_manager.h"
 #include "../src/database/DB_helper/db_helper.h"
 #include "../src/gui/widgets/secure_table/VaultTableModel.h"
 #include "../src/gui/widgets/secure_table/SearchProxyModel.h"

@@ -3,15 +3,15 @@
 
 #include <cstdint>
 #include <vector>
-#include "key_manager.h"
+#include "key_storage.h"
 
 
 class IEncryptionService
 {
 public:
-  virtual std::vector<uint8_t> encrypt(const KeyManager::KeyData& key, const std::vector<uint8_t>& plaintext) = 0;
+  virtual std::vector<uint8_t> encrypt(const KeyData& key, const std::vector<uint8_t>& plaintext) = 0;
 
-  virtual std::vector<uint8_t> decrypt(const KeyManager::KeyData& key, const std::vector<uint8_t>& ciphertext) = 0;
+  virtual std::vector<uint8_t> decrypt(const KeyData& key, const std::vector<uint8_t>& ciphertext) = 0;
 };
 
 
