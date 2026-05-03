@@ -6,8 +6,9 @@
 class KeyManager{
     KeyStorage m_encryptionKey;
     KeyStorage m_oldEncryptionKey;
-    KeyStorage m_signKey;
+    KeyStorage m_logSignKey;
     KeyStorage m_exportKey;
+    KeyStorage m_exportSignKey;
 
 public:
     static KeyManager& getInstance() {
@@ -39,16 +40,16 @@ public:
         m_oldEncryptionKey.clear();
     }
 
-    void storeSignKey(std::vector<uint8_t>& key) {
-        m_signKey.store(key);
+    void storeLogSignKey(std::vector<uint8_t>& key) {
+        m_logSignKey.store(key);
     }
 
-    void getSignKey(KeyData& d) {
-        m_signKey.get(d);
+    void getLogSignKey(KeyData& d) {
+        m_logSignKey.get(d);
     }
 
-    void clearSignKey() {
-        m_signKey.clear();
+    void clearLogSignKey() {
+        m_logSignKey.clear();
     }
 
     void storeExportKey(std::vector<uint8_t>& key) {
@@ -60,6 +61,18 @@ public:
     }
 
     void clearExportKey() {
+        m_exportKey.clear();
+    }
+
+    void storeExportSignKey(std::vector<uint8_t>& key) {
+        m_exportKey.store(key);
+    }
+
+    void getExportSignKey(KeyData& d) {
+        m_exportKey.get(d);
+    }
+
+    void clearExportSignKey() {
         m_exportKey.clear();
     }
 };

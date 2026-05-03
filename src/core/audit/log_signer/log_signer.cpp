@@ -1,20 +1,20 @@
-#include <openssl/evp.h>
-#include <vector>
-#include <cstdint>
-#include <nlohmann/json.hpp>
-#include <iostream>
+// #include <openssl/evp.h>
+// #include <vector>
+// #include <cstdint>
+// #include <nlohmann/json.hpp>
+// #include <iostream>
 
 
-#include "key_manager.h"
-#include "key_derivation.h"
-#include "LogEntry.h"
-#include "log_signer.h"
+// #include "key_manager.h"
+// #include "key_derivation.h"
+// #include "LogEntry.h"
+// #include "log_signer.h"
 
 
-void LogSigner::initFromMasterPassword(const std::string& password)
+/*void LogSigner::initFromMasterPassword(const std::string& password)
 {
     std::vector<uint8_t> private_key(32);
-    derive_log_seed(password, private_key);
+    derive_private_sign_key(password, private_key);
     KeyManager::getInstance().storeSignKey(private_key);
 
     KeyData d;
@@ -72,4 +72,4 @@ std::string LogSigner::getHash(LogEntry entry, std::string previous_hash){
         ss << std::hex << std::setw(2) << std::setfill('0') << (int)byte;
     }
     return ss.str();
-}
+}*/

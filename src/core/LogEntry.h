@@ -26,6 +26,16 @@ struct LogEntry {
     Severity severity;
     std::string timestamp;
 
+    void to_json(json& j) {
+
+        j["user_id"] = user_id;
+        j["event_type"] = static_cast<int>(type);
+        j["entry_id"] = entry_id;
+        j["source"] = source;
+        j["details"] = details;
+        j["severity"] = static_cast<int>(severity);
+        j["timestamp"] = timestamp;
+    }
 };
 
 struct AuditEntryDisplay {

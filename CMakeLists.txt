@@ -123,6 +123,8 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/import_export
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/import_export/export
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/key_management
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/crypto
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/serialization

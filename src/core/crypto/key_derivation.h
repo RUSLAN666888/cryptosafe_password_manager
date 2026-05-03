@@ -41,21 +41,10 @@ inline void derive_encryption_key(const std::string &password,
   }
 }
 
-inline void derive_log_seed(const std::string &password, std::vector<uint8_t> &key) {
-
-    std::vector<uint8_t> salt = {
-        0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x53, 0x61,
-        0x66, 0x65, 0x5f, 0x41, 0x75, 0x64, 0x69, 0x74
-    };
+inline void derive_private_sign_key(const std::string &password, std::vector<uint8_t> &key, std::vector<uint8_t> salt, const std::string info) {
 
     const int key_length = 32;
     key.resize(key_length);
-
-    // Контекст для ключа подписи аудита
-    const std::string info = "audit-signing";
-
-
-    const std::vector<uint8_t>& actual_salt = salt;
 
     // Загружаем алгоритм HKDF
     EVP_KDF *kdf = EVP_KDF_fetch(NULL, "HKDF", NULL);
@@ -84,8 +73,8 @@ inline void derive_log_seed(const std::string &password, std::vector<uint8_t> &k
 
     // Соль
     *p++ = OSSL_PARAM_construct_octet_string("salt",
-                                             const_cast<uint8_t*>(actual_salt.data()),
-                                             actual_salt.size());
+                                             const_cast<uint8_t*>(salt.data()),
+                                             salt.size());
 
     // мастер-пароль
     *p++ = OSSL_PARAM_construct_octet_string("key",
