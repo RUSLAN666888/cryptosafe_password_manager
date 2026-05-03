@@ -1,3 +1,4 @@
+// login_dialog.h
 #ifndef LOGIN_DIALOG_H
 #define LOGIN_DIALOG_H
 
@@ -5,33 +6,31 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QPushButton>
-#include <QTimer>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include "../core/config_handler.h"
-#include "../core/crypto/authentication.h"
-#include "../src/database/DB_helper/db_helper.h"
+#include <QMessageBox>
+#include <QTimer>
+#include <string>
+#include <functional>
+
+// Интерфейс для проверки пароля (внешняя зависимость)
+class IPasswordVerifier {
+public:
+    virtual ~IPasswordVerifier() = default;
+    virtual bool verify(const std::string& password) = 0;
+};
 
 class LoginDialog : public QDialog
 {
     Q_OBJECT
 
-private:
-    ConfigHander &config;
-    Database &db;
-    Argon2Data authData;
-    std::vector<uint8_t> encSalt;
+public:
+    // Принимает функцию проверки пароля
+    LoginDialog(QWidget* parent, std::function<bool(const std::string&)> verifier);
+    ~LoginDialog();
 
-    // Элементы UI
-    QLineEdit *passwordCtrl;
-    QLabel *errorText;
-    QPushButton *loginButton;
-    QPushButton *cancelButton;
-
-    // Для exponential backoff
-    int failedAttempts;
-    QTimer *backoffTimer;
-    int currentDelay;
+    // Возвращает пароль и статус
+    bool exec(std::string& outPassword);
 
 private slots:
     void onLogin();
@@ -41,11 +40,22 @@ private slots:
 
 private:
     void resetBackoff();
-    bool loadAuthData();
 
-public:
-    LoginDialog(QWidget *parent, ConfigHander &cfg, Database &database);
-    ~LoginDialog();
+    std::function<bool(const std::string&)> m_verifier;
+
+    // UI элементы
+    QLineEdit* m_passwordCtrl;
+    QLabel* m_errorText;
+    QPushButton* m_loginButton;
+    QPushButton* m_cancelButton;
+
+    // Backoff
+    int m_failedAttempts;
+    int m_currentDelay;
+    QTimer* m_backoffTimer;
+
+    // Полученный пароль
+    std::string m_password;
 };
 
-#endif // LOGIN_DIALOG_H
+#endif

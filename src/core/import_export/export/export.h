@@ -13,7 +13,7 @@ public:
         AES_256
     };
 
-    void exportToEncryptedJSON(const std::vector<PlaintextEntry>& entries, const std::string& filepath,
+    void exportToEncryptedJSON(std::vector<PlaintextEntry>& entries, const std::string& filepath,
                                const std::string& password,
                                 EncryptionStrength strength = EncryptionStrength::AES_256);
 

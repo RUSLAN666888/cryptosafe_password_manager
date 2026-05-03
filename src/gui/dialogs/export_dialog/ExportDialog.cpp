@@ -1,5 +1,6 @@
 #include "../src/gui/dialogs/export_dialog/ExportDialog.h"
 #include "../src/database/DB_helper/db_helper.h"
+#include "export.h"
 #include <vector>
 #include <sqlite3.h>
 
@@ -171,3 +172,4 @@ void ExportDialog::onItemChanged(QTreeWidgetItem* item, int column)
         m_selectAllCheck->blockSignals(false);
     }
 }
+

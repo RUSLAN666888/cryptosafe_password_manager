@@ -1,41 +1,28 @@
+// login_dialog.cpp
 #include "LoginDialog.h"
-#include <chrono>
-#include <QMessageBox>
-#include "../src/core/state_manager.h"
-#include "../src/core/audit/log_signer/log_signer.h"
-#include "key_manager.h"
-#include "key_derivation.h"
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 
-LoginDialog::LoginDialog(QWidget *parent, ConfigHander &cfg, Database &database)
+LoginDialog::LoginDialog(QWidget* parent, std::function<bool(const std::string&)> verifier)
     : QDialog(parent)
-    , config(cfg)
-    , db(database)
-    , failedAttempts(0)
-    , currentDelay(0)
-    , backoffTimer(nullptr)
+    , m_verifier(verifier)
+    , m_failedAttempts(0)
+    , m_currentDelay(0)
+    , m_backoffTimer(nullptr)
 {
-    setWindowTitle("Login to CryptoSafe");
+    setWindowTitle("Enter Master Password");
     setMinimumSize(400, 200);
+    setModal(true);
 
-    // Загружаем данные аутентификации из БД
-    if (!loadAuthData())
-    {
-        QMessageBox::critical(this, "Error",
-                              "Failed to load authentication data. Database may be corrupted.");
-        return;
-    }
-
-    // Основной вертикальный layout
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-
-    // Пустое пространство сверху
+    // Основной layout
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->addStretch();
 
     // Центрированное содержимое
-    QVBoxLayout *centerLayout = new QVBoxLayout();
+    QVBoxLayout* centerLayout = new QVBoxLayout();
 
     // Заголовок
-    QLabel *title = new QLabel("Enter Master Password", this);
+    QLabel* title = new QLabel("Enter Master Password", this);
     QFont titleFont = title->font();
     titleFont.setPointSize(14);
     titleFont.setBold(true);
@@ -45,185 +32,119 @@ LoginDialog::LoginDialog(QWidget *parent, ConfigHander &cfg, Database &database)
     centerLayout->addSpacing(20);
 
     // Поле ввода пароля
-    QHBoxLayout *rowLayout = new QHBoxLayout();
-    QLabel *label = new QLabel("Password:", this);
-    passwordCtrl = new QLineEdit(this);
-    passwordCtrl->setEchoMode(QLineEdit::Password);
-    passwordCtrl->setMinimumWidth(200);
-
+    QHBoxLayout* rowLayout = new QHBoxLayout();
+    QLabel* label = new QLabel("Password:", this);
+    m_passwordCtrl = new QLineEdit(this);
+    m_passwordCtrl->setEchoMode(QLineEdit::Password);
+    m_passwordCtrl->setMinimumWidth(250);
     rowLayout->addWidget(label);
-    rowLayout->addWidget(passwordCtrl);
+    rowLayout->addWidget(m_passwordCtrl);
     rowLayout->setAlignment(Qt::AlignCenter);
     centerLayout->addLayout(rowLayout);
 
     // Текст ошибки
-    errorText = new QLabel("", this);
-    errorText->setStyleSheet("color: red;");
-    errorText->setAlignment(Qt::AlignCenter);
-    centerLayout->addWidget(errorText);
+    m_errorText = new QLabel("", this);
+    m_errorText->setStyleSheet("color: red;");
+    m_errorText->setAlignment(Qt::AlignCenter);
+    centerLayout->addWidget(m_errorText);
     centerLayout->addSpacing(10);
 
     mainLayout->addLayout(centerLayout);
-
-    // Пустое пространство снизу
     mainLayout->addStretch();
 
     // Кнопки
-    QHBoxLayout *buttonLayout = new QHBoxLayout();
-    loginButton = new QPushButton("Login", this);
-    cancelButton = new QPushButton("Cancel", this);
+    QHBoxLayout* buttonLayout = new QHBoxLayout();
+    m_loginButton = new QPushButton("Login", this);
+    m_cancelButton = new QPushButton("Cancel", this);
 
     buttonLayout->addStretch();
-    buttonLayout->addWidget(loginButton);
+    buttonLayout->addWidget(m_loginButton);
     buttonLayout->addSpacing(10);
-    buttonLayout->addWidget(cancelButton);
+    buttonLayout->addWidget(m_cancelButton);
     buttonLayout->addSpacing(20);
 
     mainLayout->addLayout(buttonLayout);
     mainLayout->addSpacing(15);
 
     // Подключаем сигналы
-    connect(loginButton, &QPushButton::clicked, this, &LoginDialog::onLogin);
-    connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
-    connect(passwordCtrl, &QLineEdit::returnPressed, this, &LoginDialog::onPasswordEnter);
+    connect(m_loginButton, &QPushButton::clicked, this, &LoginDialog::onLogin);
+    connect(m_cancelButton, &QPushButton::clicked, this, &QDialog::reject);
+    connect(m_passwordCtrl, &QLineEdit::returnPressed, this, &LoginDialog::onPasswordEnter);
 
-    // Создаем таймер для backoff
-    backoffTimer = new QTimer(this);
-    backoffTimer->setSingleShot(true);
-    connect(backoffTimer, &QTimer::timeout, this, &LoginDialog::onBackoffTimer);
+    // Таймер для backoff
+    m_backoffTimer = new QTimer(this);
+    m_backoffTimer->setSingleShot(true);
+    connect(m_backoffTimer, &QTimer::timeout, this, &LoginDialog::onBackoffTimer);
 
-    // Устанавливаем фокус на поле пароля
-    passwordCtrl->setFocus();
+    m_passwordCtrl->setFocus();
 }
 
 LoginDialog::~LoginDialog()
 {
-    if (backoffTimer)
-    {
-        backoffTimer->stop();
+    if (m_backoffTimer) {
+        m_backoffTimer->stop();
     }
 }
 
-bool LoginDialog::loadAuthData()
+bool LoginDialog::exec(std::string& outPassword)
 {
-    std::vector<uint8_t> hash;
-    std::vector<uint8_t> salt;
-    uint32_t time_cost, memory_cost, parallelism, hash_len;
+    if (QDialog::exec() == QDialog::Accepted) {
+        outPassword = m_password;
 
-    try
-    {
-        if (!db.getAuthData(hash, salt, time_cost, memory_cost, parallelism, hash_len))
-        {
-            return false;
+        // Очищаем пароль из памяти диалога
+        volatile char* p = const_cast<char*>(m_password.data());
+        for (size_t i = 0; i < m_password.size(); ++i) {
+            p[i] = 0;
         }
-    }
-    catch (const std::exception &e)
-    {
-        return false;
-    }
-    catch (...)
-    {
-        return false;
-    }
+        m_password.clear();
 
-    if (!db.getEncSalt(encSalt))
-    {
-        return false;
+        return true;
     }
-
-    // Заполняем Argon2Data
-    authData = Argon2Data(time_cost, memory_cost, parallelism, hash_len);
-    authData.hash = std::move(hash);
-    authData.salt = std::move(salt);
-
-    return true;
+    return false;
 }
 
 void LoginDialog::onLogin()
 {
-    QString password = passwordCtrl->text();
+    QString qPassword = m_passwordCtrl->text();
 
-    if (password.isEmpty())
-    {
-        errorText->setText("Password cannot be empty");
+    if (qPassword.isEmpty()) {
+        m_errorText->setText("Password cannot be empty");
         return;
     }
 
-    // Проверка на backoff
-    if (failedAttempts > 0 && currentDelay > 0)
-    {
-        errorText->setText(QString("Too many attempts. Wait %1 seconds").arg(currentDelay));
+    // Проверка backoff
+    if (m_failedAttempts > 0 && m_currentDelay > 0) {
+        m_errorText->setText(QString("Too many attempts. Wait %1 seconds").arg(m_currentDelay));
         return;
     }
 
-    // Конвертируем QString в std::string
-    std::string pwdStr = password.toStdString();
+    std::string password = qPassword.toStdString();
 
-    // Verify password against Argon2 hash
-    if (!verify_password(pwdStr, authData))
-    {
-        StateManager::getInstance().addFailedAttempt();
-        failedAttempts = StateManager::getInstance().getFailedAttempts();
-
-        json details = json::object();
-        details["action"] = "login_failed";
-        details["reason"] = "invalid_password";
-
-        EventBus::getInstance().publish(EventType::LoginFailure, details, "LoginDialog");
+    // Проверка пароля через внешний верификатор
+    if (!m_verifier(password)) {
+        m_failedAttempts++;
 
         // Exponential backoff
-        if (failedAttempts <= 2)
-        {
-            currentDelay = 1;
-        }
-        else if (failedAttempts <= 4)
-        {
-            currentDelay = 5;
-        }
-        else
-        {
-            currentDelay = 30;
+        if (m_failedAttempts <= 2) {
+            m_currentDelay = 1;
+        } else if (m_failedAttempts <= 4) {
+            m_currentDelay = 5;
+        } else {
+            m_currentDelay = 30;
         }
 
-        errorText->setText(QString("Invalid password. Try again in %1 seconds").arg(currentDelay));
-        updateUIForBackoff();
+        m_errorText->setText(QString("Invalid password. Try again in %1 seconds").arg(m_currentDelay));
 
-        // Запускаем таймер
-        backoffTimer->start(currentDelay * 1000);
+        m_loginButton->setEnabled(false);
+        m_passwordCtrl->setEnabled(false);
 
+        m_backoffTimer->start(m_currentDelay * 1000);
         return;
     }
 
-    // выводим ключ через PBKDF2
-    std::vector<uint8_t> encKey;
-    derive_encryption_key(pwdStr, encSalt, encKey);
-
-    LogSigner::getInstance().initFromMasterPassword(pwdStr);
-
-
-    db.addPublicKey(LogSigner::getInstance().get_public_key(), 1, 1);
-
-    // Зануляем пароль в памяти
-    volatile char *p = const_cast<char*>(pwdStr.data());
-    for (size_t i = 0; i < pwdStr.size(); ++i)
-    {
-        p[i] = 0;
-    }
-
-    // cache encryption key in secure memory
-    KeyManager::getInstance().storeEncryptionKey(encKey);
-
-    // Publish UserLoggedIn event
-    struct LoginEventData
-    {
-        std::string username;
-        std::chrono::system_clock::time_point loginTime;
-    };
-
-    // Сбрасываем счетчик попыток при успешном входе
+    // Успешный вход
+    m_password = password;
     resetBackoff();
-
-    // Закрываем диалог с успехом
     accept();
 }
 
@@ -234,30 +155,23 @@ void LoginDialog::onPasswordEnter()
 
 void LoginDialog::onBackoffTimer()
 {
-    currentDelay = 0;
-    updateUIForBackoff();
-    errorText->setText("You can try again now");
-    passwordCtrl->setFocus();
+    m_currentDelay = 0;
+    m_loginButton->setEnabled(true);
+    m_passwordCtrl->setEnabled(true);
+    m_errorText->setText("You can try again now");
+    m_passwordCtrl->setFocus();
 }
 
 void LoginDialog::updateUIForBackoff()
 {
-    if (currentDelay > 0)
-    {
-        loginButton->setEnabled(false);
-        passwordCtrl->setEnabled(false);
-    }
-    else
-    {
-        loginButton->setEnabled(true);
-        passwordCtrl->setEnabled(true);
-    }
+    // Оставлено для совместимости, логика перенесена в onBackoffTimer
 }
 
 void LoginDialog::resetBackoff()
 {
-    failedAttempts = 0;
-    currentDelay = 0;
-    updateUIForBackoff();
-    errorText->setText("");
+    m_failedAttempts = 0;
+    m_currentDelay = 0;
+    m_loginButton->setEnabled(true);
+    m_passwordCtrl->setEnabled(true);
+    m_errorText->setText("");
 }

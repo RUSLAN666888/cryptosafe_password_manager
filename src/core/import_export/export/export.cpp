@@ -11,7 +11,7 @@
 #include <openssl/rand.h>
 #include <fstream>
 
-void Exporter::exportToEncryptedJSON(const std::vector<PlaintextEntry>& entries,
+void Exporter::exportToEncryptedJSON(std::vector<PlaintextEntry>& entries,
                                      const std::string& filepath,
                                      const std::string& password,
                                      EncryptionStrength strength){

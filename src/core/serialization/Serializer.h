@@ -10,7 +10,7 @@
 class Serializer {
 public:
     template<typename T>
-    static std::vector<uint8_t> serialize(const T& obj) {
+    static std::vector<uint8_t> serialize(T& obj) {
         nlohmann::json j;
         obj.to_json(j);
         std::string str = j.dump();
@@ -27,7 +27,7 @@ public:
     }
 
     template<typename T>
-    static std::vector<uint8_t> serializeBatch(const std::vector<T>& objects) {
+    static std::vector<uint8_t> serializeBatch(std::vector<T>& objects) {
         nlohmann::json j_array = nlohmann::json::array();
         for (const auto& obj : objects) {
             nlohmann::json j;

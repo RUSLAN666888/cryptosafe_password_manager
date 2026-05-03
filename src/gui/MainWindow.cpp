@@ -468,17 +468,66 @@ bool MainWindow::showFirstRunWizard()
     return false;
 }
 
+// В MainWindow.cpp
+
 bool MainWindow::showLoginDialog()
 {
-    LoginDialog dialog(this, config, db);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        unlockApplication();
+    // Загружаем данные аутентификации из БД
+    std::vector<uint8_t> hash, salt;
+    uint32_t time_cost, memory_cost, parallelism, hash_len;
+
+    if (!db.getAuthData(hash, salt, time_cost, memory_cost, parallelism, hash_len)) {
+        QMessageBox::critical(this, "Ошибка",
+                              "Не удалось загрузить данные аутентификации. База данных может быть повреждена.");
+        return false;
+    }
+
+    Argon2Data authData(time_cost, memory_cost, parallelism, hash_len);
+    authData.hash = std::move(hash);
+    authData.salt = std::move(salt);
+
+    // Создаём диалог с лямбдой для проверки пароля
+    LoginDialog dialog(this, [authData](const std::string& password) -> bool {
+        return verify_password(password, authData);
+    });
+
+    std::string masterPassword;
+    if (dialog.exec(masterPassword)) {
+        // Загружаем соль для PBKDF2 из БД
+        std::vector<uint8_t> encSalt;
+        if (!db.getEncSalt(encSalt)) {
+            QMessageBox::critical(this, "Ошибка", "Не удалось загрузить соль");
+            return false;
+        }
+
+        // 1. Выводим ключ шифрования
+        std::vector<uint8_t> encKey;
+        derive_encryption_key(masterPassword, encSalt, encKey);
+        KeyManager::getInstance().storeEncryptionKey(encKey);
+
+        // 2. Инициализируем подпись для аудита
+        LogSigner::getInstance().initFromMasterPassword(masterPassword);
+
+        // 3. Публичный ключ в БД (если ещё нет)
+        // int keyVersion;
+        // std::vector<uint8_t> existingKey;
+        // if (!db.getCurrentPublicKey(existingKey, keyVersion)) {
+        //     // Первый запуск или ключ отсутствует
+        //     db.addPublicKey(LogSigner::getInstance().get_public_key(), 1, 1);
+        // }
+
+        // Очищаем пароль из памяти
+        volatile char* p = const_cast<char*>(masterPassword.data());
+        for (size_t i = 0; i < masterPassword.size(); ++i) {
+            p[i] = 0;
+        }
+
+        isLoggedIn = true;
         return true;
     }
+
     return false;
 }
-
 void MainWindow::unlockApplication()
 {
     if (!isLoggedIn)
