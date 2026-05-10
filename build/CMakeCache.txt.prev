@@ -351,6 +351,12 @@ PKG_CONFIG_ARGN:STRING=
 //pkg-config executable
 PKG_CONFIG_EXECUTABLE:FILEPATH=/usr/bin/pkg-config
 
+//Path to a file.
+QRENCODE_INCLUDE:PATH=/usr/include
+
+//Path to a library.
+QRENCODE_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libqrencode.so
+
 //The directory containing a CMake configuration file for Qt5Core.
 Qt5Core_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt5Core
 
@@ -374,6 +380,12 @@ ZXCVB_INCLUDE:PATH=/usr/include
 
 //Path to a library.
 ZXCVB_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libzxcvbn.so
+
+//Path to a file.
+ZXING_INCLUDE:PATH=/usr/include
+
+//Path to a library.
+ZXING_LIB:FILEPATH=ZXING_LIB-NOTFOUND
 
 //Value Computed by CMake
 gmock_BINARY_DIR:STATIC=/home/master666/development/cryptosafe_password_manager/build/_deps/googletest-build/googlemock

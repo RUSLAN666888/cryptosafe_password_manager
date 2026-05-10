@@ -1033,3 +1033,168 @@ std::vector<AuditEntryDisplay> Database::getAuditPage(
     sqlite3_finalize(stmt);
     return entries;
 }
+
+bool Database::addContact(const std::string& name, const std::string& publicKeyPEM)
+{
+    sqlite3* conn = getConnection();
+    if (!conn) return false;
+
+    sqlite3_stmt* stmt;
+    const char* sql = "INSERT INTO contacts (name, public_key, created_at) VALUES (?, ?, CURRENT_TIMESTAMP)";
+
+    int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+        releaseConnection(conn);
+        return false;
+    }
+
+    sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, publicKeyPEM.c_str(), -1, SQLITE_STATIC);
+
+    rc = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+    releaseConnection(conn);
+
+    return (rc == SQLITE_DONE);
+}
+
+std::vector<std::pair<int, std::string>> Database::getAllContacts()
+{
+    std::vector<std::pair<int, std::string>> contacts;
+
+    sqlite3* conn = getConnection();
+    if (!conn) return contacts;
+
+    sqlite3_stmt* stmt;
+    const char* sql = "SELECT id, name FROM contacts ORDER BY name";
+
+    int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+        releaseConnection(conn);
+        return contacts;
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int id = sqlite3_column_int(stmt, 0);
+        const char* name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        contacts.push_back({id, name ? name : ""});
+    }
+
+    sqlite3_finalize(stmt);
+    releaseConnection(conn);
+    return contacts;
+}
+
+bool Database::getContactPublicKey(const std::string& name, std::vector<uint8_t>& publicKey)
+{
+    sqlite3* conn = getConnection();
+    if (!conn) return false;
+
+    sqlite3_stmt* stmt;
+    const char* sql = "SELECT public_key FROM contacts WHERE name = ?";
+
+    int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+        releaseConnection(conn);
+        return false;
+    }
+
+    sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);
+    rc = sqlite3_step(stmt);
+
+    if (rc == SQLITE_ROW) {
+        const char* keyData = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        if (keyData) {
+            publicKey.assign(keyData, keyData + strlen(keyData));
+        }
+        sqlite3_finalize(stmt);
+        releaseConnection(conn);
+        return true;
+    }
+
+    sqlite3_finalize(stmt);
+    releaseConnection(conn);
+    return false;
+}
+
+bool Database::getContactPublicKeyById(int contactId, std::vector<uint8_t>& publicKey)
+{
+    sqlite3* conn = getConnection();
+    if (!conn) return false;
+
+    sqlite3_stmt* stmt;
+    const char* sql = "SELECT public_key FROM contacts WHERE id = ?";
+
+    int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+        releaseConnection(conn);
+        return false;
+    }
+
+    sqlite3_bind_int(stmt, 1, contactId);
+    rc = sqlite3_step(stmt);
+
+    if (rc == SQLITE_ROW) {
+        const char* keyData = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        if (keyData) {
+            publicKey.assign(keyData, keyData + strlen(keyData));
+        }
+        sqlite3_finalize(stmt);
+        releaseConnection(conn);
+        return true;
+    }
+
+    sqlite3_finalize(stmt);
+    releaseConnection(conn);
+    return false;
+}
+
+bool Database::deleteContact(int contactId)
+{
+    sqlite3* conn = getConnection();
+    if (!conn) return false;
+
+    sqlite3_stmt* stmt;
+    const char* sql = "DELETE FROM contacts WHERE id = ?";
+
+    int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+        releaseConnection(conn);
+        return false;
+    }
+
+    sqlite3_bind_int(stmt, 1, contactId);
+    rc = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+    releaseConnection(conn);
+
+    return (rc == SQLITE_DONE);
+}
+
+bool Database::updateContactLastUsed(int contactId)
+{
+    sqlite3* conn = getConnection();
+    if (!conn) return false;
+
+    sqlite3_stmt* stmt;
+    const char* sql = "UPDATE contacts SET last_used = CURRENT_TIMESTAMP WHERE id = ?";
+
+    int rc = sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Prepare failed: " << sqlite3_errmsg(conn) << std::endl;
+        releaseConnection(conn);
+        return false;
+    }
+
+    sqlite3_bind_int(stmt, 1, contactId);
+    rc = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+    releaseConnection(conn);
+
+    return (rc == SQLITE_DONE);
+}

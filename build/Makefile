@@ -473,6 +473,54 @@ src/core/import_export/export/export.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/import_export/export/export.cpp.s
 .PHONY : src/core/import_export/export/export.cpp.s
 
+src/core/import_export/import/import.o: src/core/import_export/import/import.cpp.o
+.PHONY : src/core/import_export/import/import.o
+
+# target to build an object file
+src/core/import_export/import/import.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/import_export/import/import.cpp.o
+.PHONY : src/core/import_export/import/import.cpp.o
+
+src/core/import_export/import/import.i: src/core/import_export/import/import.cpp.i
+.PHONY : src/core/import_export/import/import.i
+
+# target to preprocess a source file
+src/core/import_export/import/import.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/import_export/import/import.cpp.i
+.PHONY : src/core/import_export/import/import.cpp.i
+
+src/core/import_export/import/import.s: src/core/import_export/import/import.cpp.s
+.PHONY : src/core/import_export/import/import.s
+
+# target to generate assembly for a file
+src/core/import_export/import/import.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/import_export/import/import.cpp.s
+.PHONY : src/core/import_export/import/import.cpp.s
+
+src/core/sharing/sharing_service.o: src/core/sharing/sharing_service.cpp.o
+.PHONY : src/core/sharing/sharing_service.o
+
+# target to build an object file
+src/core/sharing/sharing_service.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/sharing/sharing_service.cpp.o
+.PHONY : src/core/sharing/sharing_service.cpp.o
+
+src/core/sharing/sharing_service.i: src/core/sharing/sharing_service.cpp.i
+.PHONY : src/core/sharing/sharing_service.i
+
+# target to preprocess a source file
+src/core/sharing/sharing_service.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/sharing/sharing_service.cpp.i
+.PHONY : src/core/sharing/sharing_service.cpp.i
+
+src/core/sharing/sharing_service.s: src/core/sharing/sharing_service.cpp.s
+.PHONY : src/core/sharing/sharing_service.s
+
+# target to generate assembly for a file
+src/core/sharing/sharing_service.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/core/sharing/sharing_service.cpp.s
+.PHONY : src/core/sharing/sharing_service.cpp.s
+
 src/core/vault/VaultManager.o: src/core/vault/VaultManager.cpp.o
 .PHONY : src/core/vault/VaultManager.o
 
@@ -641,6 +689,30 @@ src/gui/dialogs/export_dialog/ExportDialog.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/export_dialog/ExportDialog.cpp.s
 .PHONY : src/gui/dialogs/export_dialog/ExportDialog.cpp.s
 
+src/gui/dialogs/export_pk_dialog/export_pk_dialog.o: src/gui/dialogs/export_pk_dialog/export_pk_dialog.cpp.o
+.PHONY : src/gui/dialogs/export_pk_dialog/export_pk_dialog.o
+
+# target to build an object file
+src/gui/dialogs/export_pk_dialog/export_pk_dialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/export_pk_dialog/export_pk_dialog.cpp.o
+.PHONY : src/gui/dialogs/export_pk_dialog/export_pk_dialog.cpp.o
+
+src/gui/dialogs/export_pk_dialog/export_pk_dialog.i: src/gui/dialogs/export_pk_dialog/export_pk_dialog.cpp.i
+.PHONY : src/gui/dialogs/export_pk_dialog/export_pk_dialog.i
+
+# target to preprocess a source file
+src/gui/dialogs/export_pk_dialog/export_pk_dialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/export_pk_dialog/export_pk_dialog.cpp.i
+.PHONY : src/gui/dialogs/export_pk_dialog/export_pk_dialog.cpp.i
+
+src/gui/dialogs/export_pk_dialog/export_pk_dialog.s: src/gui/dialogs/export_pk_dialog/export_pk_dialog.cpp.s
+.PHONY : src/gui/dialogs/export_pk_dialog/export_pk_dialog.s
+
+# target to generate assembly for a file
+src/gui/dialogs/export_pk_dialog/export_pk_dialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/export_pk_dialog/export_pk_dialog.cpp.s
+.PHONY : src/gui/dialogs/export_pk_dialog/export_pk_dialog.cpp.s
+
 src/gui/dialogs/first_run_wizard/FirstRunWizard.o: src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.o
 .PHONY : src/gui/dialogs/first_run_wizard/FirstRunWizard.o
 
@@ -664,6 +736,54 @@ src/gui/dialogs/first_run_wizard/FirstRunWizard.s: src/gui/dialogs/first_run_wiz
 src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.s
 .PHONY : src/gui/dialogs/first_run_wizard/FirstRunWizard.cpp.s
+
+src/gui/dialogs/import_dialog/import_dialog.o: src/gui/dialogs/import_dialog/import_dialog.cpp.o
+.PHONY : src/gui/dialogs/import_dialog/import_dialog.o
+
+# target to build an object file
+src/gui/dialogs/import_dialog/import_dialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/import_dialog/import_dialog.cpp.o
+.PHONY : src/gui/dialogs/import_dialog/import_dialog.cpp.o
+
+src/gui/dialogs/import_dialog/import_dialog.i: src/gui/dialogs/import_dialog/import_dialog.cpp.i
+.PHONY : src/gui/dialogs/import_dialog/import_dialog.i
+
+# target to preprocess a source file
+src/gui/dialogs/import_dialog/import_dialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/import_dialog/import_dialog.cpp.i
+.PHONY : src/gui/dialogs/import_dialog/import_dialog.cpp.i
+
+src/gui/dialogs/import_dialog/import_dialog.s: src/gui/dialogs/import_dialog/import_dialog.cpp.s
+.PHONY : src/gui/dialogs/import_dialog/import_dialog.s
+
+# target to generate assembly for a file
+src/gui/dialogs/import_dialog/import_dialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/import_dialog/import_dialog.cpp.s
+.PHONY : src/gui/dialogs/import_dialog/import_dialog.cpp.s
+
+src/gui/dialogs/import_pk_dialog/import_pk_dialog.o: src/gui/dialogs/import_pk_dialog/import_pk_dialog.cpp.o
+.PHONY : src/gui/dialogs/import_pk_dialog/import_pk_dialog.o
+
+# target to build an object file
+src/gui/dialogs/import_pk_dialog/import_pk_dialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/import_pk_dialog/import_pk_dialog.cpp.o
+.PHONY : src/gui/dialogs/import_pk_dialog/import_pk_dialog.cpp.o
+
+src/gui/dialogs/import_pk_dialog/import_pk_dialog.i: src/gui/dialogs/import_pk_dialog/import_pk_dialog.cpp.i
+.PHONY : src/gui/dialogs/import_pk_dialog/import_pk_dialog.i
+
+# target to preprocess a source file
+src/gui/dialogs/import_pk_dialog/import_pk_dialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/import_pk_dialog/import_pk_dialog.cpp.i
+.PHONY : src/gui/dialogs/import_pk_dialog/import_pk_dialog.cpp.i
+
+src/gui/dialogs/import_pk_dialog/import_pk_dialog.s: src/gui/dialogs/import_pk_dialog/import_pk_dialog.cpp.s
+.PHONY : src/gui/dialogs/import_pk_dialog/import_pk_dialog.s
+
+# target to generate assembly for a file
+src/gui/dialogs/import_pk_dialog/import_pk_dialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/import_pk_dialog/import_pk_dialog.cpp.s
+.PHONY : src/gui/dialogs/import_pk_dialog/import_pk_dialog.cpp.s
 
 src/gui/dialogs/login_dialog/LoginDialog.o: src/gui/dialogs/login_dialog/LoginDialog.cpp.o
 .PHONY : src/gui/dialogs/login_dialog/LoginDialog.o
@@ -736,6 +856,30 @@ src/gui/dialogs/settings_dialog/SettingsDialog.s: src/gui/dialogs/settings_dialo
 src/gui/dialogs/settings_dialog/SettingsDialog.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/settings_dialog/SettingsDialog.cpp.s
 .PHONY : src/gui/dialogs/settings_dialog/SettingsDialog.cpp.s
+
+src/gui/dialogs/share_dialog/share_dialog.o: src/gui/dialogs/share_dialog/share_dialog.cpp.o
+.PHONY : src/gui/dialogs/share_dialog/share_dialog.o
+
+# target to build an object file
+src/gui/dialogs/share_dialog/share_dialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/share_dialog/share_dialog.cpp.o
+.PHONY : src/gui/dialogs/share_dialog/share_dialog.cpp.o
+
+src/gui/dialogs/share_dialog/share_dialog.i: src/gui/dialogs/share_dialog/share_dialog.cpp.i
+.PHONY : src/gui/dialogs/share_dialog/share_dialog.i
+
+# target to preprocess a source file
+src/gui/dialogs/share_dialog/share_dialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/share_dialog/share_dialog.cpp.i
+.PHONY : src/gui/dialogs/share_dialog/share_dialog.cpp.i
+
+src/gui/dialogs/share_dialog/share_dialog.s: src/gui/dialogs/share_dialog/share_dialog.cpp.s
+.PHONY : src/gui/dialogs/share_dialog/share_dialog.s
+
+# target to generate assembly for a file
+src/gui/dialogs/share_dialog/share_dialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/share_dialog/share_dialog.cpp.s
+.PHONY : src/gui/dialogs/share_dialog/share_dialog.cpp.s
 
 src/gui/widgets/audit_log/audit_logViewer.o: src/gui/widgets/audit_log/audit_logViewer.cpp.o
 .PHONY : src/gui/widgets/audit_log/audit_logViewer.o
@@ -952,6 +1096,12 @@ help:
 	@echo "... src/core/import_export/export/export.o"
 	@echo "... src/core/import_export/export/export.i"
 	@echo "... src/core/import_export/export/export.s"
+	@echo "... src/core/import_export/import/import.o"
+	@echo "... src/core/import_export/import/import.i"
+	@echo "... src/core/import_export/import/import.s"
+	@echo "... src/core/sharing/sharing_service.o"
+	@echo "... src/core/sharing/sharing_service.i"
+	@echo "... src/core/sharing/sharing_service.s"
 	@echo "... src/core/vault/VaultManager.o"
 	@echo "... src/core/vault/VaultManager.i"
 	@echo "... src/core/vault/VaultManager.s"
@@ -973,9 +1123,18 @@ help:
 	@echo "... src/gui/dialogs/export_dialog/ExportDialog.o"
 	@echo "... src/gui/dialogs/export_dialog/ExportDialog.i"
 	@echo "... src/gui/dialogs/export_dialog/ExportDialog.s"
+	@echo "... src/gui/dialogs/export_pk_dialog/export_pk_dialog.o"
+	@echo "... src/gui/dialogs/export_pk_dialog/export_pk_dialog.i"
+	@echo "... src/gui/dialogs/export_pk_dialog/export_pk_dialog.s"
 	@echo "... src/gui/dialogs/first_run_wizard/FirstRunWizard.o"
 	@echo "... src/gui/dialogs/first_run_wizard/FirstRunWizard.i"
 	@echo "... src/gui/dialogs/first_run_wizard/FirstRunWizard.s"
+	@echo "... src/gui/dialogs/import_dialog/import_dialog.o"
+	@echo "... src/gui/dialogs/import_dialog/import_dialog.i"
+	@echo "... src/gui/dialogs/import_dialog/import_dialog.s"
+	@echo "... src/gui/dialogs/import_pk_dialog/import_pk_dialog.o"
+	@echo "... src/gui/dialogs/import_pk_dialog/import_pk_dialog.i"
+	@echo "... src/gui/dialogs/import_pk_dialog/import_pk_dialog.s"
 	@echo "... src/gui/dialogs/login_dialog/LoginDialog.o"
 	@echo "... src/gui/dialogs/login_dialog/LoginDialog.i"
 	@echo "... src/gui/dialogs/login_dialog/LoginDialog.s"
@@ -985,6 +1144,9 @@ help:
 	@echo "... src/gui/dialogs/settings_dialog/SettingsDialog.o"
 	@echo "... src/gui/dialogs/settings_dialog/SettingsDialog.i"
 	@echo "... src/gui/dialogs/settings_dialog/SettingsDialog.s"
+	@echo "... src/gui/dialogs/share_dialog/share_dialog.o"
+	@echo "... src/gui/dialogs/share_dialog/share_dialog.i"
+	@echo "... src/gui/dialogs/share_dialog/share_dialog.s"
 	@echo "... src/gui/widgets/audit_log/audit_logViewer.o"
 	@echo "... src/gui/widgets/audit_log/audit_logViewer.i"
 	@echo "... src/gui/widgets/audit_log/audit_logViewer.s"

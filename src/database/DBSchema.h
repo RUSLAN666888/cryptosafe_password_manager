@@ -177,7 +177,7 @@ const std::string CREATE_TABLES_V2 = R"(
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
-            CREATE TRIGGER IF NOT EXISTS update_settings_timestamp 
+            CREATE TRIGGER IF NOT EXISTS update_settings_timestamp
             AFTER UPDATE ON settings
             BEGIN
                 UPDATE settings SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
@@ -192,13 +192,27 @@ const std::string CREATE_TABLES_V2 = R"(
                 key_data BLOB NOT NULL,           -- Универсальное поле для хранения
                 version INTEGER DEFAULT 1,         -- Версия алгоритма
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                
+
                 -- Составной уникальный индекс для защиты от дубликатов
                 UNIQUE(key_type, version)
             );
 
             CREATE INDEX IF NOT EXISTS idx_key_type ON key_store(key_type);
             CREATE INDEX IF NOT EXISTS idx_key_version ON key_store(version);
+
+            -- =====================================================
+            -- Таблица: contacts (Контакты для шеринга)
+            -- =====================================================
+            CREATE TABLE IF NOT EXISTS contacts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,                -- Имя контакта
+                public_key TEXT NOT NULL,          -- Публичный ключ в PEM формате (текст)
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_used TIMESTAMP                -- Когда последний раз использовался для шеринга
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_contacts_name ON contacts(name);
+            CREATE INDEX IF NOT EXISTS idx_contacts_last_used ON contacts(last_used);
 
         )";
 

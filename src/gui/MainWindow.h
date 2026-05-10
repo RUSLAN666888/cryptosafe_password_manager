@@ -96,6 +96,10 @@ private slots:
     void onAbout();
     void onFirstRunWizard();
     void onChangePassword();
+    void onImport();
+    void onShare();
+    void onExportPublicKey();
+    void onImportPublicKey();
 
     void showContextMenu(const QPoint& pos);
     void onCopyUsername();

@@ -175,6 +175,24 @@ public:
     bool getEncSalt(std::vector<uint8_t> &salt);
 
     void initDefaultSettings();
+
+    // Добавление нового контакта
+    bool addContact(const std::string& name, const std::string& publicKeyPEM);
+
+    // Получение всех контактов
+    std::vector<std::pair<int, std::string>> getAllContacts();  // возвращает (id, name)
+
+    // Получение публичного ключа по имени контакта
+    bool getContactPublicKey(const std::string& name, std::vector<uint8_t>& publicKey);
+
+    // Получение публичного ключа по id контакта
+    bool getContactPublicKeyById(int contactId, std::vector<uint8_t>& publicKey);
+
+    // Удаление контакта
+    bool deleteContact(int contactId);
+
+    // Обновление времени последнего использования
+    bool updateContactLastUsed(int contactId);
 };
 
 #endif

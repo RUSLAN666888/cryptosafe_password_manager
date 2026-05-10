@@ -86,7 +86,13 @@ set(SOURCES
     src/core/audit/log_formatter/log_formatter.cpp
     src/gui/widgets/audit_log/audit_logViewer.cpp
     src/gui/dialogs/export_dialog/ExportDialog.cpp
+    src/gui/dialogs/import_dialog/import_dialog.cpp
     src/core/import_export/export/export.cpp
+    src/core/import_export/import/import.cpp
+    src/core/sharing/sharing_service.cpp
+    src/gui/dialogs/share_dialog/share_dialog.cpp
+    src/gui/dialogs/export_pk_dialog/export_pk_dialog.cpp
+    src/gui/dialogs/import_pk_dialog/import_pk_dialog.cpp
 )
 
 set(MAIN_SOURCES
@@ -111,6 +117,10 @@ set(HEADERS
     src/gui/dialogs/audit_dialog/audit_log_dialog.h
     src/gui/widgets/audit_log/audit_logViewer.h
     src/gui/dialogs/export_dialog/ExportDialog.h
+    src/gui/dialogs/import_dialog/import_dialog.h
+    src/gui/dialogs/share_dialog/share_dialog.h
+    src/gui/dialogs/export_pk_dialog/export_pk_dialog.h
+    src/gui/dialogs/import_pk_dialog/import_pk_dialog.h
 )
 
 
@@ -125,6 +135,7 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/import_export
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/import_export/export
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/import_export/import
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/key_management
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/crypto
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/serialization
@@ -132,6 +143,8 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit/log_verifier
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit/audit_logger
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit/log_signer
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audit/log_signer
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/sharing/
     ${CMAKE_CURRENT_SOURCE_DIR}/src/database
     ${CMAKE_CURRENT_SOURCE_DIR}/src/database/DB_helper
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui
@@ -140,6 +153,11 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets/audit_log/
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/widgets/secure_table
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/audit_dialog
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/import_dialog
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/share_dialog
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/import_pk_dialog
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/dialogs/export_pk_dialog
     ${SQLite3_INCLUDE_DIRS}
     ${nlohmann_json_INCLUDE_DIRS}
     ${ARGON2_INCLUDE}

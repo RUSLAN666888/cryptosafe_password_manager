@@ -9,6 +9,8 @@ class KeyManager{
     KeyStorage m_logSignKey;
     KeyStorage m_exportKey;
     KeyStorage m_exportSignKey;
+    KeyStorage m_privateRSAKey;
+    KeyStorage m_publicRSAKey;
 
 public:
     static KeyManager& getInstance() {
@@ -74,6 +76,21 @@ public:
 
     void clearExportSignKey() {
         m_exportKey.clear();
+    }
+    void storePrivateRSAKey(std::vector<uint8_t>& key) {
+        m_privateRSAKey.store(key);
+    }
+
+    void getPrivateRSAKey(KeyData& d) {
+        m_privateRSAKey.get(d);
+    }
+
+    void storePublicRSAKey(std::vector<uint8_t>& key) {
+        m_publicRSAKey.store(key);
+    }
+
+    void getPublicRSAKey(KeyData& d) {
+        m_publicRSAKey.get(d);
     }
 };
 

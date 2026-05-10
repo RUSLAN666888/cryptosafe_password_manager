@@ -15,6 +15,10 @@
 #include "../src/core/audit/log_verifier/log_verifier.h"
 #include "../src/core/audit/log_formatter/log_formatter.h"
 #include "../src/gui/dialogs/export_dialog/ExportDialog.h"
+#include "share_dialog.h"
+#include "import_dialog.h"
+#include "export_pk_dialog.h"
+#include "import_pk_dialog.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QDebug>
@@ -24,7 +28,7 @@
 //#include <random>
 #include <QProgressDialog>
 #include <nlohmann/json.hpp>
-
+#include "rsa_cipher.h"
 
 using json = nlohmann::json;
 
@@ -296,6 +300,10 @@ void MainWindow::createMenuBar()
     helpMenu->addSeparator();
     helpMenu->addAction("&About", this, &MainWindow::onAbout);
 
+    QMenu* toolsMenu = menuBar->addMenu("&Tools");
+    toolsMenu->addAction("Мой публичный ключ", this, &MainWindow::onExportPublicKey);
+    toolsMenu->addAction("Импорт публичного ключа", this, &MainWindow::onImportPublicKey);
+
     setMenuBar(menuBar);
 }
 
@@ -307,6 +315,8 @@ void MainWindow::createToolBar()
     toolBar->addAction("Delete", this, &MainWindow::onDeleteEntry);
     toolBar->addSeparator();
     toolBar->addAction("Экспорт", this, &MainWindow::onExport);
+    toolBar->addAction("Импорт", this, &MainWindow::onImport);
+    //toolBar->addAction("Поделиться", this, &MainWindow::onShare);
 
 
     toolBar->addSeparator();
@@ -470,6 +480,65 @@ bool MainWindow::showFirstRunWizard()
 
 // В MainWindow.cpp
 
+// bool MainWindow::showLoginDialog()
+// {
+//     // Загружаем данные аутентификации из БД
+//     std::vector<uint8_t> hash, salt;
+//     uint32_t time_cost, memory_cost, parallelism, hash_len;
+
+//     if (!db.getAuthData(hash, salt, time_cost, memory_cost, parallelism, hash_len)) {
+//         QMessageBox::critical(this, "Ошибка",
+//                               "Не удалось загрузить данные аутентификации. База данных может быть повреждена.");
+//         return false;
+//     }
+
+//     Argon2Data authData(time_cost, memory_cost, parallelism, hash_len);
+//     authData.hash = std::move(hash);
+//     authData.salt = std::move(salt);
+
+//     // Создаём диалог с лямбдой для проверки пароля
+//     LoginDialog dialog(this, [authData](const std::string& password) -> bool {
+//         return verify_password(password, authData);
+//     });
+
+//     std::string masterPassword;
+//     if (dialog.exec(masterPassword)) {
+//         // Загружаем соль для PBKDF2 из БД
+//         std::vector<uint8_t> encSalt;
+//         if (!db.getEncSalt(encSalt)) {
+//             QMessageBox::critical(this, "Ошибка", "Не удалось загрузить соль");
+//             return false;
+//         }
+
+//         // 1. Выводим ключ шифрования
+//         std::vector<uint8_t> encKey;
+//         derive_encryption_key(masterPassword, encSalt, encKey);
+//         KeyManager::getInstance().storeEncryptionKey(encKey);
+
+//         // 2. Инициализируем подпись для аудита
+//         LogSigner::getInstance().initFromMasterPassword(masterPassword);
+
+//         // 3. Публичный ключ в БД (если ещё нет)
+//         // int keyVersion;
+//         // std::vector<uint8_t> existingKey;
+//         // if (!db.getCurrentPublicKey(existingKey, keyVersion)) {
+//         //     // Первый запуск или ключ отсутствует
+//         //     db.addPublicKey(LogSigner::getInstance().get_public_key(), 1, 1);
+//         // }
+
+//         // Очищаем пароль из памяти
+//         volatile char* p = const_cast<char*>(masterPassword.data());
+//         for (size_t i = 0; i < masterPassword.size(); ++i) {
+//             p[i] = 0;
+//         }
+
+//         isLoggedIn = true;
+//         return true;
+//     }
+
+//     return false;
+// }
+
 bool MainWindow::showLoginDialog()
 {
     // Загружаем данные аутентификации из БД
@@ -500,19 +569,49 @@ bool MainWindow::showLoginDialog()
             return false;
         }
 
-        // 1. Выводим ключ шифрования
+        // Выводим ключ шифрования
         std::vector<uint8_t> encKey;
         derive_encryption_key(masterPassword, encSalt, encKey);
         KeyManager::getInstance().storeEncryptionKey(encKey);
 
-        // 2. Инициализируем подпись для аудита
+        // Инициализируем подпись для аудита
         LogSigner::getInstance().initFromMasterPassword(masterPassword);
 
-        // 3. Публичный ключ в БД (если ещё нет)
+        // Генерируем RSA ключи для шеринга
+        // Проверяем, есть ли уже RSA ключи
+        KeyData existingRSA;
+        KeyManager::getInstance().getPrivateRSAKey(existingRSA);
+
+        if (existingRSA.size == 0) {
+            // Нет ключей - генерируем новые
+            try {
+                auto rsaKeys = RSACipher::generateKeyPair(2048);
+
+                // Сохраняем приватный ключ
+                std::vector<uint8_t> privateKey = rsaKeys.privateKey;
+                KeyManager::getInstance().storePrivateRSAKey(privateKey);
+
+                // Сохраняем публичный ключ
+                std::vector<uint8_t> publicKey = rsaKeys.publicKey;
+                KeyManager::getInstance().storePublicRSAKey(publicKey);
+
+
+                // Очищаем временные ключи из памяти
+                volatile uint8_t* pPriv = privateKey.data();
+                for (size_t i = 0; i < privateKey.size(); ++i) pPriv[i] = 0;
+
+                volatile uint8_t* pPub = publicKey.data();
+                for (size_t i = 0; i < publicKey.size(); ++i) pPub[i] = 0;
+
+            } catch (const std::exception& e) {
+                qWarning() << "Failed to generate RSA keys:" << e.what();
+            }
+        }
+
+        // 4. Публичный ключ Ed25519 в БД (если ещё нет)
         // int keyVersion;
         // std::vector<uint8_t> existingKey;
         // if (!db.getCurrentPublicKey(existingKey, keyVersion)) {
-        //     // Первый запуск или ключ отсутствует
         //     db.addPublicKey(LogSigner::getInstance().get_public_key(), 1, 1);
         // }
 
@@ -617,7 +716,8 @@ void MainWindow::onOpenDatabase()
 
 void MainWindow::onExport()
 {
-    ExportDialog dialog(&db, this);
+    std::cout <<"export"<<std::endl;
+    ExportDialog dialog(&db, &m_vaultManager, this);
     dialog.exec();
 }
 
@@ -932,7 +1032,9 @@ void MainWindow::showContextMenu(const QPoint& pos)
         menu.addSeparator();
         menu.addAction("Копировать логин", this, &MainWindow::onCopyUsername);
         menu.addAction("Копировать пароль", this, &MainWindow::onCopyPassword);
-        menu.addAction("Копировать всё", this, &MainWindow::onCopyAll);  // ← ДОБАВИТЬ
+        menu.addAction("Копировать всё", this, &MainWindow::onCopyAll);
+        menu.addSeparator();
+        menu.addAction("Поделиться", this, &MainWindow::onShare);
         menu.addSeparator();
         menu.addAction("Удалить", this, &MainWindow::onDeleteEntry);
     } else if (multiSelected) {
@@ -1054,4 +1156,42 @@ void MainWindow::onViewAuditLogs()
     // dialog.exec();
 
     // updateStatusBar();
+}
+
+void MainWindow::onImport(){
+    ImportDialog dialog(&m_vaultManager, &db, this);
+    dialog.exec();
+}
+
+void MainWindow::onShare(){
+    QModelIndexList selected = m_tableView->selectionModel()->selectedRows();
+    if (selected.isEmpty()) return;
+
+    QModelIndex sourceIdx = m_proxyModel->mapToSource(selected.first());
+    long entryId = m_tableModel->getId(sourceIdx.row());
+
+    auto entry = m_vaultManager.getEntry(static_cast<int>(entryId));
+    if (!entry) {
+        QMessageBox::warning(this, "Ошибка", "Запись не найдена");
+        return;
+    }
+
+    ShareDialog dialog(&m_vaultManager, &db, *entry, this);
+    dialog.exec();
+}
+
+void MainWindow::onExportPublicKey()
+{
+    ExportPublicKeyDialog dialog(this);
+    dialog.exec();
+}
+
+void MainWindow::onImportPublicKey()
+{
+    ImportPublicKeyDialog dialog(&db, this);
+    if (dialog.exec() == QDialog::Accepted) {
+        QMessageBox::information(this, "Успех",
+                                 QString("Публичный ключ пользователя '%1' импортирован")
+                                     .arg(dialog.getContactName()));
+    }
 }

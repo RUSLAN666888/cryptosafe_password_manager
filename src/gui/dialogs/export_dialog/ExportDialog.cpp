@@ -3,8 +3,9 @@
 #include "export.h"
 #include <vector>
 #include <sqlite3.h>
+#include "authentication.h"
 
-ExportDialog::ExportDialog(Database* db, QWidget *parent) : QDialog(parent){
+ExportDialog::ExportDialog(Database* db, VaultManager* vm, QWidget *parent) : m_vaultManager(vm),  QDialog(parent){
     m_db = db;
 
     setWindowTitle("Экспорт хранилища");
@@ -58,24 +59,26 @@ ExportDialog::ExportDialog(Database* db, QWidget *parent) : QDialog(parent){
     mainLayout->addWidget(m_encryptionGroup);
 
     // ===== Предпросмотр =====
-    QGroupBox* previewGroup = new QGroupBox("Предпросмотр");
-    QVBoxLayout* previewLayout = new QVBoxLayout(previewGroup);
+    // QGroupBox* previewGroup = new QGroupBox("Предпросмотр");
+    // QVBoxLayout* previewLayout = new QVBoxLayout(previewGroup);
 
-    m_entriesCountLabel = new QLabel("Записей к экспорту: 0");
-    m_previewLabel = new QLabel();
-    m_previewLabel->setWordWrap(true);
-    m_previewLabel->setStyleSheet("QLabel { background-color: #f5f5f5; padding: 10px; border-radius: 5px; }");
+    // m_entriesCountLabel = new QLabel("Записей к экспорту: 0");
+    // m_previewLabel = new QLabel();
+    // m_previewLabel->setWordWrap(true);
+    // m_previewLabel->setStyleSheet("QLabel { background-color: #f5f5f5; padding: 10px; border-radius: 5px; }");
 
-    previewLayout->addWidget(m_entriesCountLabel);
-    previewLayout->addWidget(m_previewLabel);
+    // previewLayout->addWidget(m_entriesCountLabel);
+    // previewLayout->addWidget(m_previewLabel);
 
-    mainLayout->addWidget(previewGroup);
+    // mainLayout->addWidget(previewGroup);
 
     // ===== Кнопки =====
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();
 
     m_exportButton = new QPushButton("Экспорт");
+    connect(m_exportButton, &QPushButton::clicked, this, &ExportDialog::onExport);
+
     m_cancelButton = new QPushButton("Отмена");
 
     buttonLayout->addWidget(m_exportButton);
@@ -136,12 +139,6 @@ void ExportDialog::loadPreview()
 
     // Возвращаем соединение в пул
     m_db->releaseConnection(conn);
-
-    // Обновляем счетчик
-    m_entriesCountLabel->setText(QString("Записей к экспорту: %1").arg(count));
-
-    // Подключаем сигнал изменения чекбокса для обновления счетчика
-    connect(m_entriesTree, &QTreeWidget::itemChanged, this, &ExportDialog::onItemChanged);
 }
 
 void ExportDialog::onItemChanged(QTreeWidgetItem* item, int column)
@@ -173,3 +170,139 @@ void ExportDialog::onItemChanged(QTreeWidgetItem* item, int column)
     }
 }
 
+void ExportDialog::onExport()
+{
+    // Проверяем, что выбраны записи
+    std::vector<int> selectedIds = getSelectedEntryIds();
+    if (selectedIds.empty()) {
+        QMessageBox::warning(this, "Предупреждение", "Не выбрано ни одной записи для экспорта");
+        return;
+    }
+
+    // Подтверждение мастер-пароля
+    if (!confirmMasterPassword()) {
+        return;
+    }
+
+    // Получаем выбранные записи из БД через VaultManager
+    std::vector<PlaintextEntry> entries;
+    for (int id : selectedIds) {
+        auto entry = m_vaultManager->getEntry(id);
+        if (entry) {
+            entries.push_back(*entry);
+        }
+    }
+
+    if (entries.empty()) {
+        QMessageBox::warning(this, "Ошибка", "Не удалось загрузить выбранные записи");
+        return;
+    }
+
+    // Проверяем формат и запрашиваем пароль для шифрования (если нужно)
+    std::string exportPassword;
+    bool needPassword = false;
+
+    if (m_encryptedJsonRadio->isChecked())
+        needPassword = true;
+    else if (m_csvRadio->isChecked())
+        needPassword = false;
+
+
+    if (needPassword) {
+        bool ok;
+        QString pwd = QInputDialog::getText(this, "Пароль экспорта",
+                                            "Введите пароль для шифрования:",
+                                            QLineEdit::Password,
+                                            "", &ok);
+        if (!ok || pwd.isEmpty()) {
+            QMessageBox::warning(this, "Ошибка", "Пароль не может быть пустым");
+            return;
+        }
+        exportPassword = pwd.toStdString();
+    }
+
+    // Выбираем файл для сохранения
+    QString filepath;
+    Exporter::EncryptionStrength strength = m_aes256Radio->isChecked()
+                                                ? Exporter::EncryptionStrength::AES_256
+                                                : Exporter::EncryptionStrength::AES_128;
+
+    if (m_encryptedJsonRadio->isChecked()) {
+        filepath = QFileDialog::getSaveFileName(this, "Сохранить как",
+                                                "export.cryptosafe",
+                                                "CryptoSafe Export (*.cryptosafe)");
+        if (filepath.isEmpty()) return;
+
+        Exporter exporter;
+        exporter.exportToEncryptedJSON(entries, filepath.toStdString(), exportPassword, strength);
+    }
+    else if (m_csvRadio->isChecked()) {
+        filepath = QFileDialog::getSaveFileName(this, "Сохранить как",
+                                                "export.csv",
+                                                "CSV Files (*.csv)");
+        if (filepath.isEmpty()) return;
+
+        Exporter exporter;
+        exporter.exportToCSV(entries, filepath.toStdString());
+    }
+
+    // Логируем экспорт в аудит
+    // json logDetails = json::object();
+    // logDetails["action"] = "export";
+    // logDetails["format"] = m_encryptedJsonRadio->isChecked() ? "encrypted_json" : "csv";
+    // logDetails["entry_count"] = entries.size();
+    // logDetails["strength"] = (strength == Exporter::EncryptionStrength::AES_256) ? "256" : "128";
+
+    // EventBus::getInstance().publish(EventType::AuditExport, logDetails, "ExportDialog");
+
+    QMessageBox::information(this, "Успех",
+                             QString("Экспортировано %1 записей").arg(entries.size()));
+    accept();
+}
+
+std::vector<int> ExportDialog::getSelectedEntryIds()
+{
+    std::vector<int> ids;
+    for (int i = 0; i < m_entriesTree->topLevelItemCount(); ++i) {
+        QTreeWidgetItem* item = m_entriesTree->topLevelItem(i);
+        if (item->checkState(0) == Qt::Checked) {
+            int id = item->data(0, Qt::UserRole).toInt();
+            ids.push_back(id);
+        }
+    }
+    return ids;
+}
+
+bool ExportDialog::confirmMasterPassword()
+{
+    // Загружаем данные аутентификации из БД
+    std::vector<uint8_t> hash, salt;
+    uint32_t time_cost, memory_cost, parallelism, hash_len;
+
+    if (!m_db->getAuthData(hash, salt, time_cost, memory_cost, parallelism, hash_len)) {
+        QMessageBox::critical(this, "Ошибка", "Не удалось загрузить данные аутентификации");
+        return false;
+    }
+
+    Argon2Data authData(time_cost, memory_cost, parallelism, hash_len);
+    authData.hash = std::move(hash);
+    authData.salt = std::move(salt);
+
+    // Создаём диалог подтверждения пароля
+    LoginDialog confirmDialog(this, [authData](const std::string& password) -> bool {
+        return verify_password(password, authData);
+    });
+
+    std::string masterPassword;
+    if (!confirmDialog.exec(masterPassword)) {
+        return false;
+    }
+
+    // Очищаем пароль
+    volatile char* p = const_cast<char*>(masterPassword.data());
+    for (size_t i = 0; i < masterPassword.size(); ++i) {
+        p[i] = 0;
+    }
+
+    return true;
+}

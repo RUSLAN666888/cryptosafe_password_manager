@@ -45,6 +45,8 @@ void Exporter::exportToEncryptedJSON(std::vector<PlaintextEntry>& entries,
         ciphertext = cipher.encrypt(d, plaintext);
     }
 
+    std::vector<uint8_t> publicKey = derivePublicKey("exportSign");
+
     json exportJson;
     exportJson["cryptosafe_export"] = true;
     exportJson["timestamp"] = getUTCTimestamp();
@@ -54,6 +56,8 @@ void Exporter::exportToEncryptedJSON(std::vector<PlaintextEntry>& entries,
     exportJson["encryption"]["salt"] = base64Encode(salt);
     exportJson["encryption"]["nonce"] = base64Encode(nonce);
     exportJson["data"] = base64Encode(ciphertext);
+
+    exportJson["public_key"] = base64Encode(publicKey);
 
     std::ofstream file(filepath);
     if (!file.is_open()) {
@@ -157,7 +161,7 @@ std::string Exporter::escapeCSV(const std::string& field) {
         return "";
     }
 
-    // Если поле содержит запятую, кавычку или перевод строки — оборачиваем в кавычки
+    // Если поле содержит запятую, кавычку или перевод строки - оборачиваем в кавычки
     bool needQuotes = field.find(',') != std::string::npos ||
                       field.find('"') != std::string::npos ||
                       field.find('\n') != std::string::npos;
