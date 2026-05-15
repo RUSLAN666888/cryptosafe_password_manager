@@ -25,7 +25,6 @@
 #include <QHeaderView>
 #include <QShortcut>
 #include <QClipboard>
-//#include <random>
 #include <QProgressDialog>
 #include <nlohmann/json.hpp>
 #include "rsa_cipher.h"
@@ -88,141 +87,6 @@ MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaul
     }
 
     updateStatusBar();
-
-
-    // ПРОВЕРКА НА ПРОИЗОДИТЕЛЬНОСТЬ (ПРОСТО ДОБАВЛЯЕМ ЗАПИСИ В БД)
-    // int count = 1000;
-    // std::cout << "Generating " << count << " test entries..." << std::endl;
-
-    // // Генератор случайных чисел
-    // auto getRandomInt = [](int min, int max) -> int {
-    //     static std::random_device rd;
-    //     static std::mt19937 gen(rd());
-    //     std::uniform_int_distribution<> dis(min, max);
-    //     return dis(gen);
-    // };
-
-    // auto getRandomString = [&](int minLen, int maxLen) -> std::string {
-    //     const std::string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    //     int len = getRandomInt(minLen, maxLen);
-    //     std::string result;
-    //     for (int i = 0; i < len; ++i) {
-    //         result += chars[getRandomInt(0, chars.length() - 1)];
-    //     }
-    //     return result;
-    // };
-
-    // auto getRandomDomain = [&]() -> std::string {
-    //     std::vector<std::string> domains = {
-    //         "gmail.com", "yahoo.com", "outlook.com", "hotmail.com",
-    //         "github.com", "gitlab.com", "bitbucket.org",
-    //         "facebook.com", "twitter.com", "linkedin.com",
-    //         "amazon.com", "google.com", "microsoft.com",
-    //         "apple.com", "netflix.com", "spotify.com",
-    //         "work.com", "personal.com", "bank.com", "shopping.com"
-    //     };
-    //     return domains[getRandomInt(0, domains.size() - 1)];
-    // };
-
-    // auto getRandomTitle = [&]() -> std::string {
-    //     std::vector<std::string> titles = {
-    //         "GitHub", "Gmail", "Facebook", "Twitter", "LinkedIn",
-    //         "Amazon", "Netflix", "Spotify", "Google", "Microsoft",
-    //         "Apple", "Bank Account", "Work Email", "Personal Email",
-    //         "VPN", "Server", "Database", "Admin Panel", "WiFi", "Router"
-    //     };
-    //     return titles[getRandomInt(0, titles.size() - 1)] + " " + std::to_string(getRandomInt(1, 1000));
-    // };
-
-    // auto getRandomPassword = [&]() -> std::string {
-    //     const std::string upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-    //     const std::string lower = "abcdefghijkmnopqrstuvwxyz";
-    //     const std::string digits = "23456789";
-    //     const std::string symbols = "!@#$%^&*";
-    //     std::string all = upper + lower + digits + symbols;
-
-    //     int length = getRandomInt(12, 24);
-    //     std::string password;
-
-    //     password += upper[getRandomInt(0, upper.length() - 1)];
-    //     password += lower[getRandomInt(0, lower.length() - 1)];
-    //     password += digits[getRandomInt(0, digits.length() - 1)];
-    //     password += symbols[getRandomInt(0, symbols.length() - 1)];
-
-    //     for (int i = password.length(); i < length; ++i) {
-    //         password += all[getRandomInt(0, all.length() - 1)];
-    //     }
-
-    //     for (int i = password.length() - 1; i > 0; --i) {
-    //         int j = getRandomInt(0, i);
-    //         std::swap(password[i], password[j]);
-    //     }
-
-    //     return password;
-    // };
-
-    // auto getRandomCategory = [&]() -> std::string {
-    //     std::vector<std::string> categories = {"Work", "Personal", "Finance", "Social", "Development", "Entertainment", "Shopping", "Travel"};
-    //     return categories[getRandomInt(0, categories.size() - 1)];
-    // };
-
-    // auto getRandomTags = [&]() -> std::string {
-    //     std::vector<std::string> allTags = {"work", "personal", "dev", "finance", "social", "important", "backup", "frequent"};
-    //     int tagCount = getRandomInt(1, 3);
-    //     std::string tags;
-    //     for (int i = 0; i < tagCount; ++i) {
-    //         if (i > 0) tags += ",";
-    //         tags += allTags[getRandomInt(0, allTags.size() - 1)];
-    //     }
-    //     return tags;
-    // };
-
-    // auto getRandomNotes = [&]() -> std::string {
-    //     std::vector<std::string> notes = {
-    //         "Important account",
-    //         "Used for 2FA",
-    //         "Shared with team",
-    //         "Regularly updated",
-    //         "Backup codes stored",
-    //         "Recovery email set",
-    //         "This is a test note for performance testing",
-    //         "Additional information about this account",
-    //         "Password last changed recently"
-    //     };
-    //     return getRandomInt(0, 5) == 0 ? notes[getRandomInt(0, notes.size() - 1)] : "";
-    // };
-
-    // // Получаем текущее время
-    // auto now = std::chrono::system_clock::now();
-    // auto now_time_t = std::chrono::system_clock::to_time_t(now);
-    // std::string currentTimestamp = std::ctime(&now_time_t);
-    // if (!currentTimestamp.empty() && currentTimestamp.back() == '\n') {
-    //     currentTimestamp.pop_back();
-    // }
-
-    // // Генерируем записи
-    // for (int i = 0; i < count; ++i) {
-    //     PlaintextEntry entry;
-    //     entry.title = getRandomTitle();
-    //     entry.username = "user_" + getRandomString(5, 12) + "@" + getRandomDomain();
-    //     entry.password = getRandomPassword();
-    //     entry.url = "https://" + getRandomDomain();
-    //     entry.notes = getRandomNotes();
-    //     entry.category = getRandomCategory();
-    //     entry.tags = getRandomTags();
-    //     entry.creation_timestamp = currentTimestamp;
-    //     entry.version = 1;
-
-    //     m_vaultManager.createEntry(entry);
-
-    //     if ((i + 1) % 100 == 0) {
-    //         std::cout << "  Generated " << (i + 1) << "/" << count << " entries..." << std::endl;
-    //     }
-    // }
-
-    // std::cout << "Done! Generated " << count << " test entries." << std::endl;
-
-
 }
 
 
@@ -405,6 +269,8 @@ void MainWindow::createCentralWidget()
 
     tabWidget->addTab(passwordsTab, "Пароли");
 
+    // ===== ЛОГИ =====
+
     QWidget* auditTab = new QWidget();
     QVBoxLayout* auditLayout = new QVBoxLayout(auditTab);
     auditLayout->setContentsMargins(0, 0, 0, 0);
@@ -417,37 +283,58 @@ void MainWindow::createCentralWidget()
 
     mainLayout->addWidget(tabWidget);
 
+    // ===== СТАТУСНАЯ ПАНЕЛЬ =====
+
+    m_statusBar = new QTextEdit();
+    m_statusBar->setReadOnly(true);
+    m_statusBar->setMaximumHeight(120);
+    m_statusBar->setStyleSheet(
+        "QTextEdit {"
+        "   background-color: #2c3e50;"
+        "   color: #ecf0f1;"
+        "   font-family: 'Monospace';"
+        "   font-size: 9pt;"
+        "}"
+        );
+
+    // Очищаем и добавляем начальное сообщение
+    m_statusBar->clear();
+    m_statusBar->append("Audit system ready");
+    m_statusBar->append("Waiting for events...");
+
+    mainLayout->addWidget(m_statusBar);
+
     // Устанавливаем центральный виджет
     setCentralWidget(centralWidget);
 }
 
 void MainWindow::createStatusBar()
 {
-    statusBar = new QStatusBar(this);
-    setStatusBar(statusBar);
-    statusBar->showMessage("Not logged in");
+    // statusBar = new QStatusBar(this);
+    // setStatusBar(statusBar);
+    // statusBar->showMessage("Not logged in");
 }
 
 
 
 void MainWindow::updateStatusBar()
 {
-    QString msg;
+    // QString msg;
 
-    // Базовый статус
-    if (isLoggedIn) {
-        msg = "Logged in";
-    } else {
-        msg = "Not logged in";
-    }
+    // // Базовый статус
+    // if (isLoggedIn) {
+    //     msg = "Logged in";
+    // } else {
+    //     msg = "Not logged in";
+    // }
 
 
-    // Временное сообщение (если есть)
-    if (!m_temporaryMessage.isEmpty()) {
-        msg = m_temporaryMessage + " | " + msg;
-    }
+    // // Временное сообщение (если есть)
+    // if (!m_temporaryMessage.isEmpty()) {
+    //     msg = m_temporaryMessage + " | " + msg;
+    // }
 
-    statusBar->showMessage(msg);
+    // statusBar->showMessage(msg);
 }
 
 void MainWindow::showTemporaryMessage(const QString& msg, int timeoutMs)
@@ -897,7 +784,7 @@ void MainWindow::onDeleteEntry()
 
         if (allSuccess) {
             m_tableModel->refresh();
-            statusBar->showMessage(QString("Удалено %1 записей").arg(deletedCount), 3000);
+            //statusBar->showMessage(QString("Удалено %1 записей").arg(deletedCount), 3000);
         } else {
             QMessageBox::warning(this, "Ошибка",
                                  QString("Удалено %1 из %2 записей. Некоторые записи не удалось удалить.")
@@ -1071,7 +958,7 @@ void MainWindow::onCopyUsername()
             showTemporaryMessage("Логин скопирован", 2000);
         }
     } catch (const std::exception& e) {
-        statusBar->showMessage("Ошибка при копировании", 2000);
+        //statusBar->showMessage("Ошибка при копировании", 2000);
     }
 }
 
@@ -1099,7 +986,7 @@ void MainWindow::onCopyPassword()
                 );
         }
     } catch (const std::exception& e) {
-        statusBar->showMessage("Ошибка при копировании", 2000);
+        //statusBar->showMessage("Ошибка при копировании", 2000);
     }
 }
 
@@ -1140,7 +1027,7 @@ void MainWindow::onCopyAll()
             showTemporaryMessage("Все данные скопированы", 2000);
         }
     } catch (const std::exception& e) {
-        statusBar->showMessage("Ошибка при копировании", 2000);
+        //statusBar->showMessage("Ошибка при копировании", 2000);
     }
 }
 

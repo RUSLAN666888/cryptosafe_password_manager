@@ -41,8 +41,7 @@ private:
     QToolBar *toolBar;
     QWidget *centralWidget;
     QVBoxLayout *mainLayout;
-    //SecureTable *passwordTable;
-    QStatusBar *statusBar;
+    QTextEdit *m_statusBar;
 
     QTableView* m_tableView;
     VaultTableModel* m_tableModel;

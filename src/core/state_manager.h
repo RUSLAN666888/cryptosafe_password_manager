@@ -1,90 +1,116 @@
-#ifndef STATE_MANAGER_H
-#define STATE_MANAGER_H
+// session_manager.h
+#ifndef SESSION_MANAGER_H
+#define SESSION_MANAGER_H
 
 #include <chrono>
 #include <mutex>
-#include <nlohmann/json.hpp>
-#include "../src/core/events.h"
+#include <QObject>
+#include <QTimer>
 
-using json = nlohmann::json;
-
-
-class StateManager
+class SessionManager : public QObject
 {
-private:
-    bool loggedIn;
-    std::chrono::system_clock::time_point loginTime;
-    std::chrono::steady_clock::time_point lastActivity;
-    int failedAttempts;
-    std::mutex mutex;
-    bool isFirstRun;
+    Q_OBJECT
 
-    StateManager() : loggedIn(false), failedAttempts(0) {}
+private:
+    SessionManager() = default;
+
+    bool m_isLoggedIn = false;
+    bool m_isLocked = false;
+    std::chrono::steady_clock::time_point m_lastActivity;
+
+    int m_autoLockSeconds = 3600;
+    QTimer* m_timer = nullptr;
+
+    void startTimer() {
+        if (m_timer) m_timer->start();
+    }
+
+    void stopTimer() {
+        if (m_timer) m_timer->stop();
+    }
 
 public:
-    static StateManager& getInstance()
-    {
-        static StateManager instance;
+    static SessionManager& getInstance() {
+        static SessionManager instance;
         return instance;
     }
 
-    void login()
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        loggedIn = true;
-        loginTime = std::chrono::system_clock::now();
-        lastActivity = std::chrono::steady_clock::now();
-        failedAttempts = 0;
+    void init(int autoLockSeconds = 3600) {
+        m_autoLockSeconds = autoLockSeconds;
+        m_timer = new QTimer(this);
+        m_timer->setInterval(1000);
+        connect(m_timer, &QTimer::timeout, this, [this]() {
+            if (m_isLoggedIn && !m_isLocked) {
+                auto now = std::chrono::steady_clock::now();
+                auto inactive = std::chrono::duration_cast<std::chrono::seconds>(now - m_lastActivity).count();
+                if (inactive >= m_autoLockSeconds) {
+                    lock();
+                    emit inactivityTimeout();
+                }
+            }
+        });
     }
 
-    void logout()
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        loggedIn = false;
+    void login() {
+        m_isLoggedIn = true;
+        m_isLocked = false;
+        m_lastActivity = std::chrono::steady_clock::now();
+        startTimer();
+        emit sessionStarted();
     }
 
-    void updateActivity()
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        if (loggedIn)
-        {
-            lastActivity = std::chrono::steady_clock::now();
+    void logout() {
+        m_isLoggedIn = false;
+        m_isLocked = false;
+        stopTimer();
+        emit sessionEnded();
+    }
+
+    void lock() {
+        if (!m_isLoggedIn) return;
+        m_isLocked = true;
+        stopTimer();
+        emit sessionLocked();
+    }
+
+    void unlock() {
+        if (!m_isLoggedIn) return;
+        m_isLocked = false;
+        m_lastActivity = std::chrono::steady_clock::now();
+        startTimer();
+        emit sessionUnlocked();
+    }
+
+    void updateActivity() {
+        if (m_isLoggedIn && !m_isLocked) {
+            m_lastActivity = std::chrono::steady_clock::now();
         }
     }
 
-    void addFailedAttempt()
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        failedAttempts++;
+    bool isLoggedIn() const {
+        return m_isLoggedIn;
     }
 
-    bool isLoggedIn()
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        return loggedIn;
+    bool isLocked() const {
+        return m_isLocked;
     }
 
-    int getFailedAttempts()
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        return failedAttempts;
-    }
-
-    // Получить время бездействия в секундах
-    long getInactivitySeconds()
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        if (!loggedIn) return 0;
-
+    long getInactivitySeconds() const {
+        if (!m_isLoggedIn || m_isLocked) return 0;
         auto now = std::chrono::steady_clock::now();
-        return std::chrono::duration_cast<std::chrono::seconds>(now - lastActivity).count();
+        return std::chrono::duration_cast<std::chrono::seconds>(now - m_lastActivity).count();
     }
 
-    void publishUserLoggedIn(){
-        json details = json::object();
-        details["action"] = "login_success";
-        eventBus.publish(EventType::UserLoggedIn, details, "StateMnager");
+    void setAutoLockSeconds(int seconds) {
+        m_autoLockSeconds = seconds;
     }
+
+signals:
+    void sessionStarted();
+    void sessionEnded();
+    void sessionLocked();
+    void sessionUnlocked();
+    void inactivityTimeout();
 };
 
 #endif
