@@ -7,12 +7,12 @@
 #include <QObject>
 #include <QTimer>
 
-class SessionManager : public QObject
+class StateManager : public QObject
 {
     Q_OBJECT
 
 private:
-    SessionManager() = default;
+    StateManager() = default;
 
     bool m_isLoggedIn = false;
     bool m_isLocked = false;
@@ -30,8 +30,8 @@ private:
     }
 
 public:
-    static SessionManager& getInstance() {
-        static SessionManager instance;
+    static StateManager& getInstance() {
+        static StateManager instance;
         return instance;
     }
 
@@ -56,21 +56,21 @@ public:
         m_isLocked = false;
         m_lastActivity = std::chrono::steady_clock::now();
         startTimer();
-        emit sessionStarted();
+        emit LoggedIn();
     }
 
     void logout() {
         m_isLoggedIn = false;
         m_isLocked = false;
         stopTimer();
-        emit sessionEnded();
+        emit LoggedOut();
     }
 
     void lock() {
         if (!m_isLoggedIn) return;
         m_isLocked = true;
         stopTimer();
-        emit sessionLocked();
+        emit LoggedOut();
     }
 
     void unlock() {
@@ -78,7 +78,7 @@ public:
         m_isLocked = false;
         m_lastActivity = std::chrono::steady_clock::now();
         startTimer();
-        emit sessionUnlocked();
+        emit LoggedIn();
     }
 
     void updateActivity() {
@@ -106,10 +106,8 @@ public:
     }
 
 signals:
-    void sessionStarted();
-    void sessionEnded();
-    void sessionLocked();
-    void sessionUnlocked();
+    void LoggedIn();
+    void LoggedOut();
     void inactivityTimeout();
 };
 

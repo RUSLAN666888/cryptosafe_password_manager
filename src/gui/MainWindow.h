@@ -17,6 +17,7 @@
 #include "../src/gui/widgets/secure_table/SearchProxyModel.h"
 #include "../src/core/vault/VaultManager.h"
 #include "../src/gui/widgets/audit_log/audit_logViewer.h"
+#include "state_manager.h"
 
 class MainWindow : public QMainWindow
 {
@@ -48,9 +49,6 @@ private:
     SearchProxyModel* m_proxyModel;
     QLineEdit* m_searchField;
 
-    // Таймер бездействия
-    QTimer *inactivityTimer;
-    static const int INACTIVITY_TIMEOUT_MS = 60 * 60 * 1000; // 1 час
 
     // Методы создания UI
     void createMenuBar();
@@ -77,6 +75,9 @@ private:
     void updatePermanentStatus();
 
     QTimer* m_clipboardTimer;
+
+    void updateSessionStatusDisplay();
+    void appendStatusMessage(const QString& msg);
 
 
 private slots:
@@ -106,6 +107,11 @@ private slots:
     void onCopyAll();
 
     void onViewAuditLogs();
+
+    void onSessionStarted();
+    void onSessionEnded();
+    void onSessionLocked();
+    void onSessionUnlocked();
 
 public:
     MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaultManager);

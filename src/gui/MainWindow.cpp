@@ -52,10 +52,6 @@ MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaul
     createCentralWidget();
     createStatusBar();
 
-    // Создаем таймер бездействия
-    inactivityTimer = new QTimer(this);
-    inactivityTimer->setSingleShot(true);
-    connect(inactivityTimer, &QTimer::timeout, this, &MainWindow::onInactivityTimeout);
 
     m_clipboardTimer = new QTimer(this);
     m_clipboardTimer->setSingleShot(true);
@@ -86,7 +82,20 @@ MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaul
         eventBus.publish(EventType::UserLoggedIn, details, "StateMnager");
     }
 
-    updateStatusBar();
+    // Инициализация SessionManager
+    StateManager::getInstance().init(3600);  // 1 час бездействия
+
+    // Подключение сигналов SessionManager
+    connect(&StateManager::getInstance(), &StateManager::sessionStarted,
+            this, &MainWindow::onSessionStarted);
+    connect(&StateManager::getInstance(), &StateManager::sessionEnded,
+            this, &MainWindow::onSessionEnded);
+    connect(&StateManager::getInstance(), &StateManager::sessionLocked,
+            this, &MainWindow::onSessionLocked);
+    connect(&StateManager::getInstance(), &StateManager::sessionUnlocked,
+            this, &MainWindow::onSessionUnlocked);
+    connect(&StateManager::getInstance(), &StateManager::inactivityTimeout,
+            this, &MainWindow::onInactivityTimeout);
 }
 
 
@@ -365,66 +374,6 @@ bool MainWindow::showFirstRunWizard()
     return false;
 }
 
-// В MainWindow.cpp
-
-// bool MainWindow::showLoginDialog()
-// {
-//     // Загружаем данные аутентификации из БД
-//     std::vector<uint8_t> hash, salt;
-//     uint32_t time_cost, memory_cost, parallelism, hash_len;
-
-//     if (!db.getAuthData(hash, salt, time_cost, memory_cost, parallelism, hash_len)) {
-//         QMessageBox::critical(this, "Ошибка",
-//                               "Не удалось загрузить данные аутентификации. База данных может быть повреждена.");
-//         return false;
-//     }
-
-//     Argon2Data authData(time_cost, memory_cost, parallelism, hash_len);
-//     authData.hash = std::move(hash);
-//     authData.salt = std::move(salt);
-
-//     // Создаём диалог с лямбдой для проверки пароля
-//     LoginDialog dialog(this, [authData](const std::string& password) -> bool {
-//         return verify_password(password, authData);
-//     });
-
-//     std::string masterPassword;
-//     if (dialog.exec(masterPassword)) {
-//         // Загружаем соль для PBKDF2 из БД
-//         std::vector<uint8_t> encSalt;
-//         if (!db.getEncSalt(encSalt)) {
-//             QMessageBox::critical(this, "Ошибка", "Не удалось загрузить соль");
-//             return false;
-//         }
-
-//         // 1. Выводим ключ шифрования
-//         std::vector<uint8_t> encKey;
-//         derive_encryption_key(masterPassword, encSalt, encKey);
-//         KeyManager::getInstance().storeEncryptionKey(encKey);
-
-//         // 2. Инициализируем подпись для аудита
-//         LogSigner::getInstance().initFromMasterPassword(masterPassword);
-
-//         // 3. Публичный ключ в БД (если ещё нет)
-//         // int keyVersion;
-//         // std::vector<uint8_t> existingKey;
-//         // if (!db.getCurrentPublicKey(existingKey, keyVersion)) {
-//         //     // Первый запуск или ключ отсутствует
-//         //     db.addPublicKey(LogSigner::getInstance().get_public_key(), 1, 1);
-//         // }
-
-//         // Очищаем пароль из памяти
-//         volatile char* p = const_cast<char*>(masterPassword.data());
-//         for (size_t i = 0; i < masterPassword.size(); ++i) {
-//             p[i] = 0;
-//         }
-
-//         isLoggedIn = true;
-//         return true;
-//     }
-
-//     return false;
-// }
 
 bool MainWindow::showLoginDialog()
 {
@@ -508,88 +457,43 @@ bool MainWindow::showLoginDialog()
             p[i] = 0;
         }
 
-        isLoggedIn = true;
+        StateManager::getInstance().login();
         return true;
     }
 
     return false;
 }
+
 void MainWindow::unlockApplication()
 {
-    if (!isLoggedIn)
+    if (!StateManager::getInstance().isLoggedIn())
     {
-        isLoggedIn = true;
+        StateManager::getInstance().unlock();
         refreshTable();
-
         m_tableView->show();
         m_searchField->show();
-
-        updateStatusBar();
-
-        StateManager::getInstance().login();
-
-        resetInactivityTimer();
-
-        // json details = json::object();
-        // details["action"] = "Vault_unlocked";
-        // eventBus.publish(EventType::Unlock, details, "MainWindow");
+        updateSessionStatusDisplay();
     }
 }
 
 void MainWindow::lockApplication()
 {
-    if (isLoggedIn)
+    if (StateManager::getInstance().isLoggedIn())
     {
-        // Принудительно сбрасываем буфер обмена и таймер
         ClipboardService::getInstance().resetTimer();
-
-        isLoggedIn = false;
-
+        StateManager::getInstance().lock();
         m_tableView->hide();
         m_searchField->hide();
         m_searchField->clear();
-
-        updateStatusBar();
-
-        StateManager::getInstance().logout();
-
-        if (inactivityTimer->isActive())
-        {
-            inactivityTimer->stop();
-        }
-
-        // json details = json::object();
-        // details["action"] = "Vault_locked";
-        // eventBus.publish(EventType::Lock, details, "MainWindow");
+        updateSessionStatusDisplay();
     }
 }
 
-void MainWindow::resetInactivityTimer()
-{
-    if (isLoggedIn)
-    {
-        StateManager::getInstance().updateActivity();
-        //KeyManager::getInstance().update_activity();
-        inactivityTimer->start(INACTIVITY_TIMEOUT_MS);
-    }
-}
+// json details = json::object();
+// details["action"] = "Vault_locked";
+// eventBus.publish(EventType::Lock, details, "MainWindow");
 
-void MainWindow::onInactivityTimeout()
-{
-    if (isLoggedIn)
-    {
-        json details = json::object();
-        details["action"] = "InactivityTimeout";
-        EventBus::getInstance().publish(EventType::InactivityTimeout, details, "MainWindow");
 
-        lockApplication();
-        //KeyManager::getInstance().logout();
-        QMessageBox::information(this, "Auto-Lock", "Application locked due to inactivity.");
-        showLoginDialog();
-    }
-}
-
-// ============== ОБРАБОТЧИКИ МЕНЮ ==============
 
 void MainWindow::onNewDatabase()
 {
@@ -859,34 +763,13 @@ void MainWindow::onChangePassword()
 
 // ============== ОБРАБОТЧИКИ СОБЫТИЙ ==============
 
-void MainWindow::onUserLoggedIn(const Event& event)
-{
-    QMetaObject::invokeMethod(this, [this]() {
-        unlockApplication();
-    }, Qt::QueuedConnection);
-}
-
-void MainWindow::onUserLoggedOut(const Event& event)
-{
-    QMetaObject::invokeMethod(this, [this]() {
-        lockApplication();
-    }, Qt::QueuedConnection);
-}
 
 void MainWindow::onLock()
 {
-    if (isLoggedIn)
+    if (StateManager::getInstance().isLoggedIn())
     {
-        qDebug() << "User manually locked application";
-        lockApplication();
-        //KeyManager::getInstance().logout();
-
-        if (!showLoginDialog())
-        {
-            QMetaObject::invokeMethod(this, &MainWindow::close, Qt::QueuedConnection);
-            return;
-        }
-        StateManager::getInstance().publishUserLoggedIn();
+        StateManager::getInstance().lock();
+        showLoginDialog();
     }
 }
 
@@ -1081,4 +964,85 @@ void MainWindow::onImportPublicKey()
                                  QString("Публичный ключ пользователя '%1' импортирован")
                                      .arg(dialog.getContactName()));
     }
+}
+
+void MainWindow::onSessionStarted()
+{
+    isLoggedIn = true;
+    refreshTable();
+    m_tableView->show();
+    m_searchField->show();
+    updateSessionStatusDisplay();
+}
+
+void MainWindow::onSessionEnded()
+{
+    isLoggedIn = false;
+    m_tableView->hide();
+    m_searchField->hide();
+    m_searchField->clear();
+    ClipboardService::getInstance().resetTimer();
+    updateSessionStatusDisplay();
+}
+
+void MainWindow::onSessionLocked()
+{
+    isLoggedIn = false;
+    m_tableView->hide();
+    m_searchField->hide();
+    updateSessionStatusDisplay();
+}
+
+void MainWindow::onSessionUnlocked()
+{
+    isLoggedIn = true;
+    refreshTable();
+    m_tableView->show();
+    m_searchField->show();
+    updateSessionStatusDisplay();
+}
+
+void MainWindow::onInactivityTimeout()
+{
+    StateManager::getInstance().lock();
+    QMessageBox::information(this, "Авто-блокировка", "Приложение заблокированно из-за неактивности");
+    showLoginDialog();
+}
+
+void MainWindow::updateSessionStatusDisplay()
+{
+    if (!m_statusBar) return;
+
+    // Сохраняем текущий текст
+    QString currentText = m_statusBar->toPlainText();
+
+    // Удаляем старую строку статуса если есть
+    QStringList lines = currentText.split('\n');
+    for (int i = 0; i < lines.size(); ++i) {
+        if (lines[i].startsWith("Logged In") || lines[i].startsWith("Not Logged In")) {
+            lines.removeAt(i);
+            break;
+        }
+    }
+
+    // Добавляем новую строку статуса в начало
+    if (StateManager::getInstance().isLoggedIn()) {
+        lines.prepend("Logged In");
+    } else {
+        lines.prepend("Not Logged In");
+    }
+
+    // Обновляем текст
+    m_statusBar->setPlainText(lines.join('\n'));
+
+}
+
+void MainWindow::appendStatusMessage(const QString& msg)
+{
+    if (!m_statusBar) return;
+
+    m_statusBar->append(msg);
+
+    // После добавления сообщения обновляем строку статуса (она в начале)
+    updateSessionStatusDisplay();
 }

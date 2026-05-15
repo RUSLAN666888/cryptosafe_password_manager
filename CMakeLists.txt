@@ -121,6 +121,7 @@ set(HEADERS
     src/gui/dialogs/share_dialog/share_dialog.h
     src/gui/dialogs/export_pk_dialog/export_pk_dialog.h
     src/gui/dialogs/import_pk_dialog/import_pk_dialog.h
+    src/core/state_manager.h
 )
 
 
