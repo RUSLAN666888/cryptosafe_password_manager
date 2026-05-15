@@ -31,7 +31,7 @@ public:
 
 private slots:
     void onMethodChanged();
-    void onBrowsePublicKey();
+    //void onBrowsePublicKey();
     void onCreateShare();
     void onContactSelected(int index);
 

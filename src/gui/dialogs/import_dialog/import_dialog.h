@@ -21,6 +21,8 @@
 #include "../../database/DB_helper/db_helper.h"
 #include "../../core/vault/VaultManager.h"
 
+#include "sharing_service.h"
+
 class ImportDialog : public QDialog
 {
     Q_OBJECT
@@ -43,6 +45,7 @@ private:
     void showSummary(int imported, int skipped, int updated, int errors);
     bool isDuplicate(const PlaintextEntry& entry, PlaintextEntry* existingEntry = nullptr);
     std::vector<int> getSelectedRows();
+    void importSharedEntry();
 
     VaultManager* m_vaultManager;
     Database* m_db;
@@ -74,6 +77,9 @@ private:
     std::vector<int> m_duplicateIndices;
     int m_conflictAction; // 0=skip, 1=replace, 2=addNew, 3=update
     bool m_applyToAllConflicts;
+
+    bool m_isShareImport = false;
+    ShareMetadata m_shareMetadata;
 };
 
 #endif

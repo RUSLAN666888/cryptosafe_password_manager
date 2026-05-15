@@ -2,6 +2,7 @@
 #include "share_dialog.h"
 #include <QDate>
 
+// ShareDialog::ShareDialog (исправленный конструктор)
 ShareDialog::ShareDialog(VaultManager* vaultManager, Database* db,
                          const PlaintextEntry& entry, QWidget* parent)
     : QDialog(parent)
@@ -10,7 +11,7 @@ ShareDialog::ShareDialog(VaultManager* vaultManager, Database* db,
     , m_entry(entry)
 {
     setWindowTitle("Поделиться записью");
-    setMinimumSize(500, 450);
+    setMinimumSize(500, 500);
     setModal(true);
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -40,15 +41,16 @@ ShareDialog::ShareDialog(VaultManager* vaultManager, Database* db,
     m_passwordEdit->setEchoMode(QLineEdit::Password);
     formLayout->addRow("Пароль:", m_passwordEdit);
 
-    // Публичный ключ
-    QHBoxLayout* keyLayout = new QHBoxLayout();
-    m_browseKeyBtn = new QPushButton("Выбрать публичный ключ...");
-    m_keyInfoLabel = new QLabel("Файл не выбран");
+    // Контакт (для публичного ключа)
+    m_contactCombo = new QComboBox();
+    formLayout->addRow("Контакт:", m_contactCombo);
+    connect(m_contactCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &ShareDialog::onContactSelected);
+
+    // Информация о выбранном ключе
+    m_keyInfoLabel = new QLabel("Контакт не выбран");
     m_keyInfoLabel->setStyleSheet("color: gray;");
-    keyLayout->addWidget(m_browseKeyBtn);
-    keyLayout->addWidget(m_keyInfoLabel);
-    formLayout->addRow("Публичный ключ:", keyLayout);
-    connect(m_browseKeyBtn, &QPushButton::clicked, this, &ShareDialog::onBrowsePublicKey);
+    formLayout->addRow("", m_keyInfoLabel);
 
     // Срок действия
     m_expirationDate = new QDateEdit();
@@ -80,25 +82,8 @@ ShareDialog::ShareDialog(VaultManager* vaultManager, Database* db,
     connect(m_createButton, &QPushButton::clicked, this, &ShareDialog::onCreateShare);
     connect(m_cancelButton, &QPushButton::clicked, this, &QDialog::reject);
 
-    m_contactCombo = new QComboBox();
-    formLayout->addRow("Контакт:", m_contactCombo);
-    connect(m_contactCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &ShareDialog::onContactSelected);
-
     onMethodChanged();
     loadContacts();
-}
-
-void ShareDialog::onContactSelected(int index)
-{
-    if (index < 0) return;
-    int contactId = m_contactCombo->itemData(index).toInt();
-    std::vector<uint8_t> publicKey;
-    if (m_db->getContactPublicKeyById(contactId, publicKey)) {
-        m_selectedPublicKey = publicKey;
-        m_keyInfoLabel->setText(m_contactCombo->currentText());
-        m_keyInfoLabel->setStyleSheet("color: green;");
-    }
 }
 
 void ShareDialog::onMethodChanged()
@@ -107,7 +92,7 @@ void ShareDialog::onMethodChanged()
     bool isPassword = (method == "password");
 
     m_passwordEdit->setVisible(isPassword);
-    m_browseKeyBtn->setVisible(!isPassword);
+    m_contactCombo->setVisible(!isPassword);
     m_keyInfoLabel->setVisible(!isPassword);
 
     // Обновляем текст меток
@@ -115,30 +100,10 @@ void ShareDialog::onMethodChanged()
     if (!form) return;
 
     QLabel* passwordLabel = qobject_cast<QLabel*>(form->labelForField(m_passwordEdit));
-    QLabel* keyLabel = qobject_cast<QLabel*>(form->labelForField(m_browseKeyBtn));
+    QLabel* contactLabel = qobject_cast<QLabel*>(form->labelForField(m_contactCombo));
 
     if (passwordLabel) passwordLabel->setText(isPassword ? "Пароль:" : "");
-    if (keyLabel) keyLabel->setText(!isPassword ? "Публичный ключ:" : "");
-}
-
-void ShareDialog::onBrowsePublicKey()
-{
-    QString filepath = QFileDialog::getOpenFileName(this, "Выберите публичный ключ получателя",
-                                                    "", "PEM Files (*.pem);;All Files (*)");
-    if (filepath.isEmpty()) return;
-
-    QFile file(filepath);
-    if (!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::warning(this, "Ошибка", "Не удалось открыть файл");
-        return;
-    }
-
-    QByteArray keyData = file.readAll();
-    file.close();
-
-    m_selectedPublicKey.assign(keyData.begin(), keyData.end());
-    m_keyInfoLabel->setText(QFileInfo(filepath).fileName());
-    m_keyInfoLabel->setStyleSheet("color: green;");
+    if (contactLabel) contactLabel->setText(!isPassword ? "Контакт:" : "");
 }
 
 void ShareDialog::loadContacts()
@@ -150,6 +115,24 @@ void ShareDialog::loadContacts()
     }
     if (m_contactCombo->count() > 0) {
         m_contactCombo->setCurrentIndex(0);
+    } else {
+        m_keyInfoLabel->setText("Нет контактов. Сначала импортируйте публичный ключ.");
+        m_keyInfoLabel->setStyleSheet("color: orange;");
+    }
+}
+
+void ShareDialog::onContactSelected(int index)
+{
+    if (index < 0) return;
+    int contactId = m_contactCombo->itemData(index).toInt();
+    std::vector<uint8_t> publicKey;
+    if (m_db->getContactPublicKeyById(contactId, publicKey)) {
+        m_selectedPublicKey = publicKey;
+        m_keyInfoLabel->setText(QString::fromStdString("Ключ загружен: " + m_contactCombo->currentText().toStdString()));
+        m_keyInfoLabel->setStyleSheet("color: green;");
+    } else {
+        m_keyInfoLabel->setText("Ошибка загрузки ключа");
+        m_keyInfoLabel->setStyleSheet("color: red;");
     }
 }
 
@@ -196,7 +179,7 @@ void ShareDialog::onCreateShare()
 
         } else {
             if (m_selectedPublicKey.empty()) {
-                QMessageBox::warning(this, "Ошибка", "Выберите публичный ключ получателя");
+                QMessageBox::warning(this, "Ошибка", "Выберите контакт с публичным ключом");
                 return;
             }
 

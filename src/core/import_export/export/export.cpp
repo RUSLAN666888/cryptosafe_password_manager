@@ -73,7 +73,7 @@ void Exporter::exportToEncryptedJSON(std::vector<PlaintextEntry>& entries,
     file << exportJson.dump();
     file.close();
 
-    KeyManager::getInstance().clearExportKey();
+    //KeyManager::getInstance().clearExportKey();
 }
 
 void Exporter::exportToCSV(const std::vector<PlaintextEntry>& entries,
@@ -144,7 +144,7 @@ void Exporter::exportToCSV(const std::vector<PlaintextEntry>& entries,
         file << exportJson.dump();
         file.close();
 
-        KeyManager::getInstance().clearExportKey();
+        //KeyManager::getInstance().clearExportKey();
     } else {
         std::ofstream file(filepath);
         if (!file.is_open()) {

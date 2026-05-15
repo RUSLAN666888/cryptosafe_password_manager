@@ -126,7 +126,11 @@ ImportDialog::ImportDialog(VaultManager* vaultManager, Database* db, QWidget* pa
 
 void ImportDialog::onBrowse()
 {
-    QString filter = "Все поддерживаемые файлы (*.cryptosafe *.json *.csv);;CryptoSafe Export (*.cryptosafe);;JSON Files (*.json);;CSV Files (*.csv)";
+    QString filter = "Все поддерживаемые файлы (*.cryptosafe *.cryptoshare *.json *.csv);;"
+                    "CryptoSafe Export (*.cryptosafe);;"
+                    "CryptoSafe Share (*.cryptoshare);;"
+                    "JSON Files (*.json);;"
+                    "CSV Files (*.csv)";
     QString filepath = QFileDialog::getOpenFileName(this, "Выберите файл для импорта", "", filter);
 
     if (!filepath.isEmpty()) {
@@ -146,12 +150,13 @@ void ImportDialog::detectFormat(const QString& filepath)
 {
     if (filepath.endsWith(".cryptosafe", Qt::CaseInsensitive)) {
         m_currentFormat = "Encrypted JSON (CryptoSafe)";
+    } else if (filepath.endsWith(".cryptoshare", Qt::CaseInsensitive)) {
+        m_currentFormat = "CryptoSafe Share";
     } else if (filepath.endsWith(".json", Qt::CaseInsensitive)) {
         m_currentFormat = "JSON";
     } else if (filepath.endsWith(".csv", Qt::CaseInsensitive)) {
         m_currentFormat = "CSV";
     } else {
-        // Пробуем определить по содержимому
         QFile file(filepath);
         if (file.open(QIODevice::ReadOnly)) {
             QByteArray firstLine = file.readLine(100);
@@ -159,6 +164,8 @@ void ImportDialog::detectFormat(const QString& filepath)
 
             if (firstLine.contains("cryptosafe_export")) {
                 m_currentFormat = "Encrypted JSON (CryptoSafe)";
+            } else if (firstLine.contains("cryptosafe_share")) {
+                m_currentFormat = "CryptoSafe Share";
             } else if (firstLine.contains("{")) {
                 m_currentFormat = "JSON (предположительно)";
             } else if (firstLine.contains(",")) {
@@ -179,6 +186,11 @@ void ImportDialog::loadAndParseFile()
     m_previewTable->setRowCount(0);
     m_importedEntries.clear();
     m_duplicateIndices.clear();
+
+    if (m_currentFilepath.endsWith(".cryptoshare", Qt::CaseInsensitive)) {
+        importSharedEntry();
+        return;
+    }
 
     Importer importer;
     ImportResult result;
@@ -215,6 +227,7 @@ void ImportDialog::loadAndParseFile()
     }
 
     m_importedEntries = result.entries;
+    m_isShareImport = false;
 
     // Показываем сообщение о санитизации
     if (result.sanitizedCount > 0) {
@@ -223,6 +236,90 @@ void ImportDialog::loadAndParseFile()
                                          "Данные были очищены от опасных символов.")
                                      .arg(result.sanitizedCount));
     }
+
+    showPreview();
+}
+
+void ImportDialog::importSharedEntry()
+{
+    SharingService& service = SharingService::getInstance();
+
+    // Определяем метод шифрования
+    QFile file(m_currentFilepath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::critical(this, "Ошибка", "Не удалось открыть файл");
+        return;
+    }
+
+    QByteArray fileData = file.readAll();
+    file.close();
+
+    bool isPasswordEncrypted = fileData.contains("encryption_method\":\"password");
+    bool isPublicKeyEncrypted = fileData.contains("encryption_method\":\"public_key");
+
+    std::string password;
+
+    if (isPasswordEncrypted) {
+        bool ok;
+        QString pwd = QInputDialog::getText(this, "Пароль",
+                                            "Введите пароль для расшифровки share-файла:",
+                                            QLineEdit::Password,
+                                            "", &ok);
+        if (!ok || pwd.isEmpty()) {
+            QMessageBox::warning(this, "Ошибка", "Пароль не введён");
+            return;
+        }
+        password = pwd.toStdString();
+    }
+
+    // Импортируем share-файл
+    ImportShareResult shareResult = service.importSharedEntry(m_currentFilepath.toStdString(), password);
+
+    if (!shareResult.success) {
+        // if (!shareResult.signatureValid) {
+        //     int reply = QMessageBox::warning(this, "Предупреждение",
+        //                                      "Подпись share-файла недействительна. Файл мог быть изменён.\n\n"
+        //                                      "Продолжить импорт?",
+        //                                      QMessageBox::Yes | QMessageBox::No);
+        //     if (reply == QMessageBox::No) {
+        //         return;
+        //     }
+        // }
+
+        if (shareResult.isExpired) {
+            QMessageBox::critical(this, "Ошибка",
+                                  "Срок действия share-файла истёк.\n\n"
+                                  "Запросите новый файл у отправителя.");
+        } else {
+            QMessageBox::critical(this, "Ошибка импорта",
+                                  QString::fromStdString(shareResult.errorMessage));
+        }
+        return;
+    }
+
+    // Очищаем пароль
+    if (!password.empty()) {
+        volatile char* p = const_cast<char*>(password.data());
+        for (size_t i = 0; i < password.size(); ++i) p[i] = 0;
+    }
+
+    // Сохраняем импортированную запись
+    m_importedEntries.clear();
+    m_importedEntries.push_back(shareResult.entry);
+    m_isShareImport = true;
+    m_shareMetadata = shareResult.metadata;
+
+    // Показываем информацию об отправителе
+    QMessageBox::information(this, "Получена запись",
+                             QString("Отправитель: %1\n"
+                                     "Запись: %2 (%3)\n"
+                                     "Права: %4\n"
+                                     "Действителен до: %5")
+                                 .arg(QString::fromStdString(m_shareMetadata.sharer))
+                                 .arg(QString::fromStdString(m_shareMetadata.entry_title))
+                                 .arg(QString::fromStdString(m_shareMetadata.entry_username))
+                                 .arg(QString::fromStdString(m_shareMetadata.permissions) == "read_only" ? "Только чтение" : "Чтение и запись")
+                                 .arg(QString::fromStdString(m_shareMetadata.expires_at)));
 
     showPreview();
 }
@@ -336,12 +433,58 @@ void ImportDialog::onImport()
         return;
     }
 
+    // Для share-импорта (одна запись от другого пользователя)
+    if (m_isShareImport && m_importedEntries.size() == 1) {
+        const auto& entry = m_importedEntries[0];
+
+        // Спрашиваем, сохранить в хранилище или использовать временно
+        QMessageBox::StandardButton reply = QMessageBox::question(
+            this,
+            "Импорт записи",
+            QString("Получена запись от %1\n\n"
+                    "Название: %2\n"
+                    "Логин: %3\n"
+                    "Права: %4\n\n"
+                    "Сохранить запись в хранилище?")
+                .arg(QString::fromStdString(m_shareMetadata.sharer))
+                .arg(QString::fromStdString(entry.title))
+                .arg(QString::fromStdString(entry.username))
+                .arg(QString::fromStdString(m_shareMetadata.permissions) == "read_only" ? "Только чтение" : "Чтение и запись"),
+            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+
+        if (reply == QMessageBox::Cancel) {
+            return;
+        }
+
+        if (reply == QMessageBox::Yes) {
+            // Сохраняем в хранилище
+            try {
+                int newId = m_vaultManager->createEntry(entry);
+                if (newId != -1) {
+                    QMessageBox::information(this, "Успех", "Запись сохранена в хранилище");
+                    accept();
+                } else {
+                    QMessageBox::warning(this, "Ошибка", "Не удалось сохранить запись");
+                }
+            } catch (const std::exception& e) {
+                QMessageBox::critical(this, "Ошибка", e.what());
+            }
+        } else {
+            QMessageBox::information(this, "Временное использование",
+                                     QString("Запись \"%1\" будет доступна до закрытия приложения.\n"
+                                             "Для постоянного сохранения используйте \"Добавить запись\" вручную.")
+                                         .arg(QString::fromStdString(entry.title)));
+            accept();
+        }
+        return;
+    }
+
+    // Обычный импорт (не share)
     int imported = 0;
     int skipped = 0;
     int updated = 0;
     int errors = 0;
 
-    // Загружаем существующие записи для проверки дубликатов
     auto existingMetadata = m_vaultManager->getAllEntryMetadata();
     std::vector<PlaintextEntry> existingEntries;
     for (const auto& meta : existingMetadata) {
@@ -354,7 +497,6 @@ void ImportDialog::onImport()
     for (int row : selectedRows) {
         const auto& entry = m_importedEntries[row];
 
-        // Проверяем дубликат
         bool isDuplicate = false;
         PlaintextEntry existingEntry;
         for (const auto& existing : existingEntries) {
@@ -367,7 +509,6 @@ void ImportDialog::onImport()
 
         int action = m_conflictAction;
 
-        // Если конфликт и не применяем ко всем, показываем диалог
         if (isDuplicate && !m_applyToAll->isChecked()) {
             QDialog dialog(this);
             dialog.setWindowTitle("Конфликт при импорте");
@@ -410,15 +551,12 @@ void ImportDialog::onImport()
             }
         }
 
-        // Выполняем действие
         try {
             switch (action) {
-            case 0: // Пропустить
+            case 0:
                 skipped++;
                 break;
-
-            case 1: // Заменить (удалить старую, добавить новую)
-                // Находим ID существующей записи и удаляем
+            case 1:
                 for (const auto& meta : existingMetadata) {
                     if (meta.title == entry.title && meta.username == entry.username) {
                         m_vaultManager->deleteEntry(static_cast<int>(meta.id));
@@ -428,13 +566,11 @@ void ImportDialog::onImport()
                 m_vaultManager->createEntry(entry);
                 imported++;
                 break;
-
-            case 2: // Добавить как новую
+            case 2:
                 m_vaultManager->createEntry(entry);
                 imported++;
                 break;
-
-            case 3: // Обновить существующую
+            case 3:
                 for (const auto& meta : existingMetadata) {
                     if (meta.title == entry.title && meta.username == entry.username) {
                         m_vaultManager->updateEntry(static_cast<int>(meta.id), entry);
@@ -450,20 +586,8 @@ void ImportDialog::onImport()
         }
     }
 
-    // Логируем импорт в аудит
-    // json logDetails = json::object();
-    // logDetails["action"] = "import";
-    // logDetails["format"] = m_currentFormat.toStdString();
-    // logDetails["imported"] = imported;
-    // logDetails["skipped"] = skipped;
-    // logDetails["updated"] = updated;
-    // logDetails["errors"] = errors;
-
-    // EventBus::getInstance().publish(EventType::ImportCompleted, logDetails, "ImportDialog");
-
     showSummary(imported, skipped, updated, errors);
 
-    // Обновляем список существующих записей для следующих импортов
     auto updatedMetadata = m_vaultManager->getAllEntryMetadata();
     m_existingEntries.clear();
     for (const auto& meta : updatedMetadata) {
@@ -473,6 +597,7 @@ void ImportDialog::onImport()
         m_existingEntries.push_back(entry);
     }
 }
+
 void ImportDialog::showSummary(int imported, int skipped, int updated, int errors)
 {
     QString summary = QString("Импорт завершён!\n\n"

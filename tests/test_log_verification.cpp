@@ -182,3 +182,122 @@
 //     ASSERT_FALSE(result.isValid);
 // }
 
+#include <gtest/gtest.h>
+#include <QTemporaryDir>
+#include <QFile>
+#include "../src/core/import_export/export/export.h"
+#include "../src/core/import_export/import/import.h"
+#include "../src/core/sharing/sharing_service.h"
+#include "../src/core/crypto/rsa_cipher.h"
+#include "key_manager.h"
+
+class ImportExportTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        tempDir = std::make_unique<QTemporaryDir>();
+
+        // Генерируем RSA ключи
+        auto keys = RSACipher::generateKeyPair(2048);
+        testPublicKey = keys.publicKey;
+        testPrivateKey = keys.privateKey;
+        KeyManager::getInstance().storePrivateRSAKey(testPrivateKey);
+
+        // Ключ для подписи
+        std::vector<uint8_t> signKey(32);
+        for (int i = 0; i < 32; ++i) signKey[i] = i;
+        KeyManager::getInstance().storeExportSignKey(signKey);
+    }
+
+    PlaintextEntry createTestEntry() {
+        PlaintextEntry entry;
+        entry.title = "Test";
+        entry.username = "user@test.com";
+        entry.password = "pass123";
+        return entry;
+    }
+
+    std::unique_ptr<QTemporaryDir> tempDir;
+    std::vector<uint8_t> testPublicKey;
+    std::vector<uint8_t> testPrivateKey;
+};
+
+// === ЭКСПОРТ/ИМПОРТ ===
+TEST_F(ImportExportTest, EncryptedJSONRoundTrip) {
+    auto original = createTestEntry();
+    Exporter exporter;
+    Importer importer;
+
+    QString path = tempDir->path() + "/test.cryptosafe";
+    std::string pass = "123";
+
+    std::vector<PlaintextEntry> entries = {original};
+    exporter.exportToEncryptedJSON(entries, path.toStdString(), pass);
+
+    auto result = importer.importFromEncryptedJSON(path, pass);
+
+    EXPECT_TRUE(result.success);
+    EXPECT_EQ(result.entries[0].title, original.title);
+    EXPECT_EQ(result.entries[0].password, original.password);
+}
+
+TEST_F(ImportExportTest, CSVExportImport) {
+    auto original = createTestEntry();
+    Exporter exporter;
+    Importer importer;
+
+    QString path = tempDir->path() + "/test.csv";
+    std::vector<PlaintextEntry> entries = {original};
+    exporter.exportToCSV(entries, path.toStdString());
+
+    auto result = importer.importFromCSV(path);
+
+    EXPECT_TRUE(result.success);
+    EXPECT_EQ(result.entries[0].title, original.title);
+}
+
+// // === ШЕРИНГ ===
+TEST_F(ImportExportTest, ShareWithPassword) {
+    auto entry = createTestEntry();
+    SharingService& service = SharingService::getInstance();
+
+    QString path = tempDir->path() + "/share.cryptoshare";
+    service.shareWithPassword(entry, "pass123", "Alice", 7, "read_only", path.toStdString());
+
+    auto result = service.importSharedEntry(path.toStdString(), "pass123");
+
+    EXPECT_TRUE(result.success);
+    EXPECT_FALSE(result.isExpired);
+    EXPECT_EQ(result.entry.title, entry.title);
+    EXPECT_EQ(result.metadata.sharer, "Alice");
+}
+
+TEST_F(ImportExportTest, ShareWithPublicKey) {
+    auto entry = createTestEntry();
+    SharingService& service = SharingService::getInstance();
+
+    QString path = tempDir->path() + "/share_public.cryptoshare";
+    service.shareWithPublicKey(entry, testPublicKey, "Bob", 7, "read_write", path.toStdString());
+
+    auto result = service.importSharedEntry(path.toStdString());
+
+    EXPECT_TRUE(result.success);
+    EXPECT_EQ(result.entry.title, entry.title);
+}
+
+// // === RSA ===
+TEST_F(ImportExportTest, RSAEncryptDecrypt) {
+    auto keys = RSACipher::generateKeyPair(2048);
+    std::string original = "Hello RSA";
+    std::vector<uint8_t> data(original.begin(), original.end());
+
+    auto encrypted = RSACipher::encrypt(data, keys.publicKey);
+    auto decrypted = RSACipher::decrypt(encrypted, keys.privateKey);
+    std::string result(decrypted.begin(), decrypted.end());
+
+    EXPECT_EQ(result, original);
+}
+
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

@@ -117,7 +117,6 @@ public:
             throw std::runtime_error("Failed to init encryption");
         }
 
-        // Устанавливаем OAEP padding (более безопасный, чем PKCS#1 v1.5)
         if (EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_OAEP_PADDING) <= 0) {
             EVP_PKEY_CTX_free(ctx);
             EVP_PKEY_free(pkey);
@@ -207,7 +206,7 @@ public:
         return decrypted;
     }
 
-    // Получение публичного ключа из приватного (PEM -> PEM)
+    // Получение публичного ключа из приватного
     static std::vector<uint8_t> extractPublicKey(const std::vector<uint8_t>& privateKeyPEM) {
         BIO* bio = BIO_new_mem_buf(privateKeyPEM.data(), static_cast<int>(privateKeyPEM.size()));
         if (!bio) {

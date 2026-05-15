@@ -30,6 +30,7 @@ struct ImportShareResult {
     ShareMetadata metadata;
     PlaintextEntry entry;
     bool isExpired;
+    bool signatureValid;
 };
 
 class SharingService {

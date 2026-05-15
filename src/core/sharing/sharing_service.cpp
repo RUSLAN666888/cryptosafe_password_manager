@@ -5,6 +5,7 @@
 #include <sstream>
 #include <openssl/rand.h>
 #include "LogEntry.h"
+#include "Ed25519.h"
 
 std::string SharingService::generateExpirationDate(int days) {
     auto now = std::chrono::system_clock::now();
@@ -99,6 +100,12 @@ void SharingService::shareWithPassword(const PlaintextEntry& entry,
 
     shareJson["data"] = base64Encode(ciphertext);
 
+    // std::vector<uint8_t> signature = sign_data("exportSign", ciphertext);
+    // shareJson["signature"] = base64Encode(signature);
+
+    // std::vector<uint8_t> senderPublicKey = derivePublicKey("exportSign");
+    // shareJson["sender_public_key"] = base64Encode(senderPublicKey);
+
     // Сохраняем в файл
     saveToFile(filepath, shareJson);
 
@@ -156,6 +163,12 @@ void SharingService::shareWithPublicKey(const PlaintextEntry& entry,
 
     shareJson["data"] = base64Encode(ciphertext);
 
+    // std::vector<uint8_t> signature = sign_data("exportSign", ciphertext);
+    // shareJson["signature"] = base64Encode(signature);
+
+    // std::vector<uint8_t> senderPublicKey = derivePublicKey("exportSign");
+    // shareJson["sender_public_key"] = base64Encode(senderPublicKey);
+
     // Сохраняем в файл
     saveToFile(filepath, shareJson);
 
@@ -190,6 +203,25 @@ ImportShareResult SharingService::importSharedEntry(const std::string& filepath,
         result.metadata.permissions = meta.value("permissions", "read_only");
         result.metadata.entry_title = meta.value("entry_title", "");
         result.metadata.entry_username = meta.value("entry_username", "");
+
+        std::string sigB64 = shareJson["signature"];
+        std::string senderPubKeyB64 = shareJson["sender_public_key"];
+
+        std::vector<uint8_t> signature = base64Decode(sigB64);
+        std::vector<uint8_t> senderPublicKey = base64Decode(senderPubKeyB64);
+
+        // Получаем зашифрованные данные для проверки подписи
+        // std::string dataB64 = shareJson.value("data", "");
+        // if (!dataB64.empty()) {
+        //     std::vector<uint8_t> encryptedData = base64Decode(dataB64);
+
+        //     // Верифицируем подпись
+        //     if (verify(encryptedData, signature, senderPublicKey)) {
+        //         result.signatureValid = true;
+        //     } else {
+        //         result.errorMessage = "Signature verification failed - share may be tampered";
+        //     }
+        // }
 
         // Проверяем срок действия
         if (isExpired(result.metadata.expires_at)) {
@@ -282,6 +314,10 @@ ImportShareResult SharingService::importSharedEntry(const std::string& filepath,
         // Десериализуем запись
         result.entry = Serializer::deserialize<PlaintextEntry>(decrypted);
         result.success = true;
+
+        // if (!result.signatureValid && shareJson.contains("signature")) {
+        //     result.errorMessage = "WARNING: Share signature invalid. File may be tampered.";
+        // }
 
     } catch (const std::exception& e) {
         result.errorMessage = e.what();
