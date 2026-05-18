@@ -8,6 +8,11 @@
 #include "IEncryptionService.h"
 #include "key_manager.h"
 
+#include <openssl/hmac.h>
+#include <openssl/evp.h>
+
+#include "base64.h"
+
 template<size_t KeyBits>
 class AESGCM : public IEncryptionService{
     static_assert(KeyBits == 128 || KeyBits == 256);
@@ -153,4 +158,102 @@ public:
     }
 };
 
+struct BitwardenEncryptedData {
+    std::vector<uint8_t> iv;        // 16 bytes для AES-CBC
+    std::vector<uint8_t> ciphertext;
+    std::vector<uint8_t> mac;       // 32 bytes HMAC-SHA256
+};
+
+// Функция для шифрования в формате Bitwarden (AES-256-CBC + HMAC-SHA256)
+
+
+// Функция для дешифрования (если понадобится)
+inline std::vector<uint8_t> bitwardenDecrypt(const std::vector<uint8_t>& key,
+                                             const std::vector<uint8_t>& iv,
+                                             const std::vector<uint8_t>& ciphertext,
+                                             const std::vector<uint8_t>& mac) {
+    if (key.size() != 64) {
+        throw std::runtime_error("Bitwarden key must be 64 bytes");
+    }
+
+    std::vector<uint8_t> encKey(key.begin(), key.begin() + 32);
+    std::vector<uint8_t> macKey(key.begin() + 32, key.end());
+
+    // 1. Проверяем MAC
+    std::vector<uint8_t> macData;
+    macData.reserve(iv.size() + ciphertext.size());
+    macData.insert(macData.end(), iv.begin(), iv.end());
+    macData.insert(macData.end(), ciphertext.begin(), ciphertext.end());
+
+    std::vector<uint8_t> computedMac(32);
+    unsigned int computedMacLen = 0;
+    HMAC(EVP_sha256(), macKey.data(), macKey.size(),
+         macData.data(), macData.size(),
+         computedMac.data(), &computedMacLen);
+    computedMac.resize(computedMacLen);
+
+    if (computedMac.size() != mac.size() ||
+        memcmp(computedMac.data(), mac.data(), mac.size()) != 0) {
+        throw std::runtime_error("HMAC verification failed");
+    }
+
+    // 2. Расшифровываем
+    EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+    if (!ctx) {
+        throw std::runtime_error("Failed to create cipher context");
+    }
+
+    std::vector<uint8_t> plaintext(ciphertext.size());
+
+    try {
+        if (EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), nullptr, encKey.data(), iv.data()) != 1) {
+            throw std::runtime_error("Failed to init decryption");
+        }
+
+        int out_len = 0;
+        if (EVP_DecryptUpdate(ctx, plaintext.data(), &out_len,
+                              ciphertext.data(), static_cast<int>(ciphertext.size())) != 1) {
+            throw std::runtime_error("Failed to decrypt update");
+        }
+
+        int final_len = 0;
+        if (EVP_DecryptFinal_ex(ctx, plaintext.data() + out_len, &final_len) != 1) {
+            throw std::runtime_error("Failed to decrypt final - wrong padding");
+        }
+
+        plaintext.resize(out_len + final_len);
+
+    } catch (...) {
+        EVP_CIPHER_CTX_free(ctx);
+        throw;
+    }
+
+    EVP_CIPHER_CTX_free(ctx);
+
+    return plaintext;
+}
+
+// Функция для получения Bitwarden ключа из пароля и соли
+inline void deriveBitwardenKey(const std::string& password,
+                               const std::vector<uint8_t>& salt,
+                               std::vector<uint8_t>& outKey) {
+    // Bitwarden использует 64-байтный ключ: 32 для шифрования + 32 для HMAC
+    const uint64_t ITERATIONS = 100000;
+    const size_t KEY_LEN = 64; // 64 bytes = 512 bits
+
+    outKey.resize(KEY_LEN);
+
+    int result = PKCS5_PBKDF2_HMAC(
+        password.c_str(), static_cast<int>(password.length()),
+        salt.data(), static_cast<int>(salt.size()),
+        static_cast<int>(ITERATIONS),
+        EVP_sha256(),
+        static_cast<int>(outKey.size()),
+        outKey.data()
+        );
+
+    if (result != 1) {
+        throw std::runtime_error("PBKDF2 key derivation failed");
+    }
+}
 #endif // AES_GCM_H

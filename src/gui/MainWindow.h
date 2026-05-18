@@ -23,64 +23,13 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-private:
-    ConfigHander &config;
-    Database &db;
-    VaultManager& m_vaultManager;
-
-
-    bool isLoggedIn;
-    QString m_temporaryMessage;
-
-    QTimer* m_clipboardUpdateTimer;
-    int m_clipboardSeconds;
-
-    AuditLogViewer* m_auditLogViewer;
-
-    // Элементы UI
-    QMenuBar *menuBar;
-    QToolBar *toolBar;
-    QWidget *centralWidget;
-    QVBoxLayout *mainLayout;
-    QTextEdit *m_statusBar;
-
-    QTableView* m_tableView;
-    VaultTableModel* m_tableModel;
-    SearchProxyModel* m_proxyModel;
-    QLineEdit* m_searchField;
-
-
-    // Методы создания UI
-    void createMenuBar();
-    void createToolBar();
-    void createCentralWidget();
-    void createStatusBar();
-
-    // Методы для работы с состоянием
-    bool showFirstRunWizard();
-    bool showLoginDialog();
-    void unlockApplication();
-    void lockApplication();
-    void resetInactivityTimer();
-
-    // Обработчики событий
-    void registerEventHandlers();
-    void onUserLoggedIn(const Event& event);
-    void onUserLoggedOut(const Event& event);
-
-    void refreshTable();
-    void keyPressEvent(QKeyEvent* event) override;
-
-    void showTemporaryMessage(const QString& msg, int timeoutMs = 3000);
-    void updatePermanentStatus();
-
-    QTimer* m_clipboardTimer;
-
-    void updateSessionStatusDisplay();
-    void appendStatusMessage(const QString& msg);
-
+public:
+    MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaultManager);
+    ~MainWindow();
 
 private slots:
+    void onLoggedIn();
+    void onLoggedOut();
     void onInactivityTimeout();
     void onLock();
 
@@ -100,25 +49,61 @@ private slots:
     void onShare();
     void onExportPublicKey();
     void onImportPublicKey();
+    void onViewAuditLogs();
 
     void showContextMenu(const QPoint& pos);
     void onCopyUsername();
     void onCopyPassword();
     void onCopyAll();
 
-    void onViewAuditLogs();
+private:
+    ConfigHander &config;
+    Database &db;
+    VaultManager& m_vaultManager;
 
-    void onSessionStarted();
-    void onSessionEnded();
-    void onSessionLocked();
-    void onSessionUnlocked();
+    bool isLoggedIn;
+    QString m_temporaryMessage;
 
-public:
-    MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaultManager);
-    ~MainWindow();
+    QTimer* m_clipboardTimer;
+    int m_clipboardSeconds;
 
-    void loadSampleData();
-    void updateStatusBar();
+    AuditLogViewer* m_auditLogViewer;
+
+    // Элементы UI
+    QMenuBar *menuBar;
+    QToolBar *toolBar;
+    QWidget *centralWidget;
+    QVBoxLayout *mainLayout;
+    QTextEdit *m_statusBar;
+
+    QTableView* m_tableView;
+    VaultTableModel* m_tableModel;
+    SearchProxyModel* m_proxyModel;
+    QLineEdit* m_searchField;
+
+    // Методы создания UI
+    void createMenuBar();
+    void createToolBar();
+    void createCentralWidget();
+
+    // Методы для работы с состоянием
+    bool showFirstRunWizard();
+    bool showLoginDialog();
+    void unlockApplication();
+    void lockApplication();
+
+    // Обработчики событий
+    void registerEventHandlers();
+    void onUserLoggedIn(const Event& event);
+    void onUserLoggedOut(const Event& event);
+
+    void refreshTable();
+    void keyPressEvent(QKeyEvent* event) override;
+
+    void showTemporaryMessage(const QString& msg, int timeoutMs = 3000);
+
+    void updateSessionStatusDisplay();
+    void appendStatusMessage(const QString& msg);
 };
 
 #endif // MAINWINDOW_H

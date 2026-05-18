@@ -1,17 +1,15 @@
+
+// mainwindow.cpp
 #include "MainWindow.h"
 #include "../src/gui/dialogs/first_run_wizard/FirstRunWizard.h"
 #include "../src/gui/dialogs/login_dialog/LoginDialog.h"
-#include "../src/gui/dialogs/password_change/password_change.h"
 #include "../src/gui/dialogs/settings_dialog/SettingsDialog.h"
 #include "../src/core/state_manager.h"
 #include "../src/gui/dialogs/entry_dialog/entry_dialog.h"
-#include "../src/gui/widgets/secure_table/VaultTableModel.h"
 #include "../src/gui/widgets/secure_table/PasswordDelegate.h"
-#include "../src/core/vault/VaultManager.h"
 #include "../src/core/clipboard_service/clipboard_service.h"
 #include "../src/core/audit/log_signer/log_signer.h"
 #include "../src/core/audit/audit_logger/audit_logger.h"
-#include "../src/gui/dialogs/audit_dialog/audit_log_dialog.h"
 #include "../src/core/audit/log_verifier/log_verifier.h"
 #include "../src/core/audit/log_formatter/log_formatter.h"
 #include "../src/gui/dialogs/export_dialog/ExportDialog.h"
@@ -25,12 +23,10 @@
 #include <QHeaderView>
 #include <QShortcut>
 #include <QClipboard>
-#include <QProgressDialog>
 #include <nlohmann/json.hpp>
 #include "rsa_cipher.h"
 
 using json = nlohmann::json;
-
 
 MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaultManager)
     : QMainWindow(nullptr)
@@ -40,26 +36,29 @@ MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaul
     , isLoggedIn(false)
     , m_temporaryMessage("")
 {
-    // json details = json::object();
-    // details["action"] = "Startup";
-    // EventBus::getInstance().publish(EventType::Startup, details, "MainWindow");
-
     setWindowTitle("CryptoSafe Manager");
     resize(900, 600);
 
     createMenuBar();
     createToolBar();
     createCentralWidget();
-    createStatusBar();
-
 
     m_clipboardTimer = new QTimer(this);
     m_clipboardTimer->setSingleShot(true);
     m_clipboardSeconds = 30;
 
-    // Регистрируем обработчики событий
     registerEventHandlers();
 
+    // Инициализация StateManager
+    StateManager::getInstance().init(3600);
+
+    // Подключение сигналов StateManager
+    connect(&StateManager::getInstance(), &StateManager::LoggedIn,
+            this, &MainWindow::onLoggedIn);
+    connect(&StateManager::getInstance(), &StateManager::LoggedOut,
+            this, &MainWindow::onLoggedOut);
+    connect(&StateManager::getInstance(), &StateManager::inactivityTimeout,
+            this, &MainWindow::onInactivityTimeout);
 
     // Проверяем первый запуск
     if (config.isFirstRun())
@@ -77,28 +76,8 @@ MainWindow::MainWindow(ConfigHander &cfg, Database &database, VaultManager& vaul
             QMetaObject::invokeMethod(this, &MainWindow::close, Qt::QueuedConnection);
             return;
         }
-        json details = json::object();
-        details["action"] = "startup";
-        eventBus.publish(EventType::UserLoggedIn, details, "StateMnager");
     }
-
-    // Инициализация SessionManager
-    StateManager::getInstance().init(3600);  // 1 час бездействия
-
-    // Подключение сигналов SessionManager
-    connect(&StateManager::getInstance(), &StateManager::sessionStarted,
-            this, &MainWindow::onSessionStarted);
-    connect(&StateManager::getInstance(), &StateManager::sessionEnded,
-            this, &MainWindow::onSessionEnded);
-    connect(&StateManager::getInstance(), &StateManager::sessionLocked,
-            this, &MainWindow::onSessionLocked);
-    connect(&StateManager::getInstance(), &StateManager::sessionUnlocked,
-            this, &MainWindow::onSessionUnlocked);
-    connect(&StateManager::getInstance(), &StateManager::inactivityTimeout,
-            this, &MainWindow::onInactivityTimeout);
 }
-
-
 
 MainWindow::~MainWindow()
 {
@@ -107,9 +86,7 @@ MainWindow::~MainWindow()
         json details = json::object();
         details["reason"] = "manual shutdown";
         eventBus.publish(EventType::UserLoggedOut, details, "MainWindow");
-        //ClipboardService::getInstance().saveRemainingTime();
         ClipboardService::getInstance().resetTimer();
-        //KeyManager::getInstance().logout();
     }
 }
 
@@ -117,20 +94,16 @@ void MainWindow::registerEventHandlers()
 {
     eventBus.subscribe(EventType::UserLoggedIn,
                        [this](const Event& event) { this->onUserLoggedIn(event); });
-
     eventBus.subscribe(EventType::UserLoggedOut,
                        [this](const Event& event) { this->onUserLoggedOut(event); });
-
     eventBus.subscribe(EventType::ClipboardWillClear,
                        [this](const Event& event) {
                            showTemporaryMessage("ВНИМАНИЕ! Буфер обмена очистится через 5 секунд!", 3000);
                        });
-
     eventBus.subscribe(EventType::ClipboardCleared,
                        [this](const Event& event) {
                            showTemporaryMessage("Буфер обмена очищен", 3000);
                        });
-
     eventBus.subscribe(EventType::ClipboardCopied,
                        [this](const Event& event) {
                            int timeout = ClipboardService::getInstance().getAutoClearTimeout();
@@ -150,8 +123,6 @@ void MainWindow::createMenuBar()
     fileMenu->addAction("&New Database", this, &MainWindow::onNewDatabase, QKeySequence::New);
     fileMenu->addAction("&Open Database", this, &MainWindow::onOpenDatabase, QKeySequence::Open);
     fileMenu->addSeparator();
-    //fileMenu->addAction("&Backup...", this, &MainWindow::onBackup);
-    fileMenu->addSeparator();
     fileMenu->addAction("E&xit", this, &MainWindow::onExit, QKeySequence::Quit);
 
     QMenu *editMenu = menuBar->addMenu("&Edit");
@@ -159,7 +130,7 @@ void MainWindow::createMenuBar()
     editMenu->addAction("&Edit Entry", this, &MainWindow::onEditEntry, QKeySequence("Ctrl+E"));
     editMenu->addAction("&Delete Entry", this, &MainWindow::onDeleteEntry, QKeySequence::Delete);
     editMenu->addSeparator();
-    editMenu->addAction("&Lock", this, &MainWindow::onLock, QKeySequence("Ctrl+L"));  // Добавить кнопку Lock
+    editMenu->addAction("&Lock", this, &MainWindow::onLock, QKeySequence("Ctrl+L"));
     editMenu->addSeparator();
     editMenu->addAction("&Change Master Password", this, &MainWindow::onChangePassword, QKeySequence("Ctrl+Shift+P"));
 
@@ -189,12 +160,8 @@ void MainWindow::createToolBar()
     toolBar->addSeparator();
     toolBar->addAction("Экспорт", this, &MainWindow::onExport);
     toolBar->addAction("Импорт", this, &MainWindow::onImport);
-    //toolBar->addAction("Поделиться", this, &MainWindow::onShare);
-
-
     toolBar->addSeparator();
 
-    // Кнопка для переключения видимости паролей
     QAction* togglePasswordsAction = toolBar->addAction("👁");
     togglePasswordsAction->setToolTip("Показать/скрыть пароли (Ctrl+Shift+P)");
     togglePasswordsAction->setCheckable(true);
@@ -202,10 +169,8 @@ void MainWindow::createToolBar()
         m_tableModel->setPasswordsVisible(checked);
     });
 
-    // Горячая клавиша Ctrl+Shift+P
     QShortcut* shortcut = new QShortcut(QKeySequence("Ctrl+Shift+P"), this);
     connect(shortcut, &QShortcut::activated, togglePasswordsAction, &QAction::toggle);
-
 }
 
 void MainWindow::createCentralWidget()
@@ -215,10 +180,10 @@ void MainWindow::createCentralWidget()
 
     QTabWidget* tabWidget = new QTabWidget(this);
 
+    // Вкладка Пароли
     QWidget* passwordsTab = new QWidget();
     QVBoxLayout* passwordsLayout = new QVBoxLayout(passwordsTab);
 
-    // Панель поиска
     QHBoxLayout* searchLayout = new QHBoxLayout();
     m_searchField = new QLineEdit(this);
     m_searchField->setPlaceholderText("Поиск...");
@@ -227,37 +192,28 @@ void MainWindow::createCentralWidget()
     searchLayout->addWidget(m_searchField);
     passwordsLayout->addLayout(searchLayout);
 
-    // Создаем модель и прокси
     m_tableModel = new VaultTableModel(m_vaultManager, this);
     m_proxyModel = new SearchProxyModel(this);
     m_proxyModel->setSourceModel(m_tableModel);
-    m_proxyModel->setFilterKeyColumn(-1);  // поиск по всем колонкам
+    m_proxyModel->setFilterKeyColumn(-1);
 
-    // Создаем таблицу
     m_tableView = new QTableView(this);
     m_tableView->setModel(m_proxyModel);
-
-    // Настройки таблицы
     m_tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_tableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_tableView->setSortingEnabled(true);
     m_tableView->setAlternatingRowColors(true);
     m_tableView->horizontalHeader()->setSectionsMovable(true);
     m_tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-
-    // Настройка ширины колонок
-    m_tableView->setColumnWidth(0, 200);  // Название
-    m_tableView->setColumnWidth(1, 150);  // Логин
-    m_tableView->setColumnWidth(2, 200);  // Сайт
-    m_tableView->setColumnWidth(3, 100);  // Дата
+    m_tableView->setColumnWidth(0, 200);
+    m_tableView->setColumnWidth(1, 150);
+    m_tableView->setColumnWidth(2, 200);
+    m_tableView->setColumnWidth(3, 100);
 
     PasswordDelegate* passwordDelegate = new PasswordDelegate(this);
     m_tableView->setItemDelegateForColumn(VaultTableModel::COL_PASSWORD, passwordDelegate);
-
-    // Подключаем сигнал от делегата к модели
     connect(passwordDelegate, &PasswordDelegate::togglePasswordVisibility,
             this, [this](const QModelIndex& proxyIndex) {
-                // Преобразуем индекс из прокси в исходную модель
                 QModelIndex sourceIndex = m_proxyModel->mapToSource(proxyIndex);
                 if (sourceIndex.isValid()) {
                     m_tableModel->togglePasswordVisibilityForRow(sourceIndex.row());
@@ -265,35 +221,27 @@ void MainWindow::createCentralWidget()
             });
 
     passwordsLayout->addWidget(m_tableView);
-
-    // Подключаем поиск
     connect(m_searchField, &QLineEdit::textChanged, this, [this](const QString& text) {
         m_proxyModel->setSearchText(text);
     });
-
-    // Подключаем контекстное меню
     m_tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_tableView, &QTableView::customContextMenuRequested,
             this, &MainWindow::showContextMenu);
 
     tabWidget->addTab(passwordsTab, "Пароли");
 
-    // ===== ЛОГИ =====
-
+    // Вкладка Аудит
     QWidget* auditTab = new QWidget();
     QVBoxLayout* auditLayout = new QVBoxLayout(auditTab);
     auditLayout->setContentsMargins(0, 0, 0, 0);
-
     m_auditLogViewer = new AuditLogViewer(auditTab);
     m_auditLogViewer->setDatabase(&db);
     auditLayout->addWidget(m_auditLogViewer);
-
     tabWidget->addTab(auditTab, "Аудит Лог");
 
     mainLayout->addWidget(tabWidget);
 
-    // ===== СТАТУСНАЯ ПАНЕЛЬ =====
-
+    // Статусная панель
     m_statusBar = new QTextEdit();
     m_statusBar->setReadOnly(true);
     m_statusBar->setMaximumHeight(120);
@@ -305,59 +253,11 @@ void MainWindow::createCentralWidget()
         "   font-size: 9pt;"
         "}"
         );
-
-    // Очищаем и добавляем начальное сообщение
     m_statusBar->clear();
-    m_statusBar->append("Audit system ready");
-    m_statusBar->append("Waiting for events...");
-
     mainLayout->addWidget(m_statusBar);
 
-    // Устанавливаем центральный виджет
     setCentralWidget(centralWidget);
 }
-
-void MainWindow::createStatusBar()
-{
-    // statusBar = new QStatusBar(this);
-    // setStatusBar(statusBar);
-    // statusBar->showMessage("Not logged in");
-}
-
-
-
-void MainWindow::updateStatusBar()
-{
-    // QString msg;
-
-    // // Базовый статус
-    // if (isLoggedIn) {
-    //     msg = "Logged in";
-    // } else {
-    //     msg = "Not logged in";
-    // }
-
-
-    // // Временное сообщение (если есть)
-    // if (!m_temporaryMessage.isEmpty()) {
-    //     msg = m_temporaryMessage + " | " + msg;
-    // }
-
-    // statusBar->showMessage(msg);
-}
-
-void MainWindow::showTemporaryMessage(const QString& msg, int timeoutMs)
-{
-    m_temporaryMessage = msg;
-    updateStatusBar();
-
-    // Таймер для очистки временного сообщения
-    QTimer::singleShot(timeoutMs, this, [this]() {
-        m_temporaryMessage.clear();
-        updateStatusBar();
-    });
-}
-
 
 bool MainWindow::showFirstRunWizard()
 {
@@ -374,16 +274,13 @@ bool MainWindow::showFirstRunWizard()
     return false;
 }
 
-
 bool MainWindow::showLoginDialog()
 {
-    // Загружаем данные аутентификации из БД
     std::vector<uint8_t> hash, salt;
     uint32_t time_cost, memory_cost, parallelism, hash_len;
 
     if (!db.getAuthData(hash, salt, time_cost, memory_cost, parallelism, hash_len)) {
-        QMessageBox::critical(this, "Ошибка",
-                              "Не удалось загрузить данные аутентификации. База данных может быть повреждена.");
+        QMessageBox::critical(this, "Ошибка", "Не удалось загрузить данные аутентификации.");
         return false;
     }
 
@@ -391,71 +288,37 @@ bool MainWindow::showLoginDialog()
     authData.hash = std::move(hash);
     authData.salt = std::move(salt);
 
-    // Создаём диалог с лямбдой для проверки пароля
     LoginDialog dialog(this, [authData](const std::string& password) -> bool {
         return verify_password(password, authData);
     });
 
     std::string masterPassword;
     if (dialog.exec(masterPassword)) {
-        // Загружаем соль для PBKDF2 из БД
         std::vector<uint8_t> encSalt;
         if (!db.getEncSalt(encSalt)) {
             QMessageBox::critical(this, "Ошибка", "Не удалось загрузить соль");
             return false;
         }
 
-        // Выводим ключ шифрования
         std::vector<uint8_t> encKey;
         derive_encryption_key(masterPassword, encSalt, encKey);
         KeyManager::getInstance().storeEncryptionKey(encKey);
-
-        // Инициализируем подпись для аудита
         LogSigner::getInstance().initFromMasterPassword(masterPassword);
 
-        // Генерируем RSA ключи для шеринга
-        // Проверяем, есть ли уже RSA ключи
         KeyData existingRSA;
         KeyManager::getInstance().getPrivateRSAKey(existingRSA);
-
         if (existingRSA.size == 0) {
-            // Нет ключей - генерируем новые
             try {
                 auto rsaKeys = RSACipher::generateKeyPair(2048);
-
-                // Сохраняем приватный ключ
-                std::vector<uint8_t> privateKey = rsaKeys.privateKey;
-                KeyManager::getInstance().storePrivateRSAKey(privateKey);
-
-                // Сохраняем публичный ключ
-                std::vector<uint8_t> publicKey = rsaKeys.publicKey;
-                KeyManager::getInstance().storePublicRSAKey(publicKey);
-
-
-                // Очищаем временные ключи из памяти
-                volatile uint8_t* pPriv = privateKey.data();
-                for (size_t i = 0; i < privateKey.size(); ++i) pPriv[i] = 0;
-
-                volatile uint8_t* pPub = publicKey.data();
-                for (size_t i = 0; i < publicKey.size(); ++i) pPub[i] = 0;
-
+                KeyManager::getInstance().storePrivateRSAKey(rsaKeys.privateKey);
+                KeyManager::getInstance().storePublicRSAKey(rsaKeys.publicKey);
             } catch (const std::exception& e) {
                 qWarning() << "Failed to generate RSA keys:" << e.what();
             }
         }
 
-        // 4. Публичный ключ Ed25519 в БД (если ещё нет)
-        // int keyVersion;
-        // std::vector<uint8_t> existingKey;
-        // if (!db.getCurrentPublicKey(existingKey, keyVersion)) {
-        //     db.addPublicKey(LogSigner::getInstance().get_public_key(), 1, 1);
-        // }
-
-        // Очищаем пароль из памяти
         volatile char* p = const_cast<char*>(masterPassword.data());
-        for (size_t i = 0; i < masterPassword.size(); ++i) {
-            p[i] = 0;
-        }
+        for (size_t i = 0; i < masterPassword.size(); ++i) p[i] = 0;
 
         StateManager::getInstance().login();
         return true;
@@ -489,11 +352,104 @@ void MainWindow::lockApplication()
     }
 }
 
-// json details = json::object();
-// details["action"] = "Vault_locked";
-// eventBus.publish(EventType::Lock, details, "MainWindow");
+void MainWindow::onLoggedIn()
+{
+    isLoggedIn = true;
+    refreshTable();
+    m_tableView->show();
+    m_searchField->show();
+    updateSessionStatusDisplay();
+    appendStatusMessage("Вход выполнен");
+}
 
+void MainWindow::onLoggedOut()
+{
+    isLoggedIn = false;
+    m_tableView->hide();
+    m_searchField->hide();
+    m_searchField->clear();
+    ClipboardService::getInstance().resetTimer();
+    updateSessionStatusDisplay();
+    appendStatusMessage("Выход выполнен");
+}
 
+void MainWindow::onInactivityTimeout()
+{
+    StateManager::getInstance().lock();
+    QMessageBox::information(this, "Авто-блокировка", "Приложение заблокировано из-за неактивности");
+    showLoginDialog();
+}
+
+void MainWindow::onLock()
+{
+    if (StateManager::getInstance().isLoggedIn())
+    {
+        StateManager::getInstance().lock();
+        showLoginDialog();
+    }
+}
+
+void MainWindow::updateSessionStatusDisplay()
+{
+    if (!m_statusBar) return;
+
+    QString currentText = m_statusBar->toPlainText();
+    QStringList lines = currentText.split('\n');
+    for (int i = 0; i < lines.size(); ++i) {
+        if (lines[i].startsWith("Logged In") || lines[i].startsWith("Not Logged In")) {
+            lines.removeAt(i);
+            break;
+        }
+    }
+
+    if (StateManager::getInstance().isLoggedIn()) {
+        lines.prepend("Logged In");
+    } else {
+        lines.prepend("Not Logged In");
+    }
+
+    m_statusBar->setPlainText(lines.join('\n'));
+}
+
+void MainWindow::appendStatusMessage(const QString& msg)
+{
+    if (!m_statusBar) return;
+    m_statusBar->append(msg);
+    updateSessionStatusDisplay();
+}
+
+void MainWindow::refreshTable()
+{
+    m_tableModel->refresh();
+}
+
+void MainWindow::showTemporaryMessage(const QString& msg, int timeoutMs)
+{
+    appendStatusMessage(msg);
+
+}
+
+void MainWindow::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_F5) {
+        refreshTable();
+    }
+    QMainWindow::keyPressEvent(event);
+}
+
+void MainWindow::onUserLoggedIn(const Event& event)
+{
+    QMetaObject::invokeMethod(this, [this]() {
+        unlockApplication();
+    }, Qt::QueuedConnection);
+}
+
+void MainWindow::onUserLoggedOut(const Event& event)
+{
+    QMetaObject::invokeMethod(this, [this]() {
+        lockApplication();
+    }, Qt::QueuedConnection);
+}
 
 void MainWindow::onNewDatabase()
 {
@@ -507,35 +463,23 @@ void MainWindow::onOpenDatabase()
 
 void MainWindow::onExport()
 {
-    std::cout <<"export"<<std::endl;
     ExportDialog dialog(&db, &m_vaultManager, this);
     dialog.exec();
 }
 
 void MainWindow::onExit()
 {
-    if (isLoggedIn)
-    {
-        //KeyManager::getInstance().logout();
-    }
     close();
 }
 
 void MainWindow::onAddEntry()
 {
-    if (!isLoggedIn)
+    if (!StateManager::getInstance().isLoggedIn())
     {
         showLoginDialog();
         return;
     }
-    resetInactivityTimer();
-
-    if (!isLoggedIn)
-    {
-        showLoginDialog();
-        return;
-    }
-    resetInactivityTimer();
+    StateManager::getInstance().updateActivity();
 
     EntryDialog dialog(db, this);
     if (dialog.exec() == QDialog::Accepted)
@@ -544,7 +488,6 @@ void MainWindow::onAddEntry()
         try {
             int id = m_vaultManager.createEntry(entry);
             if (id != -1) {
-                //showTemporaryMessage("Запись успешно добавлена", 3000);
                 json details = json::object();
                 details["entry_id"] = static_cast<int>(id);
                 details["title"] = entry.title;
@@ -556,32 +499,26 @@ void MainWindow::onAddEntry()
                 QMessageBox::warning(this, "Ошибка", "Не удалось добавить запись");
             }
         } catch (const std::exception& e) {
-            QMessageBox::critical(this, "Ошибка",
-                                  QString("Ошибка при добавлении записи: %1").arg(e.what()));
+            QMessageBox::critical(this, "Ошибка", QString("Ошибка при добавлении записи: %1").arg(e.what()));
         }
     }
-
-
-}
-
-void MainWindow::keyPressEvent(QKeyEvent* event)
-{
-    if (event->key() == Qt::Key_F5) {
-        refreshTable();
-    }
-    QMainWindow::keyPressEvent(event);
 }
 
 void MainWindow::onEditEntry()
 {
-    // олучаем ID выбранной записи
+    if (!StateManager::getInstance().isLoggedIn())
+    {
+        showLoginDialog();
+        return;
+    }
+    StateManager::getInstance().updateActivity();
+
     QModelIndexList selected = m_tableView->selectionModel()->selectedRows();
     if (selected.isEmpty()) return;
 
     QModelIndex sourceIdx = m_proxyModel->mapToSource(selected.first());
     long entryId = m_tableModel->getId(sourceIdx.row());
 
-    // Загружаем текущую запись из БД
     auto entry = m_vaultManager.getEntry(static_cast<int>(entryId));
     if (!entry) {
         QMessageBox::warning(this, "Ошибка", "Запись не найдена");
@@ -589,21 +526,13 @@ void MainWindow::onEditEntry()
     }
 
     PlaintextEntry oldEntry = *entry;
-
-    // Открываем диалог с данными записи
-    EntryDialog dialog(db, *entry, this);  // конструктор для редактирования
+    EntryDialog dialog(db, *entry, this);
     if (dialog.exec() == QDialog::Accepted)
     {
         PlaintextEntry updatedEntry = dialog.getEntry();
-
-        // Сохраняем оригинальные поля, которые не меняются
         updatedEntry.creation_timestamp = entry->creation_timestamp;
 
-        // Обновляем в БД
         if (m_vaultManager.updateEntry(static_cast<int>(entryId), updatedEntry)) {
-            // Обновляем модель (таблицу)
-            //m_tableModel->refresh();
-
             json details = json::object();
             details["entry_id"] = static_cast<int>(entryId);
             details["old_title"] = oldEntry.title;
@@ -614,8 +543,6 @@ void MainWindow::onEditEntry()
             details["new_category"] = updatedEntry.category;
             details["action"] = "update";
             EventBus::getInstance().publish(EventType::EntryUpdated, details, "VaultManager");
-
-            // Если пароль был в кэше - обновляем его
             m_tableModel->updatePasswordInCache(entryId, updatedEntry.password);
         }
     }
@@ -623,14 +550,13 @@ void MainWindow::onEditEntry()
 
 void MainWindow::onDeleteEntry()
 {
-    if (!isLoggedIn)
+    if (!StateManager::getInstance().isLoggedIn())
     {
         showLoginDialog();
         return;
     }
-    resetInactivityTimer();
+    StateManager::getInstance().updateActivity();
 
-    // Получаем выделенные строки
     QModelIndexList selected = m_tableView->selectionModel()->selectedRows();
     if (selected.isEmpty())
     {
@@ -638,8 +564,7 @@ void MainWindow::onDeleteEntry()
         return;
     }
 
-    // Собираем ID и title выбранных записей
-    QMap<long, QString> entries;  // id -> title
+    QMap<long, QString> entries;
     for (const QModelIndex& idx : selected) {
         QModelIndex sourceIdx = m_proxyModel->mapToSource(idx);
         long id = m_tableModel->getId(sourceIdx.row());
@@ -654,15 +579,12 @@ void MainWindow::onDeleteEntry()
         return;
     }
 
-    // Подтверждение удаления
     QString message = entries.size() == 1
                           ? "Вы уверены, что хотите удалить эту запись?"
                           : QString("Вы уверены, что хотите удалить %1 записей?").arg(entries.size());
 
     QMessageBox::StandardButton reply = QMessageBox::question(
-        this, "Подтверждение удаления", message,
-        QMessageBox::Yes | QMessageBox::No
-        );
+        this, "Подтверждение удаления", message, QMessageBox::Yes | QMessageBox::No);
 
     if (reply == QMessageBox::Yes)
     {
@@ -675,7 +597,6 @@ void MainWindow::onDeleteEntry()
 
             if (m_vaultManager.deleteEntry(static_cast<int>(id))) {
                 deletedCount++;
-
                 json details = json::object();
                 details["entry_id"] = static_cast<int>(id);
                 details["title"] = title.toStdString();
@@ -686,18 +607,12 @@ void MainWindow::onDeleteEntry()
             }
         }
 
-        if (allSuccess) {
-            m_tableModel->refresh();
-            //statusBar->showMessage(QString("Удалено %1 записей").arg(deletedCount), 3000);
-        } else {
-            QMessageBox::warning(this, "Ошибка",
-                                 QString("Удалено %1 из %2 записей. Некоторые записи не удалось удалить.")
-                                     .arg(deletedCount).arg(entries.size()));
-            m_tableModel->refresh();
+        m_tableModel->refresh();
+        if (!allSuccess) {
+            QMessageBox::warning(this, "Ошибка", QString("Удалено %1 из %2 записей.").arg(deletedCount).arg(entries.size()));
         }
     }
 }
-
 
 void MainWindow::onSettings()
 {
@@ -709,10 +624,7 @@ void MainWindow::onAbout()
 {
     QMessageBox::about(this, "About CryptoSafe Manager",
                        "<h2>CryptoSafe Manager</h2>"
-                       "<p>Version 2.0 (Sprint 2)</p>"
-                       "<p>Secure Password Manager</p>"
-                       "<p>Sprint 2: Authentication & Key Management</p>"
-                       "<p>Copyright (C) 2024</p>");
+                       "<p>Secure Password Manager</p>");
 }
 
 void MainWindow::onFirstRunWizard()
@@ -722,63 +634,55 @@ void MainWindow::onFirstRunWizard()
 
 void MainWindow::onChangePassword()
 {
-    // if (!isLoggedIn)
-    // {
-    //     QMessageBox::warning(this, "Not Logged In", "You must be logged in to change password");
-    //     return;
-    // }
-    // resetInactivityTimer();
-
-    // ChangePasswordDialog dialog(this, db);
-    // if (dialog.exec() == QDialog::Accepted)
-    // {
-    //     lockApplication();
-
-    //     QProgressDialog progressDialog("Идёт перешифровка базы данных...\nПожалуйста, подождите.",
-    //                                    nullptr, 0, 0, this);
-    //     progressDialog.setWindowModality(Qt::WindowModal);
-    //     progressDialog.setMinimumDuration(0);
-    //     progressDialog.setCancelButton(nullptr);
-    //     progressDialog.show();
-
-    //     KeyManager::getInstance().logout();
-
-    //     if (!showLoginDialog()) {
-    //         QMetaObject::invokeMethod(this, &MainWindow::close, Qt::QueuedConnection);
-    //     }
-
-    //     // Синхронный вызов
-    //     bool success = m_vaultManager.rotate();
-
-    //     progressDialog.close();
-    //     setEnabled(true);
-
-    //     if (success) {
-    //         QMessageBox::information(this, "Успех", "База данных успешно перешифрована");
-    //     } else {
-    //         QMessageBox::critical(this, "Ошибка", "Не удалось перешифровать базу данных");
-    //     }
-    // }
+    // TODO: реализовать смену пароля
+    QMessageBox::information(this, "Info", "Change password - will be implemented in Sprint 2");
 }
 
-// ============== ОБРАБОТЧИКИ СОБЫТИЙ ==============
-
-
-void MainWindow::onLock()
+void MainWindow::onImport()
 {
-    if (StateManager::getInstance().isLoggedIn())
-    {
-        StateManager::getInstance().lock();
-        showLoginDialog();
+    ImportDialog dialog(&m_vaultManager, &db, this);
+    dialog.exec();
+}
+
+void MainWindow::onShare()
+{
+    QModelIndexList selected = m_tableView->selectionModel()->selectedRows();
+    if (selected.isEmpty()) return;
+
+    QModelIndex sourceIdx = m_proxyModel->mapToSource(selected.first());
+    long entryId = m_tableModel->getId(sourceIdx.row());
+
+    auto entry = m_vaultManager.getEntry(static_cast<int>(entryId));
+    if (!entry) {
+        QMessageBox::warning(this, "Ошибка", "Запись не найдена");
+        return;
+    }
+
+    ShareDialog dialog(&m_vaultManager, &db, *entry, this);
+    dialog.exec();
+}
+
+void MainWindow::onExportPublicKey()
+{
+    ExportPublicKeyDialog dialog(this);
+    dialog.exec();
+}
+
+void MainWindow::onImportPublicKey()
+{
+    ImportPublicKeyDialog dialog(&db, this);
+    if (dialog.exec() == QDialog::Accepted) {
+        QMessageBox::information(this, "Успех",
+                                 QString("Публичный ключ пользователя '%1' импортирован")
+                                     .arg(dialog.getContactName()));
     }
 }
 
-void MainWindow::refreshTable()
+void MainWindow::onViewAuditLogs()
 {
-    m_tableModel->refresh();
+    // AuditLogDialog dialog(db, this);
+    // dialog.exec();
 }
-
-// ============== КОНТЕКСТНОЕ МЕНЮ ==============
 
 void MainWindow::showContextMenu(const QPoint& pos)
 {
@@ -787,8 +691,7 @@ void MainWindow::showContextMenu(const QPoint& pos)
 
     if (!m_tableView->selectionModel()->isSelected(index)) {
         m_tableView->selectionModel()->clear();
-        m_tableView->selectionModel()->select(index,
-                                              QItemSelectionModel::Select | QItemSelectionModel::Rows);
+        m_tableView->selectionModel()->select(index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
     }
 
     QModelIndexList selected = m_tableView->selectionModel()->selectedRows();
@@ -837,12 +740,9 @@ void MainWindow::onCopyUsername()
                 QString::fromStdString(entry->title),
                 "username"
                 );
-            // Уведомление уже в EventBus, можно убрать или оставить
             showTemporaryMessage("Логин скопирован", 2000);
         }
-    } catch (const std::exception& e) {
-        //statusBar->showMessage("Ошибка при копировании", 2000);
-    }
+    } catch (const std::exception& e) {}
 }
 
 void MainWindow::onCopyPassword()
@@ -868,9 +768,7 @@ void MainWindow::onCopyPassword()
                 "password"
                 );
         }
-    } catch (const std::exception& e) {
-        //statusBar->showMessage("Ошибка при копировании", 2000);
-    }
+    } catch (const std::exception& e) {}
 }
 
 void MainWindow::onCopyAll()
@@ -890,15 +788,8 @@ void MainWindow::onCopyAll()
             details["action"] = "copy";
             EventBus::getInstance().publish(EventType::ClipboardCopied, details, "MainWindow");
 
-            QString allData = QString(
-                                  "Title: %1\n"
-                                  "Username: %2\n"
-                                  "Password: %3\n"
-                                  "URL: %4\n"
-                                  "Notes: %5\n"
-                                  "Category: %6\n"
-                                  "Tags: %7"
-                                  ).arg(QString::fromStdString(entry->title))
+            QString allData = QString("Title: %1\nUsername: %2\nPassword: %3\nURL: %4\nNotes: %5\nCategory: %6\nTags: %7")
+                                  .arg(QString::fromStdString(entry->title))
                                   .arg(QString::fromStdString(entry->username))
                                   .arg(QString::fromStdString(entry->password))
                                   .arg(QString::fromStdString(entry->url))
@@ -909,140 +800,5 @@ void MainWindow::onCopyAll()
             ClipboardService::getInstance().copyText(allData, QString::fromStdString(entry->title), "all");
             showTemporaryMessage("Все данные скопированы", 2000);
         }
-    } catch (const std::exception& e) {
-        //statusBar->showMessage("Ошибка при копировании", 2000);
-    }
-}
-
-void MainWindow::onViewAuditLogs()
-{
-    // if (!isLoggedIn) {
-    //     QMessageBox::warning(this, "Not Logged In",
-    //                          "Please log in to view audit logs.");
-    //     return;
-    // }
-
-    // AuditLogDialog dialog(db, this);
-    // dialog.exec();
-
-    // updateStatusBar();
-}
-
-void MainWindow::onImport(){
-    ImportDialog dialog(&m_vaultManager, &db, this);
-    dialog.exec();
-}
-
-void MainWindow::onShare(){
-    QModelIndexList selected = m_tableView->selectionModel()->selectedRows();
-    if (selected.isEmpty()) return;
-
-    QModelIndex sourceIdx = m_proxyModel->mapToSource(selected.first());
-    long entryId = m_tableModel->getId(sourceIdx.row());
-
-    auto entry = m_vaultManager.getEntry(static_cast<int>(entryId));
-    if (!entry) {
-        QMessageBox::warning(this, "Ошибка", "Запись не найдена");
-        return;
-    }
-
-    ShareDialog dialog(&m_vaultManager, &db, *entry, this);
-    dialog.exec();
-}
-
-void MainWindow::onExportPublicKey()
-{
-    ExportPublicKeyDialog dialog(this);
-    dialog.exec();
-}
-
-void MainWindow::onImportPublicKey()
-{
-    ImportPublicKeyDialog dialog(&db, this);
-    if (dialog.exec() == QDialog::Accepted) {
-        QMessageBox::information(this, "Успех",
-                                 QString("Публичный ключ пользователя '%1' импортирован")
-                                     .arg(dialog.getContactName()));
-    }
-}
-
-void MainWindow::onSessionStarted()
-{
-    isLoggedIn = true;
-    refreshTable();
-    m_tableView->show();
-    m_searchField->show();
-    updateSessionStatusDisplay();
-}
-
-void MainWindow::onSessionEnded()
-{
-    isLoggedIn = false;
-    m_tableView->hide();
-    m_searchField->hide();
-    m_searchField->clear();
-    ClipboardService::getInstance().resetTimer();
-    updateSessionStatusDisplay();
-}
-
-void MainWindow::onSessionLocked()
-{
-    isLoggedIn = false;
-    m_tableView->hide();
-    m_searchField->hide();
-    updateSessionStatusDisplay();
-}
-
-void MainWindow::onSessionUnlocked()
-{
-    isLoggedIn = true;
-    refreshTable();
-    m_tableView->show();
-    m_searchField->show();
-    updateSessionStatusDisplay();
-}
-
-void MainWindow::onInactivityTimeout()
-{
-    StateManager::getInstance().lock();
-    QMessageBox::information(this, "Авто-блокировка", "Приложение заблокированно из-за неактивности");
-    showLoginDialog();
-}
-
-void MainWindow::updateSessionStatusDisplay()
-{
-    if (!m_statusBar) return;
-
-    // Сохраняем текущий текст
-    QString currentText = m_statusBar->toPlainText();
-
-    // Удаляем старую строку статуса если есть
-    QStringList lines = currentText.split('\n');
-    for (int i = 0; i < lines.size(); ++i) {
-        if (lines[i].startsWith("Logged In") || lines[i].startsWith("Not Logged In")) {
-            lines.removeAt(i);
-            break;
-        }
-    }
-
-    // Добавляем новую строку статуса в начало
-    if (StateManager::getInstance().isLoggedIn()) {
-        lines.prepend("Logged In");
-    } else {
-        lines.prepend("Not Logged In");
-    }
-
-    // Обновляем текст
-    m_statusBar->setPlainText(lines.join('\n'));
-
-}
-
-void MainWindow::appendStatusMessage(const QString& msg)
-{
-    if (!m_statusBar) return;
-
-    m_statusBar->append(msg);
-
-    // После добавления сообщения обновляем строку статуса (она в начале)
-    updateSessionStatusDisplay();
+    } catch (const std::exception& e) {}
 }

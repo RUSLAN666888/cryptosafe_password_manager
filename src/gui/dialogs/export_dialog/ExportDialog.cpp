@@ -202,11 +202,11 @@ void ExportDialog::onExport()
     std::string exportPassword;
     bool needPassword = false;
 
-    if (m_encryptedJsonRadio->isChecked())
+    if (m_encryptedJsonRadio->isChecked() || m_bitwardenRadio->isChecked()) {
         needPassword = true;
-    else if (m_csvRadio->isChecked())
+    } else if (m_csvRadio->isChecked() || m_lastpassRadio->isChecked()) {
         needPassword = false;
-
+    }
 
     if (needPassword) {
         bool ok;
@@ -227,14 +227,24 @@ void ExportDialog::onExport()
                                                 ? Exporter::EncryptionStrength::AES_256
                                                 : Exporter::EncryptionStrength::AES_128;
 
+    Exporter exporter;
+
     if (m_encryptedJsonRadio->isChecked()) {
         filepath = QFileDialog::getSaveFileName(this, "Сохранить как",
                                                 "export.cryptosafe",
                                                 "CryptoSafe Export (*.cryptosafe)");
         if (filepath.isEmpty()) return;
 
-        Exporter exporter;
         exporter.exportToEncryptedJSON(entries, filepath.toStdString(), exportPassword, strength);
+    }
+    else if (m_bitwardenRadio->isChecked()) {
+        filepath = QFileDialog::getSaveFileName(this, "Сохранить как",
+                                                "bitwarden_export.json",
+                                                "Bitwarden JSON (*.json)");
+        if (filepath.isEmpty()) return;
+
+        // Bitwarden export ВСЕГДА использует AES-256-GCM, игнорируем выбор пользователя
+        exporter.exportToBitwardenEncryptedJSON(entries, filepath.toStdString(), exportPassword);
     }
     else if (m_csvRadio->isChecked()) {
         filepath = QFileDialog::getSaveFileName(this, "Сохранить как",
@@ -242,21 +252,28 @@ void ExportDialog::onExport()
                                                 "CSV Files (*.csv)");
         if (filepath.isEmpty()) return;
 
-        Exporter exporter;
         exporter.exportToCSV(entries, filepath.toStdString());
     }
+    else if (m_lastpassRadio->isChecked()) {
+        filepath = QFileDialog::getSaveFileName(this, "Сохранить как",
+                                                "lastpass_export.csv",
+                                                "LastPass CSV (*.csv)");
+        if (filepath.isEmpty()) return;
 
-    // Логируем экспорт в аудит
-    // json logDetails = json::object();
-    // logDetails["action"] = "export";
-    // logDetails["format"] = m_encryptedJsonRadio->isChecked() ? "encrypted_json" : "csv";
-    // logDetails["entry_count"] = entries.size();
-    // logDetails["strength"] = (strength == Exporter::EncryptionStrength::AES_256) ? "256" : "128";
+        // TODO: Реализовать экспорт в формат LastPass CSV
+        //exporter.exportToLastPassCSV(entries, filepath.toStdString());
+    }
 
-    // EventBus::getInstance().publish(EventType::AuditExport, logDetails, "ExportDialog");
+    QString formatName;
+    if (m_encryptedJsonRadio->isChecked()) formatName = "Encrypted JSON";
+    else if (m_bitwardenRadio->isChecked()) formatName = "Bitwarden JSON";
+    else if (m_csvRadio->isChecked()) formatName = "CSV";
+    else if (m_lastpassRadio->isChecked()) formatName = "LastPass CSV";
 
     QMessageBox::information(this, "Успех",
-                             QString("Экспортировано %1 записей").arg(entries.size()));
+                             QString("Экспортировано %1 записей в формат %2")
+                                 .arg(entries.size())
+                                 .arg(formatName));
     accept();
 }
 

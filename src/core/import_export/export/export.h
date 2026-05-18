@@ -22,6 +22,17 @@ public:
                      bool encrypt = false,
                      const std::string& password = "");
 
+
+    void exportToBitwardenEncryptedJSON(std::vector<PlaintextEntry>& entries,
+                                                  const std::string& filepath,
+                                                  const std::string& password);
+
+    std::vector<uint8_t> stretchBitwardenKey(const std::vector<uint8_t>& key);
+    std::string encryptBitwardenData(const std::string& plaintext, const std::vector<uint8_t>& stretchedKey);
+    std::vector<uint8_t> aesCbcEncrypt(const std::string& plaintext, const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv);
+    std::vector<uint8_t> computeHmacSha256(const std::vector<uint8_t>& iv, const std::vector<uint8_t>& ciphertext, const std::vector<uint8_t>& key);
+    std::string generateUUID();
+
 };
 
 #endif // EXPORT_H
