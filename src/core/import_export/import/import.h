@@ -39,9 +39,12 @@ public:
     // Импорт из CSV
     ImportResult importFromCSV(const QString& filepath);
 
+    ImportResult importFromLastPassCSV(const std::string& filepath);
+
 private:
     std::string sanitize(const std::string& input);
     bool containsMaliciousContent(const std::string& input);
+    std::string unescapeCSV(const std::string& field);
 };
 
 #endif
