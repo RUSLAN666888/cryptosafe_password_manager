@@ -6,10 +6,12 @@ SecureTable::SecureTable(QWidget *parent)
 {
     initColumns();
 
-    // Минимальные настройки
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
     setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    // Позволяем таблице растягиваться вместе с контейнером
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
 void SecureTable::initColumns()
@@ -20,13 +22,24 @@ void SecureTable::initColumns()
     headers << "ID" << "Title" << "Username" << "URL" << "Tags" << "Created";
     setHorizontalHeaderLabels(headers);
 
-    // Устанавливаем ширину колонок как в wxWidgets
+    // Настраиваем режимы изменения размеров
+    horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);    // ID - фиксированный
+    horizontalHeader()->setSectionResizeMode(1, QHeaderView::Interactive); // Title
+    horizontalHeader()->setSectionResizeMode(2, QHeaderView::Interactive); // Username
+    horizontalHeader()->setSectionResizeMode(3, QHeaderView::Interactive); // URL
+    horizontalHeader()->setSectionResizeMode(4, QHeaderView::Interactive); // Tags
+    horizontalHeader()->setSectionResizeMode(5, QHeaderView::Stretch);     // Created - растягивается
+
+    // Начальные ширины
     setColumnWidth(0, 50);
     setColumnWidth(1, 200);
     setColumnWidth(2, 150);
     setColumnWidth(3, 200);
     setColumnWidth(4, 150);
-    setColumnWidth(5, 150);
+    // Колонка 5 (Created) растянется автоматически
+
+    // Опционально: минимальные ширины
+    horizontalHeader()->setMinimumSectionSize(30);
 }
 
 void SecureTable::addEntry(const VaultEntry &entry)

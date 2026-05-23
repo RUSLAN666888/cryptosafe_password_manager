@@ -1,4 +1,3 @@
-// login_dialog.h
 #ifndef LOGIN_DIALOG_H
 #define LOGIN_DIALOG_H
 
@@ -6,18 +5,14 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QMessageBox>
 #include <QTimer>
-#include <string>
 #include <functional>
+#include <cstring>
 
-// Интерфейс для проверки пароля (внешняя зависимость)
 class IPasswordVerifier {
 public:
     virtual ~IPasswordVerifier() = default;
-    virtual bool verify(const std::string& password) = 0;
+    virtual bool verify(const char* password, size_t len) = 0;
 };
 
 class LoginDialog : public QDialog
@@ -25,23 +20,26 @@ class LoginDialog : public QDialog
     Q_OBJECT
 
 public:
-    // Принимает функцию проверки пароля
-    LoginDialog(QWidget* parent, std::function<bool(const std::string&)> verifier);
+    // Новый конструктор с верификатором на указателях
+    LoginDialog(QWidget* parent, std::function<bool(const char*, size_t)> verifier);
+
+
     ~LoginDialog();
 
-    // Возвращает пароль и статус
-    bool exec(std::string& outPassword);
+
+    // Новая версия с буфером (без копирования)
+    bool exec(char* outBuffer, size_t bufferSize, size_t& outLen);
 
 private slots:
     void onLogin();
     void onPasswordEnter();
     void onBackoffTimer();
-    void updateUIForBackoff();
 
 private:
     void resetBackoff();
+    void clearPasswordBuffer();
 
-    std::function<bool(const std::string&)> m_verifier;
+    std::function<bool(const char*, size_t)> m_verifier;  // Новый тип верификатора
 
     // UI элементы
     QLineEdit* m_passwordCtrl;
@@ -54,8 +52,10 @@ private:
     int m_currentDelay;
     QTimer* m_backoffTimer;
 
-    // Полученный пароль
-    std::string m_password;
+    // Буфер для пароля (вместо std::string)
+    char* m_passwordBuffer;
+    size_t m_passwordLen;
+    static constexpr size_t MAX_PASSWORD_LEN = 4096;
 };
 
 #endif

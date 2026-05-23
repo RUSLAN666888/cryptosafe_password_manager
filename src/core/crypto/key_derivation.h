@@ -1,140 +1,112 @@
 #ifndef KEY_DERIVATION_H
 #define KEY_DERIVATION_H
 
-#include <cstdint>
 #include <openssl/evp.h>
 #include <openssl/kdf.h>
-#include <openssl/params.h>
-#include <stdexcept>
-#include <string>
 #include <vector>
+#include <cstring>
+#include <stdexcept>
+#include <authentication.h>
+
 
 // Выводит ключ из пароля и соли используя PBKDF2-HMAC-SHA256
-inline void derive_encryption_key(const std::string &password,
-                      const std::vector<uint8_t> &salt,
-                      std::vector<uint8_t> &key) // выходной параметр
+// НОВАЯ ВЕРСИЯ: принимает указатель на пароль
+inline void derive_encryption_key(const char* password, size_t password_len,
+                                  const std::vector<uint8_t>& salt,
+                                  std::vector<uint8_t>& key)
 {
-  const uint64_t ITERATIONS = 100000;
-  const size_t SALT_LEN = 16;
-  const size_t KEY_LEN = 32;
-
-  // Проверка длины соли
-  if (salt.size() != SALT_LEN)
-  {
-    throw std::runtime_error("Salt must be exactly 16 bytes");
-  }
-
-  // Изменяем размер выходного вектора
-  key.resize(KEY_LEN);
-
-  // PBKDF2-HMAC-SHA256 через OpenSSL
-  int result = PKCS5_PBKDF2_HMAC(
-      password.c_str(), static_cast<int>(password.length()), salt.data(),
-      static_cast<int>(salt.size()), static_cast<int>(ITERATIONS), EVP_sha256(),
-      static_cast<int>(key.size()), // используем size() вектора
-      key.data()                    // используем data() вектора
-  );
-
-  if (result != 1)
-  {
-    throw std::runtime_error("Key derivation failed");
-  }
-}
-
-inline void derive_encryption_key_600000(const std::string &password,
-                                  const std::vector<uint8_t> &salt,
-                                  std::vector<uint8_t> &key) // выходной параметр
-{
-    const uint64_t ITERATIONS = 600000;
+    const uint64_t ITERATIONS = 100000;
     const size_t SALT_LEN = 16;
     const size_t KEY_LEN = 32;
 
-    // Проверка длины соли
-    if (salt.size() != SALT_LEN)
-    {
+    if (salt.size() != SALT_LEN) {
         throw std::runtime_error("Salt must be exactly 16 bytes");
     }
 
-    // Изменяем размер выходного вектора
     key.resize(KEY_LEN);
 
-    // PBKDF2-HMAC-SHA256 через OpenSSL
     int result = PKCS5_PBKDF2_HMAC(
-        password.c_str(), static_cast<int>(password.length()), salt.data(),
-        static_cast<int>(salt.size()), static_cast<int>(ITERATIONS), EVP_sha256(),
-        static_cast<int>(key.size()), // используем size() вектора
-        key.data()                    // используем data() вектора
+        password, static_cast<int>(password_len),
+        salt.data(), static_cast<int>(salt.size()),
+        static_cast<int>(ITERATIONS), EVP_sha256(),
+        static_cast<int>(key.size()), key.data()
         );
 
-    if (result != 1)
-    {
+    if (result != 1) {
         throw std::runtime_error("Key derivation failed");
     }
 }
 
-inline void derive_private_sign_key(const std::string &password, std::vector<uint8_t> &key, std::vector<uint8_t> salt, const std::string info) {
+// Overload для совместимости (deprecated)
+inline void derive_encryption_key(const std::string& password,
+                                  const std::vector<uint8_t>& salt,
+                                  std::vector<uint8_t>& key)
+{
+    derive_encryption_key(password.c_str(), password.length(), salt, key);
+}
 
+// НОВАЯ ВЕРСИЯ: derive_private_sign_key с указателем
+inline void derive_private_sign_key(const char* password, size_t password_len,
+                                    const std::vector<uint8_t>& salt,
+                                    const std::string& info,
+                                    std::vector<uint8_t>& key)
+{
     const int key_length = 32;
     key.resize(key_length);
 
-    // Загружаем алгоритм HKDF
-    EVP_KDF *kdf = EVP_KDF_fetch(NULL, "HKDF", NULL);
+    EVP_KDF* kdf = EVP_KDF_fetch(NULL, "HKDF", NULL);
     if (kdf == NULL) {
-        std::fill(key.begin(), key.end(), 0);
-        return;
+        secure_zero(key.data(), key.size());
+        throw std::runtime_error("Failed to fetch HKDF");
     }
 
-    // Создаём контекст
-    EVP_KDF_CTX *kctx = EVP_KDF_CTX_new(kdf);
-    EVP_KDF_free(kdf); // kctx сохраняет ссылку
+    EVP_KDF_CTX* kctx = EVP_KDF_CTX_new(kdf);
+    EVP_KDF_free(kdf);
 
     if (kctx == NULL) {
-        std::fill(key.begin(), key.end(), 0);
-        return;
+        secure_zero(key.data(), key.size());
+        throw std::runtime_error("Failed to create KDF context");
     }
 
-    // Параметры для HKDF
     OSSL_PARAM params[6];
-    OSSL_PARAM *p = params;
+    OSSL_PARAM* p = params;
 
-    // Алгоритм хеширования
     *p++ = OSSL_PARAM_construct_utf8_string("digest",
-                                            const_cast<char*>("SHA256"),
-                                            (size_t)6);
-
-    // Соль
+                                            const_cast<char*>("SHA256"), 6);
     *p++ = OSSL_PARAM_construct_octet_string("salt",
                                              const_cast<uint8_t*>(salt.data()),
                                              salt.size());
-
-    // мастер-пароль
     *p++ = OSSL_PARAM_construct_octet_string("key",
-                                             const_cast<char*>(password.c_str()),
-                                             password.size());
-
-    // Информация (контекст)
+                                             const_cast<char*>(password),
+                                             password_len);
     *p++ = OSSL_PARAM_construct_octet_string("info",
                                              const_cast<char*>(info.c_str()),
                                              info.size());
-
     *p = OSSL_PARAM_construct_end();
 
-    // Устанавливаем параметры
     if (EVP_KDF_CTX_set_params(kctx, params) <= 0) {
         EVP_KDF_CTX_free(kctx);
-        std::fill(key.begin(), key.end(), 0);
-        return;
+        secure_zero(key.data(), key.size());
+        throw std::runtime_error("Failed to set KDF parameters");
     }
 
-    // Выполняем derivation
     if (EVP_KDF_derive(kctx, key.data(), key.size(), NULL) <= 0) {
         EVP_KDF_CTX_free(kctx);
-        std::fill(key.begin(), key.end(), 0);
-        return;
+        secure_zero(key.data(), key.size());
+        throw std::runtime_error("Failed to derive key");
     }
 
-    // Очищаем контекст
     EVP_KDF_CTX_free(kctx);
+}
+
+// Overload для совместимости (deprecated)
+inline void derive_private_sign_key(const std::string& password,
+                                    std::vector<uint8_t>& key,
+                                    const std::vector<uint8_t>& salt =
+                                    {0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x53, 0x61, 0x66, 0x65, 0x5f, 0x41, 0x75, 0x64, 0x69, 0x74},
+                                    const std::string& info = "audit-signing")
+{
+    derive_private_sign_key(password.c_str(), password.length(), salt, info, key);
 }
 
 #endif

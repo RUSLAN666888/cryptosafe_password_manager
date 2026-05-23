@@ -210,6 +210,19 @@ void MainWindow::createCentralWidget()
     m_tableView->setColumnWidth(2, 200);
     m_tableView->setColumnWidth(3, 100);
 
+    // ↓↓↓ ИЗМЕНЕНИЯ ЗДЕСЬ ↓↓↓
+    // Включаем растяжение последней колонки
+    m_tableView->horizontalHeader()->setStretchLastSection(true);
+
+
+    // Устанавливаем начальные ширины
+    m_tableView->setColumnWidth(VaultTableModel::COL_TITLE, 200);
+    m_tableView->setColumnWidth(VaultTableModel::COL_USERNAME, 150);
+    m_tableView->setColumnWidth(VaultTableModel::COL_URL, 200);
+    m_tableView->setColumnWidth(VaultTableModel::COL_PASSWORD, 100);
+    // COL_MODIFIED растянется автоматически
+    // ↑↑↑ ИЗМЕНЕНИЯ ЗДЕСЬ ↑↑↑
+
     PasswordDelegate* passwordDelegate = new PasswordDelegate(this);
     m_tableView->setItemDelegateForColumn(VaultTableModel::COL_PASSWORD, passwordDelegate);
     connect(passwordDelegate, &PasswordDelegate::togglePasswordVisibility,
@@ -288,22 +301,28 @@ bool MainWindow::showLoginDialog()
     authData.hash = std::move(hash);
     authData.salt = std::move(salt);
 
-    LoginDialog dialog(this, [authData](const std::string& password) -> bool {
-        return verify_password(password, authData);
+    // Лямбда с указателем
+    LoginDialog dialog(this, [&authData](const char* password, size_t len) -> bool {
+        return verify_password(password, len, authData);
     });
 
-    std::string masterPassword;
-    if (dialog.exec(masterPassword)) {
+    char masterPassword[4096];
+    size_t passwordLen = 0;
+
+    if (dialog.exec(masterPassword, sizeof(masterPassword), passwordLen)) {
         std::vector<uint8_t> encSalt;
         if (!db.getEncSalt(encSalt)) {
             QMessageBox::critical(this, "Ошибка", "Не удалось загрузить соль");
+            secure_zero(masterPassword, passwordLen);
             return false;
         }
 
         std::vector<uint8_t> encKey;
-        derive_encryption_key(masterPassword, encSalt, encKey);
+        derive_encryption_key(masterPassword, passwordLen, encSalt, encKey);
         KeyManager::getInstance().storeEncryptionKey(encKey);
-        LogSigner::getInstance().initFromMasterPassword(masterPassword);
+
+        // ИСПРАВЛЕНО: передаем указатель
+        LogSigner::getInstance().initFromMasterPassword(masterPassword, passwordLen);
 
         KeyData existingRSA;
         KeyManager::getInstance().getPrivateRSAKey(existingRSA);
@@ -317,16 +336,13 @@ bool MainWindow::showLoginDialog()
             }
         }
 
-        volatile char* p = const_cast<char*>(masterPassword.data());
-        for (size_t i = 0; i < masterPassword.size(); ++i) p[i] = 0;
-
+        secure_zero(masterPassword, passwordLen);
         StateManager::getInstance().login();
         return true;
     }
 
     return false;
 }
-
 void MainWindow::unlockApplication()
 {
     if (!StateManager::getInstance().isLoggedIn())

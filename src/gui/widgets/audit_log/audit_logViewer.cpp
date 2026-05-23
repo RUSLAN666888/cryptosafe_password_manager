@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QTimer>
 
 AuditLogViewer::AuditLogViewer(QWidget* parent) : QWidget(parent) {
 
@@ -152,6 +153,11 @@ AuditLogViewer::AuditLogViewer(QWidget* parent) : QWidget(parent) {
 
 void AuditLogViewer::setDatabase(Database* db) {
     m_db = db;
+
+    // QTimer* refreshTimer = new QTimer(this);
+    // connect(refreshTimer, &QTimer::timeout, this, &AuditLogViewer::refreshLog);
+    // refreshTimer->start(2000);
+
     loadPage();
 }
 

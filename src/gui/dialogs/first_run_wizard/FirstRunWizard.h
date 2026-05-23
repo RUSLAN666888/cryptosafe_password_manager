@@ -2,73 +2,78 @@
 #define FIRST_RUN_WIZARD_H
 
 #include <QWizard>
-#include <QWizardPage>
 #include <QLineEdit>
-#include <QPushButton>
-#include <QLabel>
-#include <QSpinBox>
 #include <QProgressBar>
+#include <QSpinBox>
+#include <QLabel>
+#include <QPushButton>
 #include <QTimer>
-#include "../src/core/config_handler.h"
-#include "../src/core/crypto/authentication.h"
-#include "../src/gui/widgets/password_entry/PasswordEntry.h"
+#include "gui/widgets/password_entry/PasswordEntry.h"
+#include "config_handler.h"
+#include "core/crypto/authentication.h"
 
 class FirstRunWizard : public QWizard
 {
     Q_OBJECT
 
-private:
-    ConfigHander &config;
-    QString temp_password;
-    QProgressBar *strengthGauge;
-    QLabel *strengthText;
-    QTimer *strengthTimer;
-    Argon2Data pendingAuthData;
-    std::vector<uint8_t> encSalt;
+public:
+    FirstRunWizard(QWidget *parent, ConfigHander &cfg);
+    ~FirstRunWizard();
 
-    // Страницы
+    Argon2Data& getAuthData();
+    std::vector<uint8_t>& getEncSalt() { return encSalt; }
+
+protected:
+    bool validateCurrentPage() override;
+    void accept() override;
+
+private slots:
+    void onBrowseDatabase();
+    void onPasswordTextChanged();
+    void onStrengthTimer();
+
+private:
+    QWizardPage* createWelcomePage();
+    QWizardPage* createPasswordPage();
+    QWizardPage* createDatabasePage();
+    QWizardPage* createEncryptionPage();
+    QWizardPage* createFinishPage();
+
+    bool validatePassword();
+    void clearPasswordBuffer();
+
+    ConfigHander &config;
+
+    // UI элементы
     QWizardPage *welcomePage;
     QWizardPage *passwordPage;
     QWizardPage *databasePage;
     QWizardPage *encryptionPage;
     QWizardPage *finishPage;
 
-    // Элементы для страницы пароля
     PasswordEntry *passwordCtrl;
     PasswordEntry *confirmCtrl;
+    QProgressBar *strengthGauge;
+    QLabel *strengthText;
 
-    // Элементы для страницы базы данных
     QLineEdit *dbPathCtrl;
     QPushButton *browseButton;
 
-    // Элементы для страницы шифрования
     QSpinBox *iterationsSpin;
     QSpinBox *memorySpin;
     QSpinBox *parallelSpin;
     QSpinBox *hashLengthSpin;
 
-    // Создание страниц
-    QWizardPage *createWelcomePage();
-    QWizardPage *createPasswordPage();
-    QWizardPage *createDatabasePage();
-    QWizardPage *createEncryptionPage();
-    QWizardPage *createFinishPage();
+    QTimer *strengthTimer;
 
-private slots:
-    void onBrowseDatabase();
-    void onPasswordTextChanged();
-    void onStrengthTimer();
-    bool validatePassword();
+    // Буфер для пароля (вместо QString)
+    char* m_passwordBuffer;
+    size_t m_passwordLen;
 
-public:
-    explicit FirstRunWizard(QWidget *parent, ConfigHander &cfg);
+    Argon2Data pendingAuthData;
+    std::vector<uint8_t> encSalt;
 
-    // Переопределенные виртуальные методы QWizard
-    bool validateCurrentPage() override;  // Валидация при переходе
-    void accept() override;               // При нажатии Finish
-
-    Argon2Data& getAuthData();
-    std::vector<uint8_t> getEncSalt() { return encSalt; }
+    static constexpr size_t MAX_PASSWORD_LEN = 4096;
 };
 
-#endif // FIRST_RUN_WIZARD_H
+#endif

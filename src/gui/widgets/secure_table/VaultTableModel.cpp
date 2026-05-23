@@ -35,7 +35,6 @@ QVariant VaultTableModel::data(const QModelIndex& index, int role) const
 
     const VaultManager::EntryMetadata& entry = m_data[index.row()];
 
-    // Qt::DisplayRole — что показывать в ячейке
     if (role == Qt::DisplayRole) {
         switch (index.column()) {
         case COL_TITLE:

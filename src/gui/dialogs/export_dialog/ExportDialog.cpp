@@ -291,7 +291,6 @@ std::vector<int> ExportDialog::getSelectedEntryIds()
 
 bool ExportDialog::confirmMasterPassword()
 {
-    // Загружаем данные аутентификации из БД
     std::vector<uint8_t> hash, salt;
     uint32_t time_cost, memory_cost, parallelism, hash_len;
 
@@ -304,21 +303,19 @@ bool ExportDialog::confirmMasterPassword()
     authData.hash = std::move(hash);
     authData.salt = std::move(salt);
 
-    // Создаём диалог подтверждения пароля
-    LoginDialog confirmDialog(this, [authData](const std::string& password) -> bool {
-        return verify_password(password, authData);
+    // Лямбда с указателем
+    LoginDialog confirmDialog(this, [&authData](const char* password, size_t len) -> bool {
+        return verify_password(password, len, authData);
     });
 
-    std::string masterPassword;
-    if (!confirmDialog.exec(masterPassword)) {
+    char masterPassword[4096];
+    size_t passwordLen = 0;
+
+    if (!confirmDialog.exec(masterPassword, sizeof(masterPassword), passwordLen)) {
         return false;
     }
 
-    // Очищаем пароль
-    volatile char* p = const_cast<char*>(masterPassword.data());
-    for (size_t i = 0; i < masterPassword.size(); ++i) {
-        p[i] = 0;
-    }
-
+    // Очищаем буфер
+    secure_zero(masterPassword, passwordLen);
     return true;
 }

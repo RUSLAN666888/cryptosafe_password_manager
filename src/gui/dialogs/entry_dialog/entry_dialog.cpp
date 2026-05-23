@@ -185,8 +185,11 @@ void EntryDialog::onStrengthTimer()
         return;
     }
 
-    std::string pwdStr = password.toStdString();
-    int strength = check_password_strength(pwdStr);  // 0-4
+    QByteArray pwdBytes = password.toUtf8();
+    int strength = check_password_strength(pwdBytes.constData(), pwdBytes.size());
+
+    // Зануляем временный буфер
+    secure_zero(pwdBytes.data(), pwdBytes.size());
 
     m_strengthGauge->setValue(strength);
 
@@ -214,6 +217,10 @@ void EntryDialog::onStrengthTimer()
     case 4:
         color = QColor(0, 200, 0);
         message = "Очень сильный";
+        break;
+    default:
+        color = QColor(100, 100, 100);
+        message = "Неизвестно";
         break;
     }
 
