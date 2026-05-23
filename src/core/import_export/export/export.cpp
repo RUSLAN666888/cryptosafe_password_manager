@@ -513,3 +513,37 @@ std::string Exporter::generateUUID() {
 
     return std::string(uuidStr);
 }
+
+void Exporter::exportToLastPassCSV(const std::vector<PlaintextEntry>& entries, const std::string& filepath) {
+    std::ofstream file(filepath);
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open file: " + filepath);
+    }
+
+    // Заголовки LastPass CSV
+    file << "url,username,password,totp,extra,name,grouping,fav\n";
+
+    for (const auto& entry : entries) {
+        // Экранируем поля
+        std::string url = escapeCSV(entry.url);
+        std::string username = escapeCSV(entry.username);
+        std::string password = escapeCSV(entry.password);
+        std::string totp = ""; // TOTP секрет (у нас нет, оставляем пустым)
+        std::string extra = escapeCSV(entry.notes); // Заметки в поле extra
+        std::string name = escapeCSV(entry.title);
+        std::string grouping = escapeCSV(entry.category); // Категория как grouping
+        std::string fav = "0"; // LastPass fav (0 = не избранное, так как у нас нет этого поля)
+
+        file << url << ","
+             << username << ","
+             << password << ","
+             << totp << ","
+             << extra << ","
+             << name << ","
+             << grouping << ","
+             << fav << "\n";
+    }
+
+    file.close();
+}
+

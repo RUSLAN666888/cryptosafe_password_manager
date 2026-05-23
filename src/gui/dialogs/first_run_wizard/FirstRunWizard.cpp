@@ -11,6 +11,8 @@
 #include <QLabel>
 #include <QGroupBox>
 #include <zxcvbn.h>
+#include <openssl/rand.h>
+
 
 FirstRunWizard::FirstRunWizard(QWidget *parent, ConfigHander &cfg)
     : QWizard(parent)
@@ -427,7 +429,12 @@ void FirstRunWizard::accept()
     pendingAuthData = std::move(authData);
 
     encSalt.resize(16);
-    randombytes_buf(encSalt.data(), encSalt.size());
+    if (RAND_bytes(encSalt.data(), static_cast<int>(encSalt.size())) != 1)
+    {
+        QMessageBox::critical(this, "Error",
+                              "Failed to generate random salt for encryption key");
+        return;
+    }
 
     std::vector<uint8_t> key;
     derive_encryption_key(pwdStr, encSalt, key);

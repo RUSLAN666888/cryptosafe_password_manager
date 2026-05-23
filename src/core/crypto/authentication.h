@@ -2,12 +2,11 @@
 #define AUTHENTICATION_H
 
 #include <argon2.h>
-#include <sodium.h>
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include <zxcvbn.h>
-
+#include <openssl/rand.h>
 
 struct Argon2Data
 {
@@ -28,14 +27,12 @@ struct Argon2Data
 
 inline void hash_password(const std::string &password, Argon2Data &data)
 {
-  if (sodium_init() < 0)
-  {
-    throw std::runtime_error("Failed to initialize libsodium");
-  }
 
-  // Генерируем соль
-  data.salt.resize(crypto_pwhash_SALTBYTES);
-  randombytes_buf(data.salt.data(), data.salt.size());
+    data.salt.resize(16);
+    if (RAND_bytes(data.salt.data(), static_cast<int>(data.salt.size())) != 1)
+    {
+        throw std::runtime_error("Failed to generate random salt with OpenSSL");
+    }
 
   // Переводим MiB в KiB
   uint64_t memory_kib = static_cast<uint64_t>(data.memory_cost_mb) * 1024;

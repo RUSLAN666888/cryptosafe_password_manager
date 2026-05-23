@@ -32,6 +32,7 @@ public:
     std::vector<uint8_t> aesCbcEncrypt(const std::string& plaintext, const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv);
     std::vector<uint8_t> computeHmacSha256(const std::vector<uint8_t>& iv, const std::vector<uint8_t>& ciphertext, const std::vector<uint8_t>& key);
     std::string generateUUID();
+    void exportToLastPassCSV(const std::vector<PlaintextEntry>& entries, const std::string& filepath);
 
 };
 

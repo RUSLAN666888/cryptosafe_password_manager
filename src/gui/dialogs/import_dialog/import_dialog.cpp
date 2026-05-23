@@ -214,7 +214,11 @@ void ImportDialog::loadAndParseFile()
         for (size_t i = 0; i < password.length(); ++i) p[i] = 0;
 
     } else if (m_currentFormat.contains("CSV") || m_currentFilepath.endsWith(".csv")) {
-        result = importer.importFromCSV(m_currentFilepath);
+        if (isLastPassCSV(m_currentFilepath)) {
+            result = importer.importFromLastPassCSV(m_currentFilepath.toStdString());
+        } else {
+            result = importer.importFromCSV(m_currentFilepath);
+        }
 
     } else {
         QMessageBox::warning(this, "Ошибка", "Неподдерживаемый формат файла");
@@ -612,4 +616,18 @@ void ImportDialog::showSummary(int imported, int skipped, int updated, int error
     if (imported > 0 || updated > 0) {
         accept();
     }
+}
+
+bool ImportDialog::isLastPassCSV(const QString& filepath) {
+    QFile file(filepath);
+    if (!file.open(QIODevice::ReadOnly)) return false;
+
+    QByteArray firstLine = file.readLine(200);
+    file.close();
+
+    QString line = QString::fromUtf8(firstLine).trimmed();
+    // Проверяем характерные заголовки LastPass
+    return line.contains("url,username,password") &&
+           (line.contains("totp,extra,name,grouping,fav") ||
+            line.contains("extra,name,grouping,fav"));
 }

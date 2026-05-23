@@ -260,8 +260,7 @@ void ExportDialog::onExport()
                                                 "LastPass CSV (*.csv)");
         if (filepath.isEmpty()) return;
 
-        // TODO: Реализовать экспорт в формат LastPass CSV
-        //exporter.exportToLastPassCSV(entries, filepath.toStdString());
+        exporter.exportToLastPassCSV(entries, filepath.toStdString());
     }
 
     QString formatName;

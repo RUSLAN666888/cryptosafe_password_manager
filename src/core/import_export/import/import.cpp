@@ -1,9 +1,11 @@
 // importer.cpp
 #include "import.h"
 #include <QTextCodec>
+#include <cctype>
+
+#include <fstream>
 #include <sstream>
 #include <algorithm>
-#include <cctype>
 
 std::string Importer::sanitize(const std::string& input) {
     if (input.empty()) return "";
@@ -283,5 +285,118 @@ ImportResult Importer::importFromCSV(const QString& filepath) {
 
     file.close();
     result.success = true;
+    return result;
+}
+
+ImportResult Importer::importFromLastPassCSV(const std::string& filepath) {
+    ImportResult result;
+    result.success = false;
+
+    std::ifstream file(filepath);
+    if (!file.is_open()) {
+        result.errorMessage = "Failed to open file: " + filepath;
+        return result;
+    }
+
+    std::string line;
+    bool isFirstLine = true;
+    int lineNum = 0;
+
+    while (std::getline(file, line)) {
+        lineNum++;
+
+        if (line.empty()) continue;
+
+        // Парсим заголовок
+        if (isFirstLine) {
+            isFirstLine = false;
+            // Проверяем, что это заголовок LastPass
+            if (line.find("url,username,password") == std::string::npos) {
+                result.errorMessage = "Invalid LastPass CSV format: missing required headers";
+                return result;
+            }
+            continue;
+        }
+
+        // Парсим строку CSV
+        std::vector<std::string> fields;
+        std::stringstream ss(line);
+        std::string field;
+
+        while (std::getline(ss, field, ',')) {
+            fields.push_back(field);
+        }
+
+        // LastPass CSV имеет 8 полей
+        if (fields.size() < 7) {
+            result.errorMessage = "Invalid CSV format at line " + std::to_string(lineNum) +
+                                  ": expected at least 7 fields, got " + std::to_string(fields.size());
+            return result;
+        }
+
+        PlaintextEntry entry;
+
+        // url (field 0)
+        if (fields.size() > 0) entry.url = unescapeCSV(fields[0]);
+
+        // username (field 1)
+        if (fields.size() > 1) entry.username = unescapeCSV(fields[1]);
+
+        // password (field 2)
+        if (fields.size() > 2) entry.password = unescapeCSV(fields[2]);
+
+        // totp (field 3) - пропускаем
+
+        // extra (field 4) - заметки
+        if (fields.size() > 4) entry.notes = unescapeCSV(fields[4]);
+
+        // name (field 5) - название
+        if (fields.size() > 5) entry.title = unescapeCSV(fields[5]);
+
+        // grouping (field 6) - категория
+        if (fields.size() > 6) entry.category = unescapeCSV(fields[6]);
+
+        // fav (field 7) - игнорируем, так как у нас нет этого поля
+
+        // Устанавливаем timestamp создания
+        entry.creation_timestamp = getUTCTimestamp();
+        entry.version = 1;
+        entry.tags = ""; // LastPass не имеет тегов, оставляем пустым
+
+        // Если название пустое, используем "Imported from LastPass"
+        if (entry.title.empty()) {
+            entry.title = "Imported from LastPass";
+        }
+
+        result.entries.push_back(entry);
+    }
+
+    file.close();
+
+    if (result.entries.empty()) {
+        result.errorMessage = "No entries found in CSV file";
+        return result;
+    }
+
+    result.success = true;
+    result.sanitizedCount = 0; // LastPass импорт не требует санитизации
+
+    return result;
+}
+
+std::string Importer::unescapeCSV(const std::string& field) {
+    std::string result = field;
+
+    // Если поле в двойных кавычках, удаляем их
+    if (result.size() >= 2 && result.front() == '"' && result.back() == '"') {
+        result = result.substr(1, result.size() - 2);
+        // Заменяем двойные кавычки внутри
+        size_t pos = 0;
+        while ((pos = result.find("\"\"", pos)) != std::string::npos) {
+            result.replace(pos, 2, "\"");
+            pos++;
+        }
+    }
+
     return result;
 }

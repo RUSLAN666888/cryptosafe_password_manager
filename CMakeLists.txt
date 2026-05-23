@@ -49,16 +49,7 @@ find_path(ZXCVB_INCLUDE
     PATHS /usr/include /usr/local/include
 )
 
-# 7. Поиск libsodium
-find_library(LIBSODIUM_LIB
-    NAMES sodium
-    PATHS /usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu
-)
 
-find_path(LIBSODIUM_INCLUDE
-    NAMES sodium.h
-    PATHS /usr/include /usr/local/include
-)
 
 find_package(GTest REQUIRED)
 
@@ -163,7 +154,6 @@ target_include_directories(cryptosafe_lib PUBLIC
     ${nlohmann_json_INCLUDE_DIRS}
     ${ARGON2_INCLUDE}
     ${ZXCVB_INCLUDE}
-    ${LIBSODIUM_INCLUDE}
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5Core_INCLUDE_DIRS}
 )

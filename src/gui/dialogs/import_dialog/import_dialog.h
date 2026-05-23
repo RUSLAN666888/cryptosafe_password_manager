@@ -36,6 +36,7 @@ private slots:
     void onImport();
     void onSelectAll(bool checked);
     void onConflictOptionChanged();
+    bool isLastPassCSV(const QString& filepath);
 
 private:
     void detectFormat(const QString& filepath);
