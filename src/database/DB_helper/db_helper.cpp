@@ -51,7 +51,11 @@ Database::Database(const std::string &path, int max_conn)
 }
 
 // Деструктор
-Database::~Database() { closeAllConnections(); }
+Database::~Database()
+{
+
+    closeAllConnections();
+}
 
 // Получить соединение из пула
 sqlite3 *Database::getConnection()
@@ -112,9 +116,14 @@ void Database::releaseConnection(sqlite3 *conn)
 // Закрыть все соединения
 void Database::closeAllConnections()
 {
-  std::lock_guard<std::mutex> lock(pool_mutex);
+    std::lock_guard<std::mutex> lock(pool_mutex);
+    for (sqlite3* conn : connection_pool) {
+        if (conn) {
+            sqlite3_close(conn);
+        }
+    }
 
-  connection_pool.clear();
+    connection_pool.clear();
 }
 
 // Выполнить SQL скрипт

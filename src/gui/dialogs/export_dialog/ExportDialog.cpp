@@ -245,6 +245,8 @@ void ExportDialog::onExport()
 
         // Bitwarden export ВСЕГДА использует AES-256-GCM, игнорируем выбор пользователя
         exporter.exportToBitwardenEncryptedJSON(entries, filepath.toStdString(), exportPassword);
+
+
     }
     else if (m_csvRadio->isChecked()) {
         filepath = QFileDialog::getSaveFileName(this, "Сохранить как",

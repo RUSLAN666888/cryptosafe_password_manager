@@ -7,6 +7,16 @@
 #include <sstream>
 #include <algorithm>
 
+#include <QDir>
+#include <QProcess>
+#include <sys/stat.h>
+#include <QUuid>
+
+#include <QCoreApplication>
+#include <QMessageBox>
+
+#include <QThread>
+
 std::string Importer::sanitize(const std::string& input) {
     if (input.empty()) return "";
 
@@ -396,6 +406,185 @@ std::string Importer::unescapeCSV(const std::string& field) {
             result.replace(pos, 2, "\"");
             pos++;
         }
+    }
+
+    return result;
+}
+inline QStringList parseCSVLine(const QString& line) {
+    QStringList result;
+    QString field;
+    bool inQuote = false;
+
+    for (int i = 0; i < line.length(); ++i) {
+        QChar ch = line[i];
+
+        if (ch == '"') {
+            inQuote = !inQuote;
+        } else if (ch == ',' && !inQuote) {
+            result.append(field);
+            field.clear();
+        } else {
+            field += ch;
+        }
+    }
+    result.append(field);
+
+    // Очищаем кавычки и экранированные кавычки
+    for (QString& f : result) {
+        if (f.startsWith('"') && f.endsWith('"')) {
+            f = f.mid(1, f.length() - 2);
+            f.replace("\"\"", "\"");
+        }
+    }
+
+    return result;
+}
+ImportResult Importer::importFromBitwardenEncryptedJSON(const QString& filepath) {
+    ImportResult result;
+    result.success = false;
+
+    // 1. Создаем CSV файл во временной папке (как в экспорте)
+    QString tempDir = QDir::temp().absoluteFilePath("bitwarden_import");
+    QDir().mkpath(tempDir);
+    QString csvPath = "/home/master666/Рабочий стол/export.csv";
+
+    // 2. Создаем скрипт (как в экспорте)
+    QString scriptPath = QCoreApplication::applicationDirPath() + "/bitwarden_import.sh";
+
+    std::ofstream scriptFile(scriptPath.toStdString());
+    scriptFile << "#!/bin/bash\n";
+    scriptFile << "CSV_FILE=\"" << csvPath.toStdString() << "\"\n";
+    scriptFile << "INPUT_FILE=\"" << filepath.toStdString() << "\"\n";
+    scriptFile << "\n";
+    scriptFile << "echo '========================================='\n";
+    scriptFile << "echo 'Bitwarden Import'\n";
+    scriptFile << "echo '========================================='\n";
+    scriptFile << "echo ''\n";
+    scriptFile << "echo '1. Importing encrypted JSON to Bitwarden...'\n";
+    scriptFile << "bw import bitwardenjson \"$INPUT_FILE\"\n";
+    scriptFile << "echo ''\n";
+    scriptFile << "echo '2. Exporting to CSV...'\n";
+    scriptFile << "bw export --format csv --output \"$CSV_FILE\"\n";
+    scriptFile << "echo ''\n";
+    scriptFile << "echo '========================================='\n";
+    scriptFile << "echo 'SUCCESS! CSV created at: ' $CSV_FILE\n";
+    scriptFile << "echo '========================================='\n";
+    scriptFile << "read -p 'Press Enter to close...'\n";
+    scriptFile.close();
+
+    chmod(scriptPath.toStdString().c_str(), 0755);
+
+    // 3. Открываем терминал (как в экспорте)
+    QString command = scriptPath;
+#ifdef Q_OS_WIN
+    QProcess::startDetached("cmd.exe", QStringList() << "/c" << "start" << "cmd.exe" << "/k" << command);
+#else
+    if (!QProcess::startDetached("gnome-terminal", QStringList() << "--" << "bash" << "-c" << command + "; exec bash")) {
+        if (!QProcess::startDetached("konsole", QStringList() << "-e" << "bash" << "-c" << command + "; exec bash")) {
+            if (!QProcess::startDetached("xterm", QStringList() << "-e" << "bash" << "-c" << command + "; exec bash")) {
+                QProcess::startDetached("xfce4-terminal", QStringList() << "-e" << "bash" << "-c" << command + "; exec bash");
+            }
+        }
+    }
+#endif
+
+    // 4. Ждем подтверждения
+    QMessageBox::StandardButton reply = QMessageBox::question(nullptr, "Bitwarden Import",
+                                                              "В терминале:\n\n"
+                                                              "1. Введите мастер-пароль от Bitwarden (2 раза)\n"
+                                                              "2. Дождитесь сообщения 'SUCCESS'\n"
+                                                              "3. Нажмите Enter\n\n"
+                                                              "Затем нажмите OK",
+                                                              QMessageBox::Ok | QMessageBox::Cancel);
+
+    if (reply != QMessageBox::Ok) {
+        QFile::remove(scriptPath);
+        result.errorMessage = "Cancelled";
+        return result;
+    }
+
+    // 6. Читаем CSV
+    QFile csvFile(csvPath);
+    if (!csvFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        result.errorMessage = "Cannot open CSV file";
+        QFile::remove(scriptPath);
+        return result;
+    }
+
+    QTextStream stream(&csvFile);
+    stream.setCodec("UTF-8");
+
+    QString headerLine = stream.readLine();
+    QStringList headers = parseCSVLine(headerLine);
+
+    // Определяем индексы нужных колонок
+    int titleIdx = headers.indexOf("name");
+    int usernameIdx = headers.indexOf("login_username");
+    int passwordIdx = headers.indexOf("login_password");
+    int urlIdx = headers.indexOf("login_uri");
+    int notesIdx = headers.indexOf("notes");
+    int categoryIdx = headers.indexOf("folder");
+
+    // Если не нашли "name", пробуем другие варианты
+    if (titleIdx == -1) titleIdx = headers.indexOf("title");
+    if (titleIdx == -1) titleIdx = headers.indexOf("entry_name");
+
+    // Если не нашли "folder", пробуем "category"
+    if (categoryIdx == -1) categoryIdx = headers.indexOf("category");
+
+    while (!stream.atEnd()) {
+        QString line = stream.readLine();
+        if (line.trimmed().isEmpty()) continue;
+
+        QStringList fields = parseCSVLine(line);
+
+        // Проверяем, что у нас достаточно полей
+        int maxIdx = std::max({titleIdx, usernameIdx, passwordIdx, urlIdx, notesIdx, categoryIdx});
+        if (maxIdx == -1 || fields.size() <= maxIdx) continue;
+
+        PlaintextEntry entry;
+
+        // Заполняем только существующие поля
+        if (titleIdx != -1 && titleIdx < fields.size())
+            entry.title = fields[titleIdx].toStdString();
+
+        if (usernameIdx != -1 && usernameIdx < fields.size())
+            entry.username = fields[usernameIdx].toStdString();
+
+        if (passwordIdx != -1 && passwordIdx < fields.size())
+            entry.password = fields[passwordIdx].toStdString();
+
+        if (urlIdx != -1 && urlIdx < fields.size())
+            entry.url = fields[urlIdx].toStdString();
+
+        if (notesIdx != -1 && notesIdx < fields.size())
+            entry.notes = fields[notesIdx].toStdString();
+
+        if (categoryIdx != -1 && categoryIdx < fields.size())
+            entry.category = fields[categoryIdx].toStdString();
+
+        // Генерируем timestamp если его нет
+        if (entry.creation_timestamp.empty()) {
+            auto now = std::chrono::system_clock::now();
+            auto now_c = std::chrono::system_clock::to_time_t(now);
+            entry.creation_timestamp = std::ctime(&now_c);
+            // Убираем символ новой строки
+            entry.creation_timestamp.pop_back();
+        }
+
+        result.entries.push_back(entry);
+        result.totalCount++;
+    }
+
+    csvFile.close();
+
+    // 7. Очистка
+    QDir(tempDir).removeRecursively();
+    QFile::remove(scriptPath);
+
+    result.success = !result.entries.empty();
+    if (!result.success) {
+        result.errorMessage = "No entries found in CSV";
     }
 
     return result;

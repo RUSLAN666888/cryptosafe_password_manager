@@ -9,6 +9,8 @@
 #include "Ed25519.h"
 
 #include <fstream>
+#include <QCoreApplication>
+#include <QProcess>
 
 #include <openssl/evp.h>
 #include <openssl/rand.h>
@@ -18,6 +20,11 @@
 
 #include <iomanip>
 #include <sstream>
+
+#include <QDir>
+#include <QUuid>
+#include <QTemporaryFile>
+#include <sys/stat.h>
 
 
 
@@ -194,131 +201,72 @@ std::string Exporter::escapeCSV(const std::string& field) {
 void Exporter::exportToBitwardenEncryptedJSON(std::vector<PlaintextEntry>& entries,
                                               const std::string& filepath,
                                               const std::string& password) {
+    // Сохраняем CSV файл рядом с выходным файлом
+    std::string csvPath = filepath + ".csv";
+    std::ofstream csvFile(csvPath);
+    if (!csvFile.is_open()) {
+        throw std::runtime_error("Failed to create CSV file: " + csvPath);
+    }
 
-    // 1. Конвертируем записи в формат Bitwarden
-    json bitwardenData;
-    bitwardenData["folders"] = json::array();
-    bitwardenData["items"] = json::array();
-
-    // Создаем папку по умолчанию (необязательно)
-    json defaultFolder;
-    defaultFolder["id"] = generateUUID();
-    defaultFolder["name"] = "Imported";
-    bitwardenData["folders"].push_back(defaultFolder);
-    std::string folderId = defaultFolder["id"];
+    // Записываем CSV
+    csvFile << "folder,favorite,type,name,notes,fields,login_uri,login_username,login_password,login_totp\n";
 
     for (const auto& entry : entries) {
-        json item;
-        item["id"] = generateUUID();
-        item["folderId"] = folderId;
-        item["name"] = entry.title;
-        item["notes"] = entry.notes;
-        item["favorite"] = false;
-        item["reprompt"] = 0;
-        item["type"] = 1; // Login type
-        item["creationDate"] = entry.creation_timestamp;
-        item["revisionDate"] = getUTCTimestamp();
+        csvFile << ",,";                                    // folder, favorite
+        csvFile << "1,";                                    // type (1 = login)
+        csvFile << "\"" << entry.title << "\",";
+        csvFile << "\"" << entry.notes << "\",";
+        csvFile << ",";                                     // fields
+        csvFile << "\"" << entry.url << "\",";
+        csvFile << "\"" << entry.username << "\",";
+        csvFile << "\"" << entry.password << "\",";
+        csvFile << "\n";
+    }
+    csvFile.close();
 
-        // Логин данные
-        json login;
-        login["username"] = entry.username;
-        login["password"] = entry.password;
-        login["totp"] = nullptr;
+    // Создаем shell скрипт
+    QString scriptPath = QCoreApplication::applicationDirPath() + "/import_export.sh";
+    std::ofstream scriptFile(scriptPath.toStdString());
+    scriptFile << "#!/bin/bash\n";
+    scriptFile << "CSV_FILE=\"" << csvPath << "\"\n";
+    scriptFile << "OUTPUT_FILE=\"" << filepath << "\"\n";
+    scriptFile << "\n";
+    scriptFile << "echo '========================================='\n";
+    scriptFile << "echo 'Bitwarden Export'\n";
+    scriptFile << "echo '========================================='\n";
+    scriptFile << "echo ''\n";
+    scriptFile << "echo 'CSV файл: ' $CSV_FILE\n";
+    scriptFile << "echo ''\n";
+    scriptFile << "echo '1. Импорт CSV в Bitwarden...'\n";
+    scriptFile << "bw import bitwardencsv \"$CSV_FILE\"\n";
+    scriptFile << "echo ''\n";
+    scriptFile << "echo '2. Экспорт в зашифрованный JSON...'\n";
+    scriptFile << "bw export --format encrypted_json --output \"$OUTPUT_FILE\"\n";
+    scriptFile << "echo ''\n";
+    scriptFile << "echo '========================================='\n";
+    scriptFile << "echo 'Готово! Зашифрованный файл: ' $OUTPUT_FILE\n";
+    scriptFile << "echo 'CSV файл сохранен: ' $CSV_FILE\n";
+    scriptFile << "echo '========================================='\n";
+    scriptFile << "rm -f \"$CSV_FILE\"\n";
+    scriptFile << "read -p 'Нажмите Enter для закрытия окна...'\n";
+    scriptFile.close();
 
-        // URIs
-        json loginUri;
-        loginUri["uri"] = entry.url;
-        loginUri["match"] = nullptr;
-        login["uris"] = json::array({loginUri});
+    chmod(scriptPath.toStdString().c_str(), 0755);
 
-        item["login"] = login;
-
-        // Поля (tags в Bitwarden)
-        if (!entry.tags.empty()) {
-            json field;
-            field["name"] = "Tags";
-            field["value"] = entry.tags;
-            field["type"] = 0; // Text
-            field["linkedId"] = nullptr;
-            item["fields"] = json::array({field});
-        } else {
-            item["fields"] = json::array();
+    // Открываем терминал
+    QString command = scriptPath;
+#ifdef Q_OS_WIN
+    QProcess::startDetached("cmd.exe", QStringList() << "/c" << "start" << "cmd.exe" << "/k" << command);
+#else
+    if (!QProcess::startDetached("gnome-terminal", QStringList() << "--" << "bash" << "-c" << command + "; exec bash")) {
+        if (!QProcess::startDetached("konsole", QStringList() << "-e" << "bash" << "-c" << command + "; exec bash")) {
+            if (!QProcess::startDetached("xterm", QStringList() << "-e" << "bash" << "-c" << command + "; exec bash")) {
+                QProcess::startDetached("xfce4-terminal", QStringList() << "-e" << "bash" << "-c" << command + "; exec bash");
+            }
         }
-
-        bitwardenData["items"].push_back(item);
     }
-
-    // 2. Сериализуем в JSON строку
-    std::string plaintextJson = bitwardenData.dump();
-
-    // 1. Генерируем соль (16 байт)
-    std::vector<uint8_t> saltBytes(16);
-    if (RAND_bytes(saltBytes.data(), saltBytes.size()) != 1) {
-        throw std::runtime_error("Failed to generate salt");
-    }
-
-    // 2. Кодируем соль в base64 (ЭТА СТРОКА будет использоваться как соль!)
-    std::string saltBase64 = base64Encode(saltBytes);
-
-    // 3. Настройки KDF (PBKDF2)
-    int kdfType = 0;
-    unsigned int kdfIterations = 600000;
-
-    // 4. ДЕРИВАЦИЯ КЛЮЧА - используем base64 строку, а не байты!
-    std::vector<uint8_t> derivedKey(32);
-
-    // ВАЖНО: используем saltBase64.c_str() и saltBase64.length()
-    // НЕ декодируем base64 обратно в байты!
-    int result = PKCS5_PBKDF2_HMAC(
-        password.c_str(),
-        password.length(),
-        reinterpret_cast<const unsigned char*>(saltBase64.c_str()),  // base64 строка!
-        saltBase64.length(),                                         // длина строки!
-        kdfIterations,
-        EVP_sha256(),
-        derivedKey.size(),
-        derivedKey.data()
-        );
-
-    if (result != 1) {
-        throw std::runtime_error("PBKDF2 key derivation failed");
-    }
-
-    // 6. Стрейчинг ключа (Bitwarden дополнительно стретчит ключ через HKDF)
-    std::vector<uint8_t> stretchedKey = stretchBitwardenKey(derivedKey);
-
-    // 7. Генерация validation строки (UUID v4)
-    std::string validationUuid = generateUUID();
-
-    // 8. Шифрование validation строки для проверки ключа
-    std::string encryptedValidation = encryptBitwardenData(validationUuid, stretchedKey);
-
-    // 9. Шифрование данных
-    std::string encryptedData = encryptBitwardenData(plaintextJson, stretchedKey);
-
-    // 10. Формирование выходного JSON
-    json exportJson;
-    exportJson["encrypted"] = true;
-    exportJson["passwordProtected"] = true;
-    exportJson["salt"] = saltBase64;
-    exportJson["kdfType"] = kdfType;
-    exportJson["kdfIterations"] = kdfIterations;
-
-
-
-    exportJson["encKeyValidation_DO_NOT_EDIT"] = encryptedValidation;
-    exportJson["data"] = encryptedData;
-
-    // 11. Сохранение в файл
-    std::ofstream file(filepath);
-    if (!file.is_open()) {
-        throw std::runtime_error("Failed to open file: " + filepath);
-    }
-
-    file << exportJson.dump(2); // Pretty print с отступом 2 пробела
-    file.close();
+#endif
 }
-
 // Вспомогательная функция для стрейчинга ключа (Bitwarden HKDF)
 std::vector<uint8_t> Exporter::stretchBitwardenKey(const std::vector<uint8_t>& key) {
     // Bitwarden использует HKDF, но мы можем реализовать его через HMAC

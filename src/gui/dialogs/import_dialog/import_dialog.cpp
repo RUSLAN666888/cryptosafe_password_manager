@@ -192,55 +192,54 @@ void ImportDialog::loadAndParseFile()
         return;
     }
 
-    Importer importer;
-    ImportResult result;
-
-    if (m_currentFormat.contains("Encrypted JSON") || m_currentFilepath.endsWith(".cryptosafe") || m_currentFilepath.endsWith(".json")) {
-        // Запрашиваем пароль для расшифровки
+    // Просто по расширению файла
+    if (m_currentFilepath.endsWith(".cryptosafe", Qt::CaseInsensitive)) {
         bool ok;
-        QString password = QInputDialog::getText(this, "Пароль",
-                                                 "Введите пароль для расшифровки:",
+        QString password = QInputDialog::getText(this, "CryptoSafe Import",
+                                                 "Введите пароль:",
                                                  QLineEdit::Password,
                                                  "", &ok);
-        if (!ok || password.isEmpty()) {
-            QMessageBox::warning(this, "Ошибка", "Пароль не введён");
+        if (!ok || password.isEmpty()) return;
+
+        Importer importer;
+        ImportResult result = importer.importFromEncryptedJSON(m_currentFilepath, password.toStdString());
+
+        if (!result.success) {
+            QMessageBox::critical(this, "Ошибка", QString::fromStdString(result.errorMessage));
             return;
         }
 
-        result = importer.importFromEncryptedJSON(m_currentFilepath, password.toStdString());
+        m_importedEntries = result.entries;
+    }
+    else if (m_currentFilepath.endsWith(".json", Qt::CaseInsensitive)) {
+        // Это наш зашифрованный Bitwarden JSON
+        Importer importer;
+        ImportResult result = importer.importFromBitwardenEncryptedJSON(m_currentFilepath);
 
-        // Очищаем пароль из памяти
-        volatile char* p = const_cast<char*>(password.toStdString().data());
-        for (size_t i = 0; i < password.length(); ++i) p[i] = 0;
-
-    } else if (m_currentFormat.contains("CSV") || m_currentFilepath.endsWith(".csv")) {
-        if (isLastPassCSV(m_currentFilepath)) {
-            result = importer.importFromLastPassCSV(m_currentFilepath.toStdString());
-        } else {
-            result = importer.importFromCSV(m_currentFilepath);
+        if (!result.success) {
+            QMessageBox::critical(this, "Ошибка", QString::fromStdString(result.errorMessage));
+            return;
         }
 
-    } else {
-        QMessageBox::warning(this, "Ошибка", "Неподдерживаемый формат файла");
+        m_importedEntries = result.entries;
+    }
+    else if (m_currentFilepath.endsWith(".csv", Qt::CaseInsensitive)) {
+        Importer importer;
+        ImportResult result = importer.importFromCSV(m_currentFilepath);
+
+        if (!result.success) {
+            QMessageBox::critical(this, "Ошибка", QString::fromStdString(result.errorMessage));
+            return;
+        }
+
+        m_importedEntries = result.entries;
+    }
+    else {
+        QMessageBox::warning(this, "Ошибка", "Неподдерживаемый формат");
         return;
     }
 
-    if (!result.success) {
-        QMessageBox::critical(this, "Ошибка импорта", QString::fromStdString(result.errorMessage));
-        return;
-    }
-
-    m_importedEntries = result.entries;
     m_isShareImport = false;
-
-    // Показываем сообщение о санитизации
-    if (result.sanitizedCount > 0) {
-        QMessageBox::information(this, "Санитизация",
-                                 QString("Обнаружен потенциально вредоносный контент в %1 полях.\n"
-                                         "Данные были очищены от опасных символов.")
-                                     .arg(result.sanitizedCount));
-    }
-
     showPreview();
 }
 

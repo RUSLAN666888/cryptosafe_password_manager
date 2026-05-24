@@ -41,6 +41,8 @@ public:
 
     ImportResult importFromLastPassCSV(const std::string& filepath);
 
+    ImportResult importFromBitwardenEncryptedJSON(const QString& filepath);
+
 private:
     std::string sanitize(const std::string& input);
     bool containsMaliciousContent(const std::string& input);
