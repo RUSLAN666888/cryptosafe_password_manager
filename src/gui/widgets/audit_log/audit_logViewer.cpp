@@ -64,7 +64,7 @@ AuditLogViewer::AuditLogViewer(QWidget* parent) : QWidget(parent) {
     mainLayout->addWidget(filtersGroup);
 
     // ========== Таблица ==========
-    m_model = new AuditLogModel;
+    m_model = new AuditLogModel();
     tableView = new QTableView(this);
     tableView->setModel(m_model);
     tableView->setSelectionBehavior(QAbstractItemView::SelectRows);

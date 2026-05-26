@@ -24,6 +24,8 @@
 class AuditLogModel : public QAbstractTableModel {
     Q_OBJECT
 public:
+
+
     void loadPage(const std::vector<AuditEntryDisplay>& entries) {
         beginResetModel();
         m_entries = entries;
