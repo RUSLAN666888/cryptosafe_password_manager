@@ -18,6 +18,17 @@ public:
         return instance;
     }
 
+
+    void moveCurrentToOld() {
+        KeyData currentKey;
+        m_encryptionKey.get(currentKey);
+        if (currentKey.data && currentKey.size > 0) {
+            std::vector<uint8_t> oldKey(currentKey.data, currentKey.data + currentKey.size);
+            m_oldEncryptionKey.store(oldKey);
+        }
+        m_encryptionKey.clear();
+    }
+
     void storeEncryptionKey(std::vector<uint8_t>& key) {
         m_encryptionKey.store(key);
     }
@@ -91,6 +102,16 @@ public:
 
     void getPublicRSAKey(KeyData& d) {
         m_publicRSAKey.get(d);
+    }
+
+    void clearAllKeys() {
+        m_encryptionKey.clear();
+        m_oldEncryptionKey.clear();
+        m_logSignKey.clear();
+        m_exportKey.clear();
+        m_exportSignKey.clear();
+        m_privateRSAKey.clear();
+        m_publicRSAKey.clear();
     }
 };
 

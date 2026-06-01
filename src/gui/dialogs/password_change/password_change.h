@@ -1,70 +1,77 @@
-// #ifndef PASSWORD_CHANGE_H
-// #define PASSWORD_CHANGE_H
+#ifndef PASSWORD_CHANGE_H
+#define PASSWORD_CHANGE_H
 
-// #include <QDialog>
-// #include <QStackedWidget>
-// #include <QVBoxLayout>
-// #include <QHBoxLayout>
-// #include <QLabel>
-// #include <QPushButton>
-// #include <QProgressBar>
-// #include <QTimer>
-// #include "../../../database/DB_helper/db_helper.h"
-// #include "../../../core/crypto/authentication.h"
-// #include "../../../core/key_manager.h"
-// #include "../src/gui/widgets/password_entry/PasswordEntry.h"
+#include <QDialog>
+#include <QStackedWidget>
+#include <QProgressBar>
+#include <QLabel>
+#include <QPushButton>
+#include <QTimer>
+#include "../src/gui/widgets/password_entry/PasswordEntry.h"
+#include "../src/database/DB_helper/db_helper.h"
+#include "../src/core/crypto/authentication.h"
+#include "../src/core/crypto/key_derivation.h"
+#include "key_manager.h"
 
-// class ChangePasswordDialog : public QDialog
-// {
-//     Q_OBJECT
+class ChangePasswordDialog : public QDialog
+{
+    Q_OBJECT
 
-// private:
-//     Database &db;
+public:
+    ChangePasswordDialog(QWidget *parent, Database &database);
+    ~ChangePasswordDialog();
 
-//     // Stacked widget для переключения страниц
-//     QStackedWidget *stackedWidget;
+private slots:
+    void onVerifyNext();
+    void onChange();
+    void onCancel();
+    void onPasswordTextChanged();
+    void onStrengthTimer();
 
-//     // Страница 1: верификация
-//     QWidget *verifyPage;
-//     PasswordEntry *currentPasswordCtrl;
-//     QLabel *errorText;
-//     QPushButton *verifyNextButton;
+private:
+    void createVerifyPage();
+    void createChangePage();
+    bool loadAuthData();
+    bool verifyCurrentPassword();
+    bool validateNewPassword();
+    void updatePasswordStrength();
+    void switchToChangePage();
+    void clearPasswordBuffers();
+    void reencryptAllEntries(const std::vector<uint8_t>& oldKey, const std::vector<uint8_t>& newKey);
 
-//     // Страница 2: смена пароля
-//     QWidget *changePage;
-//     PasswordEntry *newPasswordCtrl;
-//     PasswordEntry *confirmPasswordCtrl;
-//     QProgressBar *strengthGauge;
-//     QLabel *strengthText;
-//     QPushButton *changeButton;
-//     QPushButton *cancelButton;
-//     QTimer *strengthTimer;
+    Database &db;
 
-//     // Данные для аутентификации
-//     Argon2Data authData;
-//     std::vector<uint8_t> encSalt;
+    // Данные аутентификации
+    Argon2Data authData;
+    std::vector<uint8_t> encSalt;
 
-//     // Временное хранение пароля
-//     std::string tempPassword;
+    // Страницы
+    QStackedWidget* stackedWidget;
+    QWidget* verifyPage;
+    QWidget* changePage;
 
-//     void createVerifyPage();
-//     void createChangePage();
-//     bool loadAuthData();
-//     bool verifyCurrentPassword();
-//     bool validateNewPassword();
-//     void updatePasswordStrength();
-//     void switchToChangePage();
+    // UI элементы первой страницы
+    PasswordEntry* currentPasswordCtrl;
+    QLabel* errorText;
+    QPushButton* verifyNextButton;
 
-// private slots:
-//     void onVerifyNext();
-//     void onChange();
-//     void onCancel();
-//     void onPasswordTextChanged();
-//     void onStrengthTimer();
+    // UI элементы второй страницы
+    PasswordEntry* newPasswordCtrl;
+    PasswordEntry* confirmPasswordCtrl;
+    QProgressBar* strengthGauge;
+    QLabel* strengthText;
+    QPushButton* changeButton;
+    QPushButton* cancelButton;
 
-// public:
-//     ChangePasswordDialog(QWidget *parent, Database &database);
-//     ~ChangePasswordDialog();
-// };
+    // Буферы для паролей (безопасное хранение)
+    char* m_currentPasswordBuffer;
+    size_t m_currentPasswordLen;
+    char* m_newPasswordBuffer;
+    size_t m_newPasswordLen;
 
-// #endif // PASSWORD_CHANGE_H
+    QTimer* strengthTimer;
+
+    static constexpr size_t MAX_PASSWORD_LEN = 4096;
+};
+
+#endif

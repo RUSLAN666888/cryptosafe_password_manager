@@ -122,7 +122,6 @@ cryptosafe: /usr/lib/x86_64-linux-gnu/libargon2.so
 cryptosafe: /usr/lib/x86_64-linux-gnu/libssl.so
 cryptosafe: /usr/lib/x86_64-linux-gnu/libcrypto.so
 cryptosafe: /usr/lib/x86_64-linux-gnu/libzxcvbn.so
-cryptosafe: /usr/lib/x86_64-linux-gnu/libsodium.so
 cryptosafe: /usr/lib/x86_64-linux-gnu/libQt5Gui.so.5.15.13
 cryptosafe: /usr/lib/x86_64-linux-gnu/libQt5Core.so.5.15.13
 cryptosafe: CMakeFiles/cryptosafe.dir/link.txt

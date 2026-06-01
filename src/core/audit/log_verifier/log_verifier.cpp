@@ -139,21 +139,21 @@ LogVerifier::VerificationResult LogVerifier::verifyAllLogs() {
             return result;
         }
 
-        std::vector<uint8_t> publicKey;
-        int keyVersion;
+        // std::vector<uint8_t> publicKey;
+        // int keyVersion;
 
-        m_db->getPublicKeyForSequence(seq, publicKey, keyVersion);
+        // m_db->getPublicKeyForSequence(seq, publicKey, keyVersion);
 
 
-        // Проверка подписи
-        if (!verifySignature(entry_data, signature, publicKey)) {
-            result.isValid = false;
-            result.signaturesValid = false;
-            result.failedSequence = seq;
-            result.errorMessage = "Invalid signature at sequence " + std::to_string(seq);
-            result.tamperedEntries.push_back(seq);
-            return result;
-        }
+        // // Проверка подписи
+        // if (!verifySignature(entry_data, signature, publicKey)) {
+        //     result.isValid = false;
+        //     result.signaturesValid = false;
+        //     result.failedSequence = seq;
+        //     result.errorMessage = "Invalid signature at sequence " + std::to_string(seq);
+        //     result.tamperedEntries.push_back(seq);
+        //     return result;
+        // }
 
 
         // Обновляем expectedPreviousHash для следующей записи

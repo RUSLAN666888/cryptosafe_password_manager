@@ -9,6 +9,10 @@
 #include <thread>
 #include <stdexcept>
 
+#include <key_storage.h>
+#include <aes_gcm.h>
+#include <authentication.h>
+
 using json = nlohmann::json;
 
 // Вспомогательная функция для преобразования SQLite result в string
@@ -1206,4 +1210,169 @@ bool Database::updateContactLastUsed(int contactId)
     releaseConnection(conn);
 
     return (rc == SQLITE_DONE);
+}
+
+bool Database::reencryptAllEntries(int& reencryptedCount)
+{
+    reencryptedCount = 0;
+
+    std::cout << "[REENCRYPT] Starting re-encryption process..." << std::endl;
+
+    // Получаем ключи из KeyManager
+    KeyData oldKeyData;
+    KeyData newKeyData;
+    KeyManager::getInstance().getOldEncryptionKey(oldKeyData);
+    KeyManager::getInstance().getEncryptionKey(newKeyData);
+
+    if (!oldKeyData.data || oldKeyData.size == 0) {
+        std::cerr << "[REENCRYPT] Old key is empty!" << std::endl;
+        return false;
+    }
+    if (!newKeyData.data || newKeyData.size == 0) {
+        std::cerr << "[REENCRYPT] New key is empty!" << std::endl;
+        return false;
+    }
+
+    std::cout << "[REENCRYPT] Old key size: " << oldKeyData.size << std::endl;
+    std::cout << "[REENCRYPT] New key size: " << newKeyData.size << std::endl;
+
+    sqlite3* conn = getConnection();
+    if (!conn) {
+        std::cerr << "[REENCRYPT] Failed to get database connection" << std::endl;
+        return false;
+    }
+    std::cout << "[REENCRYPT] Database connection acquired" << std::endl;
+
+    // Начинаем транзакцию
+    char* errMsg = nullptr;
+    int rc = sqlite3_exec(conn, "BEGIN IMMEDIATE TRANSACTION;", nullptr, nullptr, &errMsg);
+    if (rc != SQLITE_OK) {
+        std::cerr << "[REENCRYPT] Failed to begin transaction: " << (errMsg ? errMsg : "unknown") << std::endl;
+        sqlite3_free(errMsg);
+        releaseConnection(conn);
+        return false;
+    }
+    std::cout << "[REENCRYPT] Transaction started" << std::endl;
+
+    // Проверяем, есть ли записи в таблице
+    const char* countSql = "SELECT COUNT(*) FROM vault_entries";
+    sqlite3_stmt* countStmt = nullptr;
+    rc = sqlite3_prepare_v2(conn, countSql, -1, &countStmt, nullptr);
+    if (rc == SQLITE_OK && sqlite3_step(countStmt) == SQLITE_ROW) {
+        int total = sqlite3_column_int(countStmt, 0);
+        std::cout << "[REENCRYPT] Total entries in vault: " << total << std::endl;
+    }
+    sqlite3_finalize(countStmt);
+
+    // Выбираем все записи
+    const char* selectSql = "SELECT rowid, encrypted_data FROM vault_entries";
+    sqlite3_stmt* selectStmt = nullptr;
+    rc = sqlite3_prepare_v2(conn, selectSql, -1, &selectStmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "[REENCRYPT] Failed to prepare select statement: " << sqlite3_errmsg(conn) << std::endl;
+        sqlite3_exec(conn, "ROLLBACK;", nullptr, nullptr, nullptr);
+        releaseConnection(conn);
+        return false;
+    }
+    std::cout << "[REENCRYPT] Select statement prepared" << std::endl;
+
+    // Готовим UPDATE запрос
+    const char* updateSql = "UPDATE vault_entries SET encrypted_data = ? WHERE rowid = ?";
+    sqlite3_stmt* updateStmt = nullptr;
+    rc = sqlite3_prepare_v2(conn, updateSql, -1, &updateStmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "[REENCRYPT] Failed to prepare update statement: " << sqlite3_errmsg(conn) << std::endl;
+        sqlite3_finalize(selectStmt);
+        sqlite3_exec(conn, "ROLLBACK;", nullptr, nullptr, nullptr);
+        releaseConnection(conn);
+        return false;
+    }
+    std::cout << "[REENCRYPT] Update statement prepared" << std::endl;
+
+    // Настройка шифрования
+    AESGCM<256> cipher;
+    int totalEntries = 0;
+    int successCount = 0;
+
+    while (sqlite3_step(selectStmt) == SQLITE_ROW) {
+        totalEntries++;
+        int rowid = sqlite3_column_int(selectStmt, 0);
+        std::cout << "[REENCRYPT] Processing entry " << rowid << " (" << totalEntries << ")" << std::endl;
+
+        const void* blob = sqlite3_column_blob(selectStmt, 1);
+        int blobSize = sqlite3_column_bytes(selectStmt, 1);
+
+        std::cout << "[REENCRYPT]   Blob size: " << blobSize << " bytes" << std::endl;
+
+        if (blob && blobSize > 0) {
+            std::vector<uint8_t> encryptedData(
+                static_cast<const uint8_t*>(blob),
+                static_cast<const uint8_t*>(blob) + blobSize
+                );
+
+            try {
+                // Расшифровываем старым ключом
+                std::cout << "[REENCRYPT]   Decrypting with old key..." << std::endl;
+                std::vector<uint8_t> plaintext = cipher.decrypt(oldKeyData, encryptedData);
+                std::cout << "[REENCRYPT]   Decrypted size: " << plaintext.size() << " bytes" << std::endl;
+
+                // Шифруем новым ключом
+                std::cout << "[REENCRYPT]   Encrypting with new key..." << std::endl;
+                std::vector<uint8_t> newEncrypted = cipher.encrypt(newKeyData, plaintext);
+                std::cout << "[REENCRYPT]   Encrypted size: " << newEncrypted.size() << " bytes" << std::endl;
+
+                // Обновляем в БД
+                sqlite3_bind_blob(updateStmt, 1, newEncrypted.data(), newEncrypted.size(), SQLITE_STATIC);
+                sqlite3_bind_int(updateStmt, 2, rowid);
+
+                rc = sqlite3_step(updateStmt);
+                if (rc == SQLITE_DONE) {
+                    successCount++;
+                    std::cout << "[REENCRYPT]   Entry " << rowid << " updated successfully" << std::endl;
+                } else {
+                    std::cerr << "[REENCRYPT]   Failed to update entry " << rowid << ", rc=" << rc << std::endl;
+                }
+
+                sqlite3_reset(updateStmt);
+                sqlite3_clear_bindings(updateStmt);
+
+                // Зануляем временные данные
+                secure_zero(plaintext.data(), plaintext.size());
+                secure_zero(newEncrypted.data(), newEncrypted.size());
+
+            } catch (const std::exception& e) {
+                std::cerr << "[REENCRYPT]   Exception: " << e.what() << std::endl;
+                sqlite3_finalize(selectStmt);
+                sqlite3_finalize(updateStmt);
+                sqlite3_exec(conn, "ROLLBACK;", nullptr, nullptr, nullptr);
+                releaseConnection(conn);
+                return false;
+            }
+        } else {
+            std::cout << "[REENCRYPT]   No blob data for entry " << rowid << std::endl;
+        }
+    }
+
+    std::cout << "[REENCRYPT] Total entries processed: " << totalEntries << std::endl;
+    std::cout << "[REENCRYPT] Successfully re-encrypted: " << successCount << std::endl;
+
+    sqlite3_finalize(selectStmt);
+    sqlite3_finalize(updateStmt);
+
+    // Фиксируем транзакцию
+    rc = sqlite3_exec(conn, "COMMIT;", nullptr, nullptr, &errMsg);
+    if (rc != SQLITE_OK) {
+        std::cerr << "[REENCRYPT] Failed to commit transaction: " << (errMsg ? errMsg : "unknown") << std::endl;
+        sqlite3_free(errMsg);
+        releaseConnection(conn);
+        return false;
+    }
+    std::cout << "[REENCRYPT] Transaction committed" << std::endl;
+
+    releaseConnection(conn);
+    reencryptedCount = successCount;
+
+    std::cout << "[REENCRYPT] Re-encryption completed. Success: " << (successCount == totalEntries && totalEntries > 0) << std::endl;
+
+    return successCount == totalEntries && totalEntries > 0;
 }

@@ -25,6 +25,7 @@
 #include <QClipboard>
 #include <nlohmann/json.hpp>
 #include "rsa_cipher.h"
+#include "../src/gui/dialogs/password_change/password_change.h"
 
 using json = nlohmann::json;
 
@@ -321,7 +322,6 @@ bool MainWindow::showLoginDialog()
         derive_encryption_key(masterPassword, passwordLen, encSalt, encKey);
         KeyManager::getInstance().storeEncryptionKey(encKey);
 
-        // ИСПРАВЛЕНО: передаем указатель
         LogSigner::getInstance().initFromMasterPassword(masterPassword, passwordLen);
 
         KeyData existingRSA;
@@ -650,8 +650,29 @@ void MainWindow::onFirstRunWizard()
 
 void MainWindow::onChangePassword()
 {
-    // TODO: реализовать смену пароля
-    QMessageBox::information(this, "Info", "Change password - will be implemented in Sprint 2");
+    // 1. Проверяем, что пользователь залогинен
+    if (!StateManager::getInstance().isLoggedIn()) {
+        QMessageBox::warning(this, "Ошибка", "Вы не авторизованы");
+        return;
+    }
+
+    // 2. Обновляем активность
+    StateManager::getInstance().updateActivity();
+
+    // 3. Создаем и показываем диалог смены пароля
+    ChangePasswordDialog dialog(this, db);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        // 4. После успешной смены пароля выходим из системы
+        //    (пользователь должен войти с новым паролем)
+        StateManager::getInstance().logout();
+
+        // 5. Очищаем все ключи из памяти
+        KeyManager::getInstance().clearAllKeys();
+
+        // 6. Показываем диалог входа с новым паролем
+        showLoginDialog();
+    }
 }
 
 void MainWindow::onImport()

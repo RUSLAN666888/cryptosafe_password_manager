@@ -5,7 +5,6 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 #include "../core/audit/log_verifier/log_verifier.h"
-#include "../gui/dialogs/audit_dialog//audit_log_model.h"
 #include "../src/database/DB_helper/db_helper.h"
 
 

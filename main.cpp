@@ -6,14 +6,18 @@
 #include "../src/core/vault/VaultManager.h"
 #include "src/gui/MainWindow.h"
 #include "../src/core/clipboard_service/clipboard_service.h"
-#include "../src/core/audit/audit_logger/audit_logger.h"
-#include "../src/core/audit/log_verifier/log_verifier.h"
-#include "../src/core/events.h"
+#include <QFile>
 
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    // QFile styleFile("/home/master666/development/cryptosafe_password_manager/dark_theme.qss");
+    // if (styleFile.open(QFile::ReadOnly)) {
+    //     app.setStyleSheet(QLatin1String(styleFile.readAll()));
+    //     styleFile.close();
+    // }
 
     // Устанавливаем имя приложения
     app.setApplicationName("CryptoSafe Manager");

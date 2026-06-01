@@ -593,54 +593,6 @@ src/gui/MainWindow.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/MainWindow.cpp.s
 .PHONY : src/gui/MainWindow.cpp.s
 
-src/gui/dialogs/audit_dialog/audit_log_dialog.o: src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.o
-.PHONY : src/gui/dialogs/audit_dialog/audit_log_dialog.o
-
-# target to build an object file
-src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.o
-.PHONY : src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.o
-
-src/gui/dialogs/audit_dialog/audit_log_dialog.i: src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.i
-.PHONY : src/gui/dialogs/audit_dialog/audit_log_dialog.i
-
-# target to preprocess a source file
-src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.i
-.PHONY : src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.i
-
-src/gui/dialogs/audit_dialog/audit_log_dialog.s: src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.s
-.PHONY : src/gui/dialogs/audit_dialog/audit_log_dialog.s
-
-# target to generate assembly for a file
-src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.s
-.PHONY : src/gui/dialogs/audit_dialog/audit_log_dialog.cpp.s
-
-src/gui/dialogs/audit_dialog/audit_log_model.o: src/gui/dialogs/audit_dialog/audit_log_model.cpp.o
-.PHONY : src/gui/dialogs/audit_dialog/audit_log_model.o
-
-# target to build an object file
-src/gui/dialogs/audit_dialog/audit_log_model.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/audit_dialog/audit_log_model.cpp.o
-.PHONY : src/gui/dialogs/audit_dialog/audit_log_model.cpp.o
-
-src/gui/dialogs/audit_dialog/audit_log_model.i: src/gui/dialogs/audit_dialog/audit_log_model.cpp.i
-.PHONY : src/gui/dialogs/audit_dialog/audit_log_model.i
-
-# target to preprocess a source file
-src/gui/dialogs/audit_dialog/audit_log_model.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/audit_dialog/audit_log_model.cpp.i
-.PHONY : src/gui/dialogs/audit_dialog/audit_log_model.cpp.i
-
-src/gui/dialogs/audit_dialog/audit_log_model.s: src/gui/dialogs/audit_dialog/audit_log_model.cpp.s
-.PHONY : src/gui/dialogs/audit_dialog/audit_log_model.s
-
-# target to generate assembly for a file
-src/gui/dialogs/audit_dialog/audit_log_model.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/cryptosafe_lib.dir/build.make CMakeFiles/cryptosafe_lib.dir/src/gui/dialogs/audit_dialog/audit_log_model.cpp.s
-.PHONY : src/gui/dialogs/audit_dialog/audit_log_model.cpp.s
-
 src/gui/dialogs/entry_dialog/entry_dialog.o: src/gui/dialogs/entry_dialog/entry_dialog.cpp.o
 .PHONY : src/gui/dialogs/entry_dialog/entry_dialog.o
 
@@ -1111,12 +1063,6 @@ help:
 	@echo "... src/gui/MainWindow.o"
 	@echo "... src/gui/MainWindow.i"
 	@echo "... src/gui/MainWindow.s"
-	@echo "... src/gui/dialogs/audit_dialog/audit_log_dialog.o"
-	@echo "... src/gui/dialogs/audit_dialog/audit_log_dialog.i"
-	@echo "... src/gui/dialogs/audit_dialog/audit_log_dialog.s"
-	@echo "... src/gui/dialogs/audit_dialog/audit_log_model.o"
-	@echo "... src/gui/dialogs/audit_dialog/audit_log_model.i"
-	@echo "... src/gui/dialogs/audit_dialog/audit_log_model.s"
 	@echo "... src/gui/dialogs/entry_dialog/entry_dialog.o"
 	@echo "... src/gui/dialogs/entry_dialog/entry_dialog.i"
 	@echo "... src/gui/dialogs/entry_dialog/entry_dialog.s"

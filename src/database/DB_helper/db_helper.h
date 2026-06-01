@@ -193,6 +193,8 @@ public:
 
     // Обновление времени последнего использования
     bool updateContactLastUsed(int contactId);
+
+    bool reencryptAllEntries(int& reencryptedCount);
 };
 
 #endif
