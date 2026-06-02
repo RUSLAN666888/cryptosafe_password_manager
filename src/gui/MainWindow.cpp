@@ -120,32 +120,32 @@ void MainWindow::createMenuBar()
 {
     menuBar = new QMenuBar(this);
 
-    QMenu *fileMenu = menuBar->addMenu("&File");
-    fileMenu->addAction("&New Database", this, &MainWindow::onNewDatabase, QKeySequence::New);
-    fileMenu->addAction("&Open Database", this, &MainWindow::onOpenDatabase, QKeySequence::Open);
-    fileMenu->addSeparator();
-    fileMenu->addAction("E&xit", this, &MainWindow::onExit, QKeySequence::Quit);
+    QMenu *fileMenu = menuBar->addMenu("&Файл");
+    //fileMenu->addAction("&New Database", this, &MainWindow::onNewDatabase, QKeySequence::New);
+    //fileMenu->addAction("&Open Database", this, &MainWindow::onOpenDatabase, QKeySequence::Open);
+    //fileMenu->addSeparator();
+    //fileMenu->addAction("E&xit", this, &MainWindow::onExit, QKeySequence::Quit);
 
-    QMenu *editMenu = menuBar->addMenu("&Edit");
-    editMenu->addAction("&Add Entry", this, &MainWindow::onAddEntry, QKeySequence("Ctrl+A"));
-    editMenu->addAction("&Edit Entry", this, &MainWindow::onEditEntry, QKeySequence("Ctrl+E"));
-    editMenu->addAction("&Delete Entry", this, &MainWindow::onDeleteEntry, QKeySequence::Delete);
+    QMenu *editMenu = menuBar->addMenu("&Правка");
+    editMenu->addAction("&Добавить запись", this, &MainWindow::onAddEntry, QKeySequence("Ctrl+A"));
+    editMenu->addAction("&Редактировать запись", this, &MainWindow::onEditEntry, QKeySequence("Ctrl+E"));
+    editMenu->addAction("&Удалить запись", this, &MainWindow::onDeleteEntry, QKeySequence::Delete);
     editMenu->addSeparator();
-    editMenu->addAction("&Lock", this, &MainWindow::onLock, QKeySequence("Ctrl+L"));
+    editMenu->addAction("&Заблокировать", this, &MainWindow::onLock, QKeySequence("Ctrl+L"));
     editMenu->addSeparator();
-    editMenu->addAction("&Change Master Password", this, &MainWindow::onChangePassword, QKeySequence("Ctrl+Shift+P"));
+    editMenu->addAction("&Сменить мастер-пароль", this, &MainWindow::onChangePassword, QKeySequence("Ctrl+Shift+P"));
 
-    QMenu *viewMenu = menuBar->addMenu("&View");
-    viewMenu->addAction("&Audit Logs", this, &MainWindow::onViewAuditLogs, QKeySequence("Ctrl+Shift+A"));
-    viewMenu->addSeparator();
-    viewMenu->addAction("&Settings", this, &MainWindow::onSettings, QKeySequence("Ctrl+,"));
+    QMenu *viewMenu = menuBar->addMenu("&Вид");
+    //viewMenu->addAction("&Журнал аудита", this, &MainWindow::onViewAuditLogs, QKeySequence("Ctrl+Shift+A"));
+    //viewMenu->addSeparator();
+    viewMenu->addAction("&Настройки", this, &MainWindow::onSettings, QKeySequence("Ctrl+,"));
 
-    QMenu *helpMenu = menuBar->addMenu("&Help");
-    helpMenu->addAction("Setup &Wizard", this, &MainWindow::onFirstRunWizard);
+    QMenu *helpMenu = menuBar->addMenu("&Справка");
+    helpMenu->addAction("&Мастер настройки", this, &MainWindow::onFirstRunWizard);
     helpMenu->addSeparator();
-    helpMenu->addAction("&About", this, &MainWindow::onAbout);
+    helpMenu->addAction("&О программе", this, &MainWindow::onAbout);
 
-    QMenu* toolsMenu = menuBar->addMenu("&Tools");
+    QMenu* toolsMenu = menuBar->addMenu("&Инструменты");
     toolsMenu->addAction("Мой публичный ключ", this, &MainWindow::onExportPublicKey);
     toolsMenu->addAction("Импорт публичного ключа", this, &MainWindow::onImportPublicKey);
 
@@ -155,9 +155,9 @@ void MainWindow::createMenuBar()
 void MainWindow::createToolBar()
 {
     toolBar = addToolBar("Main");
-    toolBar->addAction("Add", this, &MainWindow::onAddEntry);
-    toolBar->addAction("Edit", this, &MainWindow::onEditEntry);
-    toolBar->addAction("Delete", this, &MainWindow::onDeleteEntry);
+    toolBar->addAction("Добавить", this, &MainWindow::onAddEntry);
+    toolBar->addAction("Редактировать", this, &MainWindow::onEditEntry);
+    toolBar->addAction("Удалить", this, &MainWindow::onDeleteEntry);
     toolBar->addSeparator();
     toolBar->addAction("Экспорт", this, &MainWindow::onExport);
     toolBar->addAction("Импорт", this, &MainWindow::onImport);

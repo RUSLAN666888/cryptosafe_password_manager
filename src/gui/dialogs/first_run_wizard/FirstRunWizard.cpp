@@ -18,9 +18,14 @@ FirstRunWizard::FirstRunWizard(QWidget *parent, ConfigHander &cfg)
     , m_passwordBuffer(nullptr)
     , m_passwordLen(0)
 {
-    setWindowTitle("CryptoSafe Setup Wizard");
+    setWindowTitle("Мастер настройки CryptoSafe");
     setWizardStyle(QWizard::ModernStyle);
     setMinimumSize(500, 500);
+
+    setButtonText(QWizard::NextButton, "Далее");
+    setButtonText(QWizard::BackButton, "Назад");
+    setButtonText(QWizard::CancelButton, "Отмена");
+    setButtonText(QWizard::FinishButton, "Готово");
 
     // Создаем страницы
     welcomePage = createWelcomePage();
@@ -58,21 +63,21 @@ void FirstRunWizard::clearPasswordBuffer()
 QWizardPage* FirstRunWizard::createWelcomePage()
 {
     QWizardPage* page = new QWizardPage;
-    page->setTitle("Welcome to CryptoSafe Manager!");
+    page->setTitle("Добро пожаловать в CryptoSafe Manager!");
 
     QVBoxLayout* layout = new QVBoxLayout(page);
 
     QLabel* text = new QLabel(
-        "This wizard will help you set up your password manager.\n\n"
-        "You will need to:\n"
-        "- Create a master password\n"
-        "- Choose database location\n"
-        "- Configure encryption settings",
+        "Этот мастер поможет настроить ваш менеджер паролей.\n\n"
+        "Вам потребуется:\n"
+        "- Создать мастер-пароль\n"
+        "- Выбрать расположение базы данных\n"
+        "- Настроить параметры шифрования",
         page);
     text->setWordWrap(true);
     layout->addWidget(text);
 
-    QLabel* instruction = new QLabel("Click Next to begin setup.", page);
+    QLabel* instruction = new QLabel("Нажмите «Далее», чтобы начать настройку.", page);
     instruction->setAlignment(Qt::AlignCenter);
     layout->addWidget(instruction);
 
@@ -84,15 +89,15 @@ QWizardPage* FirstRunWizard::createWelcomePage()
 QWizardPage* FirstRunWizard::createPasswordPage()
 {
     QWizardPage* page = new QWizardPage;
-    page->setTitle("Create Master Password");
-    page->setSubTitle("Choose a strong master password to protect your vault.");
+    page->setTitle("Создание мастер-пароля");
+    page->setSubTitle("Выберите надёжный мастер-пароль для защиты вашего хранилища.");
 
     QVBoxLayout* layout = new QVBoxLayout(page);
 
-    QLabel* passLabel = new QLabel("Password:", page);
+    QLabel* passLabel = new QLabel("Пароль:", page);
     passwordCtrl = new PasswordEntry(page, "", QSize(300, -1));
 
-    QLabel* confirmLabel = new QLabel("Confirm:", page);
+    QLabel* confirmLabel = new QLabel("Подтверждение:", page);
     confirmCtrl = new PasswordEntry(page, "", QSize(300, -1));
 
     layout->addWidget(passLabel);
@@ -104,7 +109,7 @@ QWizardPage* FirstRunWizard::createPasswordPage()
     strengthGauge->setMaximumHeight(20);
     layout->addWidget(strengthGauge);
 
-    strengthText = new QLabel("Enter password to check strength", page);
+    strengthText = new QLabel("Введите пароль для проверки", page);
     QPalette pal = strengthText->palette();
     pal.setColor(QPalette::WindowText, QColor(100, 100, 100));
     strengthText->setPalette(pal);
@@ -127,26 +132,26 @@ QWizardPage* FirstRunWizard::createPasswordPage()
 QWizardPage* FirstRunWizard::createDatabasePage()
 {
     QWizardPage* page = new QWizardPage;
-    page->setTitle("Database Location");
-    page->setSubTitle("Choose where to store your encrypted vault.");
+    page->setTitle("Расположение базы данных");
+    page->setSubTitle("Выберите место для хранения зашифрованного хранилища.");
 
     QVBoxLayout* layout = new QVBoxLayout(page);
 
     QHBoxLayout* pathLayout = new QHBoxLayout;
 
-    QLabel* pathLabel = new QLabel("Path:", page);
+    QLabel* pathLabel = new QLabel("Путь:", page);
     pathLayout->addWidget(pathLabel);
 
     dbPathCtrl = new QLineEdit(page);
     dbPathCtrl->setText(QString::fromStdString(config.getDatabasePath()));
     pathLayout->addWidget(dbPathCtrl);
 
-    browseButton = new QPushButton("Browse...", page);
+    browseButton = new QPushButton("Обзор...", page);
     pathLayout->addWidget(browseButton);
 
     layout->addLayout(pathLayout);
 
-    QLabel* info = new QLabel("All passwords will be stored in this file", page);
+    QLabel* info = new QLabel("Все пароли будут храниться в этом файле", page);
     QPalette pal = info->palette();
     pal.setColor(QPalette::WindowText, QColor(100, 100, 100));
     info->setPalette(pal);
@@ -162,14 +167,14 @@ QWizardPage* FirstRunWizard::createDatabasePage()
 QWizardPage* FirstRunWizard::createEncryptionPage()
 {
     QWizardPage* page = new QWizardPage;
-    page->setTitle("Encryption Settings");
-    page->setSubTitle("Configure Argon2id parameters for key derivation.");
+    page->setTitle("Настройки шифрования");
+    page->setSubTitle("Настройте параметры Argon2id для формирования ключа.");
 
     QVBoxLayout* layout = new QVBoxLayout(page);
 
     QLabel* note = new QLabel(
-        "These settings control how your master password is strengthened.\n"
-        "Higher values = more secure but slower unlock.",
+        "Эти параметры управляют усилением вашего мастер-пароля.\n"
+        "Большие значения = безопаснее, но медленнее разблокировка.",
         page);
     note->setWordWrap(true);
     QPalette pal = note->palette();
@@ -179,13 +184,13 @@ QWizardPage* FirstRunWizard::createEncryptionPage()
 
     layout->addSpacing(20);
 
-    QGroupBox* settingsGroup = new QGroupBox("Argon2id Parameters", page);
+    QGroupBox* settingsGroup = new QGroupBox("Параметры Argon2id", page);
     QGridLayout* gridLayout = new QGridLayout(settingsGroup);
 
     gridLayout->setContentsMargins(20, 20, 20, 20);
     gridLayout->setSpacing(15);
 
-    QLabel* timeLabel = new QLabel("Time cost (iterations):", settingsGroup);
+    QLabel* timeLabel = new QLabel("Временная сложность (итерации):", settingsGroup);
     timeLabel->setMinimumHeight(30);
     gridLayout->addWidget(timeLabel, 0, 0);
 
@@ -195,7 +200,7 @@ QWizardPage* FirstRunWizard::createEncryptionPage()
     iterationsSpin->setMinimumWidth(120);
     gridLayout->addWidget(iterationsSpin, 0, 1);
 
-    QLabel* memoryLabel = new QLabel("Memory cost (MiB):", settingsGroup);
+    QLabel* memoryLabel = new QLabel("Стоимость памяти (МиБ):", settingsGroup);
     memoryLabel->setMinimumHeight(30);
     gridLayout->addWidget(memoryLabel, 1, 0);
 
@@ -205,7 +210,7 @@ QWizardPage* FirstRunWizard::createEncryptionPage()
     memorySpin->setMinimumWidth(120);
     gridLayout->addWidget(memorySpin, 1, 1);
 
-    QLabel* parallelLabel = new QLabel("Parallelism (threads):", settingsGroup);
+    QLabel* parallelLabel = new QLabel("Параллелизм (потоки):", settingsGroup);
     parallelLabel->setMinimumHeight(30);
     gridLayout->addWidget(parallelLabel, 2, 0);
 
@@ -215,7 +220,7 @@ QWizardPage* FirstRunWizard::createEncryptionPage()
     parallelSpin->setMinimumWidth(120);
     gridLayout->addWidget(parallelSpin, 2, 1);
 
-    QLabel* hashLabel = new QLabel("Hash length (bytes):", settingsGroup);
+    QLabel* hashLabel = new QLabel("Длина хеша (байты):", settingsGroup);
     hashLabel->setMinimumHeight(30);
     gridLayout->addWidget(hashLabel, 3, 0);
 
@@ -243,13 +248,13 @@ QWizardPage* FirstRunWizard::createEncryptionPage()
 QWizardPage* FirstRunWizard::createFinishPage()
 {
     QWizardPage* page = new QWizardPage;
-    page->setTitle("Setup Complete!");
+    page->setTitle("Настройка завершена!");
 
     QVBoxLayout* layout = new QVBoxLayout(page);
 
     QLabel* text = new QLabel(
-        "Your password manager is ready to use.\n\n"
-        "Click Finish to start the application.",
+        "Ваш менеджер паролей готов к использованию.\n\n"
+        "Нажмите «Готово», чтобы запустить приложение.",
         page);
     text->setWordWrap(true);
     text->setAlignment(Qt::AlignCenter);
@@ -264,9 +269,9 @@ void FirstRunWizard::onBrowseDatabase()
 {
     QString filename = QFileDialog::getSaveFileName(
         this,
-        "Select database file",
+        "Выберите файл базы данных",
         "",
-        "SQLite files (*.db);;All files (*.*)"
+        "Файлы SQLite (*.db);;Все файлы (*.*)"
         );
 
     if (!filename.isEmpty()) {
@@ -286,7 +291,7 @@ void FirstRunWizard::onStrengthTimer()
 
     if (password.isEmpty()) {
         strengthGauge->setValue(0);
-        strengthText->setText("Enter password to check strength");
+        strengthText->setText("Введите пароль для проверки");
         QPalette pal = strengthText->palette();
         pal.setColor(QPalette::WindowText, QColor(100, 100, 100));
         strengthText->setPalette(pal);
@@ -306,12 +311,12 @@ void FirstRunWizard::onStrengthTimer()
     QString message;
 
     switch (score) {
-    case 0: color = QColor(255, 0, 0); message = "Too weak - easily guessable"; break;
-    case 1: color = QColor(255, 100, 0); message = "Very weak"; break;
-    case 2: color = QColor(255, 255, 0); message = "Weak"; break;
-    case 3: color = QColor(0, 255, 0); message = "Strong"; break;
-    case 4: color = QColor(0, 200, 0); message = "Very strong"; break;
-    default: color = QColor(100, 100, 100); message = "Unknown";
+    case 0: color = QColor(255, 0, 0); message = "Слишком слабый - легко угадать"; break;
+    case 1: color = QColor(255, 100, 0); message = "Очень слабый"; break;
+    case 2: color = QColor(255, 255, 0); message = "Слабый"; break;
+    case 3: color = QColor(0, 255, 0); message = "Сильный"; break;
+    case 4: color = QColor(0, 200, 0); message = "Очень сильный"; break;
+    default: color = QColor(100, 100, 100); message = "Неизвестно";
     }
 
     strengthText->setText(message);
@@ -326,17 +331,17 @@ bool FirstRunWizard::validatePassword()
     QString confirm = confirmCtrl->getValue();
 
     if (password.isEmpty()) {
-        QMessageBox::critical(this, "Error", "Password cannot be empty!");
+        QMessageBox::critical(this, "Ошибка", "Пароль не может быть пустым!");
         return false;
     }
 
     if (password != confirm) {
-        QMessageBox::critical(this, "Error", "Passwords do not match!");
+        QMessageBox::critical(this, "Ошибка", "Пароли не совпадают!");
         return false;
     }
 
     if (password.length() < 12) {
-        QMessageBox::critical(this, "Error", "Password must be at least 12 characters!");
+        QMessageBox::critical(this, "Ошибка", "Пароль должен содержать не менее 12 символов!");
         return false;
     }
 
@@ -345,10 +350,10 @@ bool FirstRunWizard::validatePassword()
     int score = check_password_strength(pwdBytes.constData(), pwdBytes.size());
 
     if (score < 3) {
-        QMessageBox::warning(this, "Weak Password",
-                             "Password is not strong enough!\n\n"
-                             "Please choose a stronger password that is not common, "
-                             "doesn't contain dictionary words, and has good entropy.");
+        QMessageBox::warning(this, "Слабый пароль",
+                             "Пароль недостаточно надёжен!\n\n"
+                             "Пожалуйста, выберите более надёжный пароль, который не является распространённым, "
+                             "не содержит словарных слов и обладает хорошей энтропией.");
         memset(pwdBytes.data(), 0, pwdBytes.size());
         return false;
     }
@@ -393,7 +398,7 @@ void FirstRunWizard::accept()
 
     encSalt.resize(16);
     if (RAND_bytes(encSalt.data(), static_cast<int>(encSalt.size())) != 1) {
-        QMessageBox::critical(this, "Error", "Failed to generate random salt for encryption key");
+        QMessageBox::critical(this, "Ошибка", "Не удалось сгенерировать случайную соль для ключа шифрования");
         return;
     }
 

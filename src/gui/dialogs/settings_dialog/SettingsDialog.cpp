@@ -1,12 +1,6 @@
 #include "SettingsDialog.h"
 #include "../src/core/clipboard_service/clipboard_service.h"
 #include <QMessageBox>
-#include <QGroupBox>
-#include <QFormLayout>
-#include <QLineEdit>
-#include <QCheckBox>
-#include <QSpinBox>
-#include <QComboBox>
 #include <QApplication>
 #include <QScreen>
 
@@ -15,29 +9,24 @@ SettingsDialog::SettingsDialog(Database& db, QWidget *parent, ConfigHander &cfg)
     , config(cfg)
     , m_db(db)
 {
-    setWindowTitle("Settings");
-    setMinimumSize(500, 400);
+    setWindowTitle("Настройки");
+    setMinimumSize(500, 450);
     setModal(true);
 
-    // Основной layout
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-    // Создаем вкладки
     tabWidget = new QTabWidget(this);
 
-    createGeneralTab();
-    createClipboardTab();
-    createAdvancedTab();
     createPasswordGeneratorTab();
+    createClipboardTab();
 
     mainLayout->addWidget(tabWidget);
 
-    // Кнопки OK/Cancel
     QHBoxLayout *buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();
 
     QPushButton *okButton = new QPushButton("OK", this);
-    QPushButton *cancelButton = new QPushButton("Cancel", this);
+    QPushButton *cancelButton = new QPushButton("Отмена", this);
 
     buttonLayout->addWidget(okButton);
     buttonLayout->addSpacing(10);
@@ -45,20 +34,18 @@ SettingsDialog::SettingsDialog(Database& db, QWidget *parent, ConfigHander &cfg)
     buttonLayout->addSpacing(20);
 
     mainLayout->addLayout(buttonLayout);
-
     setLayout(mainLayout);
 
-    // Подключаем сигналы
     connect(okButton, &QPushButton::clicked, this, &SettingsDialog::onOk);
     connect(cancelButton, &QPushButton::clicked, this, &SettingsDialog::onCancel);
 
-    // Центрируем окно
     adjustSize();
     QRect screenGeometry = QApplication::primaryScreen()->geometry();
     int x = (screenGeometry.width() - width()) / 2;
     int y = (screenGeometry.height() - height()) / 2;
     move(x, y);
 
+    loadPasswordSettings();
     loadClipboardSettings();
 }
 
@@ -66,58 +53,11 @@ SettingsDialog::~SettingsDialog()
 {
 }
 
-void SettingsDialog::createGeneralTab()
-{
-    QWidget *panel = new QWidget();
-    QVBoxLayout *layout = new QVBoxLayout(panel);
-
-    // Заголовок
-    QLabel *title = new QLabel("General Settings", panel);
-    QFont titleFont = title->font();
-    titleFont.setPointSize(12);
-    titleFont.setBold(true);
-    title->setFont(titleFont);
-    layout->addWidget(title);
-
-    layout->addSpacing(10);
-
-    // Группа настроек
-    QGroupBox *settingsGroup = new QGroupBox("Application Settings", panel);
-    QFormLayout *formLayout = new QFormLayout(settingsGroup);
-    formLayout->setSpacing(10);
-    formLayout->setContentsMargins(15, 15, 15, 15);
-
-    QLabel *dbPathLabel = new QLabel(QString::fromStdString(config.getDatabasePath()), settingsGroup);
-    dbPathLabel->setWordWrap(true);
-    dbPathLabel->setStyleSheet("color: #666;");
-    formLayout->addRow("Database Path:", dbPathLabel);
-
-    QCheckBox *startMinimized = new QCheckBox("Start minimized to tray", settingsGroup);
-    startMinimized->setChecked(false);
-    startMinimized->setEnabled(false); // Заглушка
-    formLayout->addRow("", startMinimized);
-
-    settingsGroup->setLayout(formLayout);
-    layout->addWidget(settingsGroup);
-
-    layout->addStretch();
-
-    // Информация
-    QLabel *info = new QLabel("General settings will be fully implemented in Sprint 4-5", panel);
-    info->setStyleSheet("color: #888;");
-    info->setWordWrap(true);
-    layout->addWidget(info);
-
-    panel->setLayout(layout);
-    tabWidget->addTab(panel, "General");
-}
-
 void SettingsDialog::createPasswordGeneratorTab()
 {
     QWidget *panel = new QWidget();
     QVBoxLayout *layout = new QVBoxLayout(panel);
 
-    // Заголовок
     QLabel *title = new QLabel("Настройки генератора паролей", panel);
     QFont titleFont = title->font();
     titleFont.setPointSize(12);
@@ -127,20 +67,17 @@ void SettingsDialog::createPasswordGeneratorTab()
 
     layout->addSpacing(10);
 
-    // Группа настроек генератора
     QGroupBox *settingsGroup = new QGroupBox("Параметры генерации", panel);
     QFormLayout *formLayout = new QFormLayout(settingsGroup);
     formLayout->setSpacing(10);
     formLayout->setContentsMargins(15, 15, 15, 15);
 
-    // Длина пароля
     m_passwordLengthSpin = new QSpinBox(settingsGroup);
     m_passwordLengthSpin->setRange(8, 64);
     m_passwordLengthSpin->setSuffix(" символов");
     m_passwordLengthSpin->setValue(16);
     formLayout->addRow("Длина пароля:", m_passwordLengthSpin);
 
-    // Наборы символов
     m_useUppercaseCheck = new QCheckBox("Заглавные буквы (A-Z)", settingsGroup);
     m_useUppercaseCheck->setChecked(true);
     formLayout->addRow("", m_useUppercaseCheck);
@@ -157,7 +94,6 @@ void SettingsDialog::createPasswordGeneratorTab()
     m_useSymbolsCheck->setChecked(true);
     formLayout->addRow("", m_useSymbolsCheck);
 
-    // Исключение неоднозначных символов
     m_excludeAmbiguousCheck = new QCheckBox("Исключить неоднозначные символы (l, I, 1, 0, O)", settingsGroup);
     m_excludeAmbiguousCheck->setChecked(true);
     formLayout->addRow("", m_excludeAmbiguousCheck);
@@ -165,30 +101,16 @@ void SettingsDialog::createPasswordGeneratorTab()
     settingsGroup->setLayout(formLayout);
     layout->addWidget(settingsGroup);
 
-    // Пояснение
     QLabel *infoLabel = new QLabel(
-        "Эти настройки будут использоваться при генерации паролей в диалоге добавления/редактирования записей.",
+        "Эти настройки будут использоваться при генерации паролей в диалоге добавления и редактирования записей.",
         panel);
     infoLabel->setWordWrap(true);
     infoLabel->setStyleSheet("color: #666; font-size: 10px; margin-top: 10px;");
     layout->addWidget(infoLabel);
 
     layout->addStretch();
-
     panel->setLayout(layout);
     tabWidget->addTab(panel, "Генератор паролей");
-
-    // Загружаем настройки из БД
-    loadPasswordSettings();
-
-    // Подключаем сигналы (для сохранения, без предварительного просмотра)
-    connect(m_passwordLengthSpin, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, &SettingsDialog::onPasswordLengthChanged);
-    connect(m_useUppercaseCheck, &QCheckBox::stateChanged, this, &SettingsDialog::onUseUppercaseChanged);
-    connect(m_useLowercaseCheck, &QCheckBox::stateChanged, this, &SettingsDialog::onUseLowercaseChanged);
-    connect(m_useDigitsCheck, &QCheckBox::stateChanged, this, &SettingsDialog::onUseDigitsChanged);
-    connect(m_useSymbolsCheck, &QCheckBox::stateChanged, this, &SettingsDialog::onUseSymbolsChanged);
-    connect(m_excludeAmbiguousCheck, &QCheckBox::stateChanged, this, &SettingsDialog::onExcludeAmbiguousChanged);
 }
 
 void SettingsDialog::createClipboardTab()
@@ -211,9 +133,9 @@ void SettingsDialog::createClipboardTab()
 
     m_securityLevel = new QComboBox(securityGroup);
     m_securityLevel->addItem("Пользовательские настройки");
-    m_securityLevel->addItem("Basic (30 сек, уведомления выключены)");
-    m_securityLevel->addItem("Advanced (15 сек, уведомления включены)");
-    m_securityLevel->addItem("Paranoid (5 сек, уведомления включены)");
+    m_securityLevel->addItem("Базовый (30 сек, уведомления выключены)");
+    m_securityLevel->addItem("Продвинутый (15 сек, уведомления включены)");
+    m_securityLevel->addItem("Параноидальный (5 сек, уведомления включены)");
 
     securityLayout->addWidget(m_securityLevel);
     securityGroup->setLayout(securityLayout);
@@ -222,12 +144,14 @@ void SettingsDialog::createClipboardTab()
     layout->addSpacing(10);
 
     // === Настройки авто очистки ===
-    QGroupBox* settingsGroup = new QGroupBox("Настройки авто очистки", panel);
+    QGroupBox* settingsGroup = new QGroupBox("Автоматическая очистка", panel);
     QFormLayout* formLayout = new QFormLayout(settingsGroup);
+    formLayout->setSpacing(10);
+    formLayout->setContentsMargins(15, 15, 15, 15);
 
     m_clipboardTimeoutSpin = new QSpinBox(settingsGroup);
     m_clipboardTimeoutSpin->setRange(5, 300);
-    m_clipboardTimeoutSpin->setSuffix(" seconds");
+    m_clipboardTimeoutSpin->setSuffix(" секунд");
     m_clipboardTimeoutSpin->setValue(30);
     formLayout->addRow("Очищать буфер через:", m_clipboardTimeoutSpin);
 
@@ -244,6 +168,8 @@ void SettingsDialog::createClipboardTab()
     // === Настройки уведомлений ===
     QGroupBox* notificationGroup = new QGroupBox("Уведомления", panel);
     QVBoxLayout* notificationLayout = new QVBoxLayout(notificationGroup);
+    notificationLayout->setSpacing(8);
+    notificationLayout->setContentsMargins(15, 15, 15, 15);
 
     m_notifyOnCopy = new QCheckBox("Показывать уведомление при копировании", notificationGroup);
     m_notifyOnWarning = new QCheckBox("Показывать предупреждение за 5 секунд до очистки", notificationGroup);
@@ -260,104 +186,26 @@ void SettingsDialog::createClipboardTab()
 
     // Пояснение
     QLabel* info = new QLabel(
-        "Basic: минимальная защита, без уведомлений.\n"
-        "Advanced: стандартная защита с уведомлениями.\n"
-        "Paranoid: максимальная защита, быстрая очистка.\n"
+        "Базовый: минимальная защита, без уведомлений.\n"
+        "Продвинутый: стандартная защита с уведомлениями.\n"
+        "Параноидальный: максимальная защита, быстрая очистка.\n"
         "Пользовательские настройки: используйте свои значения.",
         panel);
     info->setWordWrap(true);
-    info->setStyleSheet("color: #666; font-size: 10px;");
+    info->setStyleSheet("color: #666; font-size: 10px; margin-top: 10px;");
     layout->addWidget(info);
 
     panel->setLayout(layout);
-    tabWidget->addTab(panel, "Clipboard");
+    tabWidget->addTab(panel, "Буфер обмена");
 
-    // Подключаем сигнал изменения пресета
     connect(m_securityLevel, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &SettingsDialog::onSecurityLevelChanged);
 }
 
-void SettingsDialog::createAdvancedTab()
-{
-    QWidget *panel = new QWidget();
-    QVBoxLayout *layout = new QVBoxLayout(panel);
-
-    // Заголовок
-    QLabel *title = new QLabel("Advanced Settings", panel);
-    QFont titleFont = title->font();
-    titleFont.setPointSize(12);
-    titleFont.setBold(true);
-    title->setFont(titleFont);
-    layout->addWidget(title);
-
-    layout->addSpacing(10);
-
-    // Группа импорта/экспорта
-    QGroupBox *importExportGroup = new QGroupBox("Import/Export", panel);
-    QVBoxLayout *importExportLayout = new QVBoxLayout(importExportGroup);
-
-    QPushButton *importBtn = new QPushButton("Import from CSV...", importExportGroup);
-    importBtn->setEnabled(false); // Заглушка
-    QPushButton *exportBtn = new QPushButton("Export to CSV...", importExportGroup);
-    exportBtn->setEnabled(false); // Заглушка
-
-    importExportLayout->addWidget(importBtn);
-    importExportLayout->addWidget(exportBtn);
-
-    importExportGroup->setLayout(importExportLayout);
-    layout->addWidget(importExportGroup);
-
-    layout->addSpacing(10);
-
-    // Группа резервного копирования
-    QGroupBox *backupGroup = new QGroupBox("Backup", panel);
-    QVBoxLayout *backupLayout = new QVBoxLayout(backupGroup);
-
-    QPushButton *backupBtn = new QPushButton("Create Backup...", backupGroup);
-    backupBtn->setEnabled(false); // Заглушка
-    QPushButton *restoreBtn = new QPushButton("Restore from Backup...", backupGroup);
-    restoreBtn->setEnabled(false); // Заглушка
-
-    backupLayout->addWidget(backupBtn);
-    backupLayout->addWidget(restoreBtn);
-
-    backupGroup->setLayout(backupLayout);
-    layout->addWidget(backupGroup);
-
-    layout->addSpacing(10);
-
-    // Группа темы
-    QGroupBox *themeGroup = new QGroupBox("Appearance", panel);
-    QFormLayout *themeLayout = new QFormLayout(themeGroup);
-
-    QComboBox *themeCombo = new QComboBox(themeGroup);
-    themeCombo->addItem("System Default");
-    themeCombo->addItem("Light");
-    themeCombo->addItem("Dark");
-    themeCombo->setEnabled(false); // Заглушка
-    themeLayout->addRow("Theme:", themeCombo);
-
-    themeGroup->setLayout(themeLayout);
-    layout->addWidget(themeGroup);
-
-    layout->addStretch();
-
-    // Информация
-    QLabel *info = new QLabel("Advanced settings will be implemented in Sprint 6-8", panel);
-    info->setStyleSheet("color: #888;");
-    info->setWordWrap(true);
-    layout->addWidget(info);
-
-    panel->setLayout(layout);
-    tabWidget->addTab(panel, "Advanced");
-}
-
 void SettingsDialog::onOk()
 {
-    // Сохраняем настройки
     savePasswordSettings();
     saveClipboardSettings();
-    //ClipboardService::getInstance().loadSettings();
 
     QMessageBox::information(this, "CryptoSafe Manager",
                              "Настройки успешно сохранены.",
@@ -373,7 +221,6 @@ void SettingsDialog::onCancel()
 
 void SettingsDialog::loadPasswordSettings()
 {
-    // Загружаем настройки из БД
     try {
         std::string lenStr = m_db.getSetting("password_length", "16");
         m_passwordLengthSpin->setValue(std::stoi(lenStr));
@@ -384,7 +231,6 @@ void SettingsDialog::loadPasswordSettings()
         m_useSymbolsCheck->setChecked(m_db.getSetting("password_use_symbols", "true") == "true");
         m_excludeAmbiguousCheck->setChecked(m_db.getSetting("password_exclude_ambiguous", "true") == "true");
     } catch (const std::exception& e) {
-        // Если ошибка, используем значения по умолчанию
         m_passwordLengthSpin->setValue(16);
         m_useUppercaseCheck->setChecked(true);
         m_useLowercaseCheck->setChecked(true);
@@ -396,7 +242,6 @@ void SettingsDialog::loadPasswordSettings()
 
 void SettingsDialog::savePasswordSettings()
 {
-    std::cout << "LENGTH" << std::to_string(m_passwordLengthSpin->value()) << std::endl;
     m_db.setSetting("password_length", std::to_string(m_passwordLengthSpin->value()));
     m_db.setSetting("password_use_uppercase", m_useUppercaseCheck->isChecked() ? "true" : "false");
     m_db.setSetting("password_use_lowercase", m_useLowercaseCheck->isChecked() ? "true" : "false");
@@ -405,72 +250,9 @@ void SettingsDialog::savePasswordSettings()
     m_db.setSetting("password_exclude_ambiguous", m_excludeAmbiguousCheck->isChecked() ? "true" : "false");
 }
 
-void SettingsDialog::onPasswordLengthChanged(int value)
-{
-    Q_UNUSED(value);
-    // Изменения будут сохранены при нажатии OK
-}
-
-void SettingsDialog::onUseUppercaseChanged(int state)
-{
-    Q_UNUSED(state);
-}
-
-void SettingsDialog::onUseLowercaseChanged(int state)
-{
-    Q_UNUSED(state);
-}
-
-void SettingsDialog::onUseDigitsChanged(int state)
-{
-    Q_UNUSED(state);
-}
-
-void SettingsDialog::onUseSymbolsChanged(int state)
-{
-    Q_UNUSED(state);
-}
-
-void SettingsDialog::onExcludeAmbiguousChanged(int state)
-{
-    Q_UNUSED(state);
-}
-
-void SettingsDialog::onSecurityLevelChanged(int index)
-{
-    // Индекс 0 = Пользовательские настройки (не меняем)
-    if (index == 0) return;
-
-    // Basic
-    if (index == 1) {
-        m_clipboardTimeoutSpin->setValue(30);
-        m_clipboardNeverClear->setChecked(false);
-        m_notifyOnCopy->setChecked(false);
-        m_notifyOnWarning->setChecked(false);
-        m_notifyOnClear->setChecked(false);
-    }
-    // Advanced
-    else if (index == 2) {
-        m_clipboardTimeoutSpin->setValue(15);
-        m_clipboardNeverClear->setChecked(false);
-        m_notifyOnCopy->setChecked(true);
-        m_notifyOnWarning->setChecked(true);
-        m_notifyOnClear->setChecked(true);
-    }
-    // Paranoid
-    else if (index == 3) {
-        m_clipboardTimeoutSpin->setValue(5);
-        m_clipboardNeverClear->setChecked(false);
-        m_notifyOnCopy->setChecked(true);
-        m_notifyOnWarning->setChecked(true);
-        m_notifyOnClear->setChecked(true);
-    }
-}
-
 void SettingsDialog::loadClipboardSettings()
 {
     try {
-        // Загружаем таймер
         std::string timeoutStr = m_db.getSetting("clipboard_timeout", "30");
         int timeout = std::stoi(timeoutStr);
 
@@ -481,12 +263,10 @@ void SettingsDialog::loadClipboardSettings()
             m_clipboardTimeoutSpin->setValue(timeout);
         }
 
-        // Загружаем уведомления
         m_notifyOnCopy->setChecked(m_db.getSetting("clipboard_notify_copy", "true") == "true");
         m_notifyOnWarning->setChecked(m_db.getSetting("clipboard_notify_warning", "true") == "true");
         m_notifyOnClear->setChecked(m_db.getSetting("clipboard_notify_clear", "true") == "true");
 
-        // Загружаем пресет (всегда пользовательский при загрузке)
         m_securityLevel->setCurrentIndex(0);
 
     } catch (const std::exception& e) {
@@ -501,7 +281,6 @@ void SettingsDialog::loadClipboardSettings()
 
 void SettingsDialog::saveClipboardSettings()
 {
-    // Сохраняем таймер
     int timeout;
     if (m_clipboardNeverClear->isChecked()) {
         timeout = 0;
@@ -510,15 +289,38 @@ void SettingsDialog::saveClipboardSettings()
     }
     m_db.setSetting("clipboard_timeout", std::to_string(timeout));
 
-    // Сохраняем уведомления
     m_db.setSetting("clipboard_notify_copy", m_notifyOnCopy->isChecked() ? "true" : "false");
     m_db.setSetting("clipboard_notify_warning", m_notifyOnWarning->isChecked() ? "true" : "false");
     m_db.setSetting("clipboard_notify_clear", m_notifyOnClear->isChecked() ? "true" : "false");
-
-    // Сохраняем выбранный пресет (пользовательский = 0)
     m_db.setSetting("clipboard_security_level", std::to_string(m_securityLevel->currentIndex()));
 
-    // Применяем к ClipboardService
     ClipboardService::getInstance().loadSettings();
     ClipboardService::getInstance().loadNotificationSettings();
+}
+
+void SettingsDialog::onSecurityLevelChanged(int index)
+{
+    if (index == 0) return;
+
+    if (index == 1) {
+        m_clipboardTimeoutSpin->setValue(30);
+        m_clipboardNeverClear->setChecked(false);
+        m_notifyOnCopy->setChecked(false);
+        m_notifyOnWarning->setChecked(false);
+        m_notifyOnClear->setChecked(false);
+    }
+    else if (index == 2) {
+        m_clipboardTimeoutSpin->setValue(15);
+        m_clipboardNeverClear->setChecked(false);
+        m_notifyOnCopy->setChecked(true);
+        m_notifyOnWarning->setChecked(true);
+        m_notifyOnClear->setChecked(true);
+    }
+    else if (index == 3) {
+        m_clipboardTimeoutSpin->setValue(5);
+        m_clipboardNeverClear->setChecked(false);
+        m_notifyOnCopy->setChecked(true);
+        m_notifyOnWarning->setChecked(true);
+        m_notifyOnClear->setChecked(true);
+    }
 }

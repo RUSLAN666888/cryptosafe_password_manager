@@ -16,12 +16,12 @@ ChangePasswordDialog::ChangePasswordDialog(QWidget *parent, Database &database)
     , m_newPasswordBuffer(nullptr)
     , m_newPasswordLen(0)
 {
-    setWindowTitle("Change Master Password");
+    setWindowTitle("Смена мастер-пароля");
     setMinimumSize(450, 400);
     setModal(true);
 
     if (!loadAuthData()) {
-        QMessageBox::critical(this, "Error", "Failed to load authentication data");
+        QMessageBox::critical(this, "Ошибка", "Не удалось загрузить данные аутентификации");
         return;
     }
 
@@ -74,7 +74,7 @@ void ChangePasswordDialog::createVerifyPage()
     verifyPage = new QWidget();
     QVBoxLayout *layout = new QVBoxLayout(verifyPage);
 
-    QLabel *title = new QLabel("Verify Current Password", verifyPage);
+    QLabel *title = new QLabel("Подтверждение текущего пароля", verifyPage);
     QFont titleFont = title->font();
     titleFont.setPointSize(14);
     titleFont.setBold(true);
@@ -83,7 +83,7 @@ void ChangePasswordDialog::createVerifyPage()
     layout->addWidget(title);
     layout->addStretch();
 
-    QLabel *passLabel = new QLabel("Current Password:", verifyPage);
+    QLabel *passLabel = new QLabel("Текущий пароль:", verifyPage);
     currentPasswordCtrl = new PasswordEntry(verifyPage, "", QSize(300, -1));
     errorText = new QLabel("", verifyPage);
     errorText->setStyleSheet("color: red;");
@@ -95,8 +95,8 @@ void ChangePasswordDialog::createVerifyPage()
     layout->addStretch();
 
     QHBoxLayout *buttonLayout = new QHBoxLayout();
-    verifyNextButton = new QPushButton("Verify & Next", verifyPage);
-    QPushButton *cancelBtn = new QPushButton("Cancel", verifyPage);
+    verifyNextButton = new QPushButton("Подтвердить и далее", verifyPage);
+    QPushButton *cancelBtn = new QPushButton("Отмена", verifyPage);
 
     buttonLayout->addStretch();
     buttonLayout->addWidget(verifyNextButton);
@@ -115,7 +115,7 @@ void ChangePasswordDialog::createChangePage()
     changePage = new QWidget();
     QVBoxLayout *layout = new QVBoxLayout(changePage);
 
-    QLabel *title = new QLabel("Create New Master Password", changePage);
+    QLabel *title = new QLabel("Создание нового мастер-пароля", changePage);
     QFont titleFont = title->font();
     titleFont.setPointSize(14);
     titleFont.setBold(true);
@@ -124,7 +124,7 @@ void ChangePasswordDialog::createChangePage()
     layout->addWidget(title);
     layout->addStretch();
 
-    QLabel *newPassLabel = new QLabel("New Password:", changePage);
+    QLabel *newPassLabel = new QLabel("Новый пароль:", changePage);
     newPasswordCtrl = new PasswordEntry(changePage, "", QSize(300, -1));
 
     strengthGauge = new QProgressBar(changePage);
@@ -132,12 +132,12 @@ void ChangePasswordDialog::createChangePage()
     strengthGauge->setValue(0);
     strengthGauge->setMaximumHeight(20);
 
-    strengthText = new QLabel("Enter password to check strength", changePage);
+    strengthText = new QLabel("Введите пароль для проверки", changePage);
     QPalette pal = strengthText->palette();
     pal.setColor(QPalette::WindowText, QColor(100, 100, 100));
     strengthText->setPalette(pal);
 
-    QLabel *confirmLabel = new QLabel("Confirm Password:", changePage);
+    QLabel *confirmLabel = new QLabel("Подтверждение пароля:", changePage);
     confirmPasswordCtrl = new PasswordEntry(changePage, "", QSize(300, -1));
 
     layout->addWidget(newPassLabel);
@@ -150,8 +150,8 @@ void ChangePasswordDialog::createChangePage()
     layout->addStretch();
 
     QHBoxLayout *buttonLayout = new QHBoxLayout();
-    changeButton = new QPushButton("Change Password", changePage);
-    cancelButton = new QPushButton("Cancel", changePage);
+    changeButton = new QPushButton("Сменить пароль", changePage);
+    cancelButton = new QPushButton("Отмена", changePage);
 
     buttonLayout->addStretch();
     buttonLayout->addWidget(changeButton);
@@ -189,12 +189,12 @@ bool ChangePasswordDialog::verifyCurrentPassword()
     QByteArray pwdBytes = currentPasswordCtrl->getValue().toUtf8();
 
     if (pwdBytes.isEmpty()) {
-        errorText->setText("Password cannot be empty");
+        errorText->setText("Пароль не может быть пустым");
         return false;
     }
 
     if (!verify_password(pwdBytes.constData(), pwdBytes.size(), authData)) {
-        errorText->setText("Invalid password");
+        errorText->setText("Неверный пароль");
         memset(pwdBytes.data(), 0, pwdBytes.size());
         return false;
     }
@@ -216,19 +216,19 @@ bool ChangePasswordDialog::validateNewPassword()
     QByteArray confirmBytes = confirmPasswordCtrl->getValue().toUtf8();
 
     if (pwdBytes.isEmpty()) {
-        QMessageBox::critical(this, "Error", "Password cannot be empty!");
+        QMessageBox::critical(this, "Ошибка", "Пароль не может быть пустым!");
         return false;
     }
 
     if (pwdBytes != confirmBytes) {
-        QMessageBox::critical(this, "Error", "Passwords do not match!");
+        QMessageBox::critical(this, "Ошибка", "Пароли не совпадают!");
         memset(pwdBytes.data(), 0, pwdBytes.size());
         memset(confirmBytes.data(), 0, confirmBytes.size());
         return false;
     }
 
     if (pwdBytes.size() < 12) {
-        QMessageBox::critical(this, "Error", "Password must be at least 12 characters!");
+        QMessageBox::critical(this, "Ошибка", "Пароль должен содержать не менее 12 символов!");
         memset(pwdBytes.data(), 0, pwdBytes.size());
         memset(confirmBytes.data(), 0, confirmBytes.size());
         return false;
@@ -236,9 +236,9 @@ bool ChangePasswordDialog::validateNewPassword()
 
     int score = check_password_strength(pwdBytes.constData(), pwdBytes.size());
     if (score < 3) {
-        QMessageBox::warning(this, "Weak Password",
-                             "Password is not strong enough!\n\n"
-                             "Please choose a stronger password.");
+        QMessageBox::warning(this, "Слабый пароль",
+                             "Пароль недостаточно надёжен!\n\n"
+                             "Пожалуйста, выберите более надёжный пароль.");
         memset(pwdBytes.data(), 0, pwdBytes.size());
         memset(confirmBytes.data(), 0, confirmBytes.size());
         return false;
@@ -261,7 +261,7 @@ void ChangePasswordDialog::updatePasswordStrength()
 
     if (pwdBytes.isEmpty()) {
         strengthGauge->setValue(0);
-        strengthText->setText("Enter password to check strength");
+        strengthText->setText("Введите пароль для проверки");
         QPalette pal = strengthText->palette();
         pal.setColor(QPalette::WindowText, QColor(100, 100, 100));
         strengthText->setPalette(pal);
@@ -275,12 +275,12 @@ void ChangePasswordDialog::updatePasswordStrength()
     QColor color;
     QString message;
     switch (score) {
-    case 0: color = QColor(255, 0, 0); message = "Too weak"; break;
-    case 1: color = QColor(255, 100, 0); message = "Very weak"; break;
-    case 2: color = QColor(255, 255, 0); message = "Weak"; break;
-    case 3: color = QColor(0, 255, 0); message = "Strong"; break;
-    case 4: color = QColor(0, 200, 0); message = "Very strong"; break;
-    default: color = QColor(100, 100, 100); message = "Unknown";
+    case 0: color = QColor(255, 0, 0); message = "Слишком слабый"; break;
+    case 1: color = QColor(255, 100, 0); message = "Очень слабый"; break;
+    case 2: color = QColor(255, 255, 0); message = "Слабый"; break;
+    case 3: color = QColor(0, 255, 0); message = "Сильный"; break;
+    case 4: color = QColor(0, 200, 0); message = "Очень сильный"; break;
+    default: color = QColor(100, 100, 100); message = "Неизвестно";
     }
 
     strengthText->setText(message);
@@ -335,18 +335,18 @@ void ChangePasswordDialog::onChange()
     // 6. Перешифровываем все записи (использует старый и новый ключи из KeyManager)
     int reencryptedCount = 0;
     if (!db.reencryptAllEntries(reencryptedCount)) {
-        QMessageBox::critical(this, "Error",
-                              "Failed to re-encrypt entries. Password change cancelled.");
+        QMessageBox::critical(this, "Ошибка",
+                              "Не удалось перешифровать записи. Смена пароля отменена.");
         return;
     }
 
     // 7. Очищаем старый ключ
     KeyManager::getInstance().clearOldEncryptionKey();
 
-    QMessageBox::information(this, "Success",
-                             QString("Password changed successfully!\n\n"
-                                     "Re-encrypted %1 entries with the new key.\n"
-                                     "You will need to log in again with your new password.")
+    QMessageBox::information(this, "Успех",
+                             QString("Пароль успешно изменён!\n\n"
+                                     "Перешифровано %1 записей новым ключом.\n"
+                                     "Вам потребуется войти заново с новым паролем.")
                                  .arg(reencryptedCount));
 
     // Выходим из сессии

@@ -27,7 +27,7 @@ PasswordEntry::PasswordEntry(QWidget *parent,
     }
 
     // Чекбокс "Показать пароль"
-    showPasswordCheck = new QCheckBox(tr("Show"), this);
+    showPasswordCheck = new QCheckBox(tr("ПОказать"), this);
 
     // Добавляем виджеты в layout
     layout->addWidget(passwordInput, 1);

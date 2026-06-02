@@ -13,7 +13,7 @@ LoginDialog::LoginDialog(QWidget* parent, std::function<bool(const char*, size_t
     , m_passwordBuffer(nullptr)
     , m_passwordLen(0)
 {
-    setWindowTitle("Enter Master Password");
+    setWindowTitle("Введите мастер-пароль");
     setMinimumSize(400, 200);
     setModal(true);
 
@@ -22,7 +22,7 @@ LoginDialog::LoginDialog(QWidget* parent, std::function<bool(const char*, size_t
 
     QVBoxLayout* centerLayout = new QVBoxLayout();
 
-    QLabel* title = new QLabel("Enter Master Password", this);
+    QLabel* title = new QLabel("Введите мастер-пароль", this);
     QFont titleFont = title->font();
     titleFont.setPointSize(14);
     titleFont.setBold(true);
@@ -32,7 +32,7 @@ LoginDialog::LoginDialog(QWidget* parent, std::function<bool(const char*, size_t
     centerLayout->addSpacing(20);
 
     QHBoxLayout* rowLayout = new QHBoxLayout();
-    QLabel* label = new QLabel("Password:", this);
+    QLabel* label = new QLabel("Пароль:", this);
     m_passwordCtrl = new QLineEdit(this);
     m_passwordCtrl->setEchoMode(QLineEdit::Password);
     m_passwordCtrl->setMinimumWidth(250);
@@ -51,8 +51,8 @@ LoginDialog::LoginDialog(QWidget* parent, std::function<bool(const char*, size_t
     mainLayout->addStretch();
 
     QHBoxLayout* buttonLayout = new QHBoxLayout();
-    m_loginButton = new QPushButton("Login", this);
-    m_cancelButton = new QPushButton("Cancel", this);
+    m_loginButton = new QPushButton("Вход", this);
+    m_cancelButton = new QPushButton("Отмена", this);
 
     buttonLayout->addStretch();
     buttonLayout->addWidget(m_loginButton);
@@ -118,19 +118,19 @@ void LoginDialog::onLogin()
     QByteArray pwdBytes = m_passwordCtrl->text().toUtf8();
 
     if (pwdBytes.isEmpty()) {
-        m_errorText->setText("Password cannot be empty");
+        m_errorText->setText("Пароль не может быть пустым");
         return;
     }
 
     if (pwdBytes.size() > MAX_PASSWORD_LEN) {
-        m_errorText->setText("Password is too long");
+        m_errorText->setText("Пароль слишком длинный");
         memset(pwdBytes.data(), 0, pwdBytes.size());
         return;
     }
 
     // Проверка backoff
     if (m_failedAttempts > 0 && m_currentDelay > 0) {
-        m_errorText->setText(QString("Too many attempts. Wait %1 seconds").arg(m_currentDelay));
+        m_errorText->setText(QString("Слишком много попыток. Подождите %1 секунд").arg(m_currentDelay));
         memset(pwdBytes.data(), 0, pwdBytes.size());
         return;
     }
@@ -150,7 +150,7 @@ void LoginDialog::onLogin()
             m_currentDelay = 30;
         }
 
-        m_errorText->setText(QString("Invalid password. Try again in %1 seconds").arg(m_currentDelay));
+        m_errorText->setText(QString("Неверный пароль. Повторите через %1 секунд").arg(m_currentDelay));
         m_loginButton->setEnabled(false);
         m_passwordCtrl->setEnabled(false);
         m_backoffTimer->start(m_currentDelay * 1000);
@@ -180,7 +180,7 @@ void LoginDialog::onBackoffTimer()
     m_currentDelay = 0;
     m_loginButton->setEnabled(true);
     m_passwordCtrl->setEnabled(true);
-    m_errorText->setText("You can try again now");
+    m_errorText->setText("Теперь можно повторить попытку");
     m_passwordCtrl->setFocus();
 }
 

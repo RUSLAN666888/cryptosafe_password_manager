@@ -10,6 +10,8 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QComboBox>
+#include <QGroupBox>
+#include <QFormLayout>
 #include "../src/core/config_handler.h"
 #include "../src/database/DB_helper/db_helper.h"
 
@@ -20,10 +22,9 @@ class SettingsDialog : public QDialog
 private:
     ConfigHander &config;
     QTabWidget *tabWidget;
-
     Database& m_db;
 
-    // Виджеты для настроек генератора паролей
+    // === Настройки генератора паролей ===
     QSpinBox *m_passwordLengthSpin;
     QCheckBox *m_useUppercaseCheck;
     QCheckBox *m_useLowercaseCheck;
@@ -31,13 +32,14 @@ private:
     QCheckBox *m_useSymbolsCheck;
     QCheckBox *m_excludeAmbiguousCheck;
 
+    // === Настройки буфера обмена ===
+    QSpinBox* m_clipboardTimeoutSpin;
+    QCheckBox* m_clipboardNeverClear;
     QCheckBox* m_notifyOnCopy;
     QCheckBox* m_notifyOnWarning;
     QCheckBox* m_notifyOnClear;
     QComboBox* m_securityLevel;
 
-    void createGeneralTab();
-    void createAdvancedTab();
     void createPasswordGeneratorTab();
     void loadPasswordSettings();
     void savePasswordSettings();
@@ -46,18 +48,9 @@ private:
     void loadClipboardSettings();
     void saveClipboardSettings();
 
-    QSpinBox* m_clipboardTimeoutSpin;
-    QCheckBox* m_clipboardNeverClear;
-
 private slots:
     void onOk();
     void onCancel();
-    void onPasswordLengthChanged(int value);
-    void onUseUppercaseChanged(int state);
-    void onUseLowercaseChanged(int state);
-    void onUseDigitsChanged(int state);
-    void onUseSymbolsChanged(int state);
-    void onExcludeAmbiguousChanged(int state);
     void onSecurityLevelChanged(int index);
 
 public:
