@@ -49,8 +49,15 @@ src/database/                   - SQLite обёртка и схемы
 
 ```bash
 sudo apt update
-sudo apt install build-essential cmake qt5-default libsqlite3-dev \
-    libssl-dev libargon2-dev libzxcvbn-dev nlohmann-json3-dev
+sudo apt install -y \
+    build-essential \
+    cmake \
+    qtbase5-dev \
+    libsqlite3-dev \
+    libssl-dev \
+    libargon2-dev \
+    libzxcvbn-dev \
+    nlohmann-json3-dev
 
 git clone https://github.com/RUSLAN666888/cryptosafe_password_manager.git
 cd cryptosafe
