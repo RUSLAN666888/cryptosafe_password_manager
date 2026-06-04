@@ -35,19 +35,15 @@ CryptoSafe Manager — это локальный менеджер паролей
 
 ## Структура проекта
 
-src/
-├── core/               # Криптография и бизнес-логика
-│   ├── crypto/         # AES-GCM, Argon2id, PBKDF2, Ed25519, RSA, HKDF
-│   ├── audit/          # Логирование, подпись, верификация
-│   ├── vault/          # VaultManager (CRUD операции)
-│   ├── clipboard_service/      # ClipboardService
-│   ├── import_export/  # Exporter / Importer
-│   └── sharing/        # SharingService
-├── gui/                # Qt виджеты и диалоги
-│   ├── dialogs/        # Все диалоговые окна
-│   └── widgets/        # Переиспользуемые компоненты
-└── database/           # SQLite обёртка и схемы
-
+src/core/crypto/                - AES-GCM, Argon2id, PBKDF2, Ed25519, RSA, HKDF
+src/core/audit/                 - Логирование, подпись, верификация
+src/core/vault/                 - VaultManager (CRUD операции)
+src/core/clipboard_service/     - ClipboardService
+src/core/import_export/         - Exporter / Importer
+src/core/sharing/               - SharingService
+src/gui/dialogs/                - Все диалоговые окна
+src/gui/widgets/                - Переиспользуемые компоненты
+src/database/                   - SQLite обёртка и схемы
 
 ## Установка и запуск (Ubuntu/Debian)
 
